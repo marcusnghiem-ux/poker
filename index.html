@@ -19,7 +19,11 @@
   <!-- Atmospheric Luxury Casino Background & Overhead Spotlight -->
   <div class="casino-bg-effects">
     <div class="bg-art-deco-lattice"></div>
+    <div class="bg-light-beams"></div>
     <div class="bg-spotlight"></div>
+    <div class="bg-bokeh bg-bokeh-1"></div>
+    <div class="bg-bokeh bg-bokeh-2"></div>
+    <div class="bg-bokeh bg-bokeh-3"></div>
     <div class="bg-vignette"></div>
     <!-- Floating Gold Dust & Card Suits -->
     <div class="floating-suits">
@@ -29,9 +33,13 @@
       <span class="float-suit fs-4">♣</span>
       <span class="float-suit fs-5">♠</span>
       <span class="float-suit fs-6">♥</span>
-      <span class="float-sparkle sp-1">✨</span>
+      <span class="float-suit fs-7">♦</span>
+      <span class="float-suit fs-8">♣</span>
+      <span class="float-sparkle sp-1">✦</span>
       <span class="float-sparkle sp-2">✨</span>
-      <span class="float-sparkle sp-3">✨</span>
+      <span class="float-sparkle sp-3">✦</span>
+      <span class="float-sparkle sp-4">✨</span>
+      <span class="float-sparkle sp-5">✦</span>
     </div>
   </div>
 
@@ -42,9 +50,16 @@
          ====================================================================== -->
     <section id="main-menu" class="main-menu-view">
       <div class="menu-hero">
-        <div class="crown-emblem">👑</div>
+        <div class="crown-emblem-wrap">
+          <div class="crown-halo"></div>
+          <div class="crown-emblem">👑</div>
+        </div>
         <h1 class="menu-title">ROYAL TEXAS HOLD'EM</h1>
-        <p class="menu-subtitle">HIGH STAKES CASINO &bull; MULTIPLAYER EDITION</p>
+        <div class="menu-subtitle-wrap">
+          <span class="menu-subtitle-diamond">♦</span>
+          <span class="menu-subtitle">HIGH STAKES CASINO &bull; MULTIPLAYER EDITION</span>
+          <span class="menu-subtitle-diamond">♦</span>
+        </div>
         <div class="menu-decor-line">
           <span class="decor-suit">♠</span>
           <span class="decor-suit red">♥</span>
@@ -319,8 +334,11 @@
         <!-- 15-SECOND TURN TIMER (Private Room Only) -->
         <div id="turn-timer-bar" class="turn-timer-bar hidden">
           <div class="turn-timer-info">
-            <span class="timer-icon">⏱️</span>
-            <span class="timer-label">YOUR TURN</span>
+            <div class="timer-info-left">
+              <span class="timer-icon">⏱️</span>
+              <span class="timer-label">YOUR TURN</span>
+              <span class="timer-warning">&bull; Auto-folds on 0s</span>
+            </div>
             <span id="turn-timer-text" class="timer-val">15s</span>
           </div>
           <div class="turn-timer-track">

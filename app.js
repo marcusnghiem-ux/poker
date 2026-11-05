@@ -815,13 +815,10 @@ class PokerApp {
         }
       } else {
         this.clearTurnTimer();
-        // 15-second time limit expired: auto-act!
-        const toCall = this.currentBet - player.currentBet;
-        if (toCall === 0) {
-          this.handleActionClick('check_call');
-        } else {
-          this.handleActionClick('fold');
-        }
+        // 15-second time limit expired: MANDATORY AUTO-FOLD!
+        this.logMessage(`⏳ 15s turn limit expired for ${player.name} - Auto-folded!`, 'turn');
+        this.setAnnouncement(`⏳ Turn time expired for ${player.name} — Auto-folded!`);
+        this.handleActionClick('fold');
       }
     }, 1000);
   }
@@ -1397,9 +1394,24 @@ class PokerApp {
       if (!slotData) {
         cardEl.className = 'slot-card empty-slot';
         cardEl.innerHTML = `
-          <div class="empty-slot-icon">➕</div>
-          <div class="empty-slot-title">SLOT ${slotId}</div>
-          <div class="empty-slot-subtitle">Empty &bull; Click to Start New Game</div>
+          <div class="slot-corner-bracket top-left"></div>
+          <div class="slot-corner-bracket top-right"></div>
+          <div class="empty-chip-emblem">
+            <div class="chip-outer-ring"></div>
+            <div class="chip-inner-circle">
+              <span class="chip-plus">+</span>
+            </div>
+          </div>
+          <div class="empty-slot-content">
+            <div class="empty-slot-badge">SLOT ${slotId}</div>
+            <div class="empty-slot-title">NEW CAMPAIGN</div>
+            <div class="empty-slot-starting-chips">
+              <span class="chips-icon">💰</span> $1,000 Starting Bankroll
+            </div>
+            <div class="empty-slot-cta">Select Difficulty &bull; Start Run</div>
+          </div>
+          <div class="slot-corner-bracket bottom-left"></div>
+          <div class="slot-corner-bracket bottom-right"></div>
         `;
         cardEl.onclick = () => {
           this.pendingSlotTarget = slotId;
@@ -1412,18 +1424,28 @@ class PokerApp {
           : 0;
 
         cardEl.innerHTML = `
+          <div class="slot-corner-bracket top-left"></div>
+          <div class="slot-corner-bracket top-right"></div>
           <div class="slot-header">
-            <span class="slot-badge">SLOT ${slotId}</span>
-            <span class="slot-diff ${slotData.difficulty}">${slotData.difficulty.toUpperCase()}</span>
+            <div class="slot-badge-wrap">
+              <span class="slot-crown-icon">👑</span>
+              <span class="slot-badge">SLOT ${slotId}</span>
+            </div>
+            <span class="slot-diff diff-${slotData.difficulty}">${slotData.difficulty.toUpperCase()}</span>
           </div>
-          <div class="slot-bankroll">$${(slotData.chips || 1000).toLocaleString()}</div>
+          <div class="slot-bankroll-wrap">
+            <span class="slot-bankroll-label">BANKROLL</span>
+            <div class="slot-bankroll">
+              <span class="bankroll-currency">$</span>${(slotData.chips || 1000).toLocaleString()}
+            </div>
+          </div>
           <div class="slot-stats-grid">
             <div class="slot-stat-item">
-              <span class="slot-stat-lbl">Hand</span>
+              <span class="slot-stat-lbl">Round</span>
               <span class="slot-stat-val">#${slotData.handNumber || 1}</span>
             </div>
             <div class="slot-stat-item">
-              <span class="slot-stat-lbl">Won</span>
+              <span class="slot-stat-lbl">Wins</span>
               <span class="slot-stat-val">${slotData.winRecord ? slotData.winRecord.won : 0}</span>
             </div>
             <div class="slot-stat-item">
@@ -1432,9 +1454,13 @@ class PokerApp {
             </div>
           </div>
           <div class="slot-actions">
-            <button class="btn btn-primary slot-btn-play">Continue Run</button>
-            <button class="btn btn-secondary slot-btn-del" title="Delete Profile">🗑️</button>
+            <button class="slot-btn-play gold-action-btn">
+              <span>Continue Run</span> <span class="play-arrow">▶</span>
+            </button>
+            <button class="slot-btn-del" title="Delete Profile">🗑️</button>
           </div>
+          <div class="slot-corner-bracket bottom-left"></div>
+          <div class="slot-corner-bracket bottom-right"></div>
         `;
 
         cardEl.querySelector('.slot-btn-play').onclick = (e) => {
@@ -1813,9 +1839,9 @@ class PokerApp {
       if (this.remoteTurnWatchdog) clearTimeout(this.remoteTurnWatchdog);
       this.remoteTurnWatchdog = setTimeout(() => {
         if (this.actingIdx === p.id && this.handInProgress) {
-          const toCall = this.currentBet - p.currentBet;
-          const autoAct = toCall === 0 ? 'check_call' : 'fold';
-          this.handleGuestAction(p.peerConn, { action: autoAct });
+          this.logMessage(`⏳ 15s turn limit expired for ${p.name} - Auto-folded!`, 'turn');
+          this.setAnnouncement(`⏳ Turn time expired for ${p.name} — Auto-folded!`);
+          this.handleGuestAction(p.peerConn, { action: 'fold' });
         }
       }, 16000);
     } else {
