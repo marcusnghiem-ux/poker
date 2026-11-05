@@ -67,6 +67,111 @@ body {
     radial-gradient(circle at 80% 80%, rgba(35, 12, 30, 0.25) 0%, transparent 60%),
     repeating-linear-gradient(60deg, rgba(212, 175, 55, 0.025) 0px, rgba(212, 175, 55, 0.025) 1px, transparent 1px, transparent 24px),
     repeating-linear-gradient(-60deg, rgba(212, 175, 55, 0.025) 0px, rgba(212, 175, 55, 0.025) 1px, transparent 1px, transparent 24px);
+  animation: atmosphereShift 45s ease-in-out infinite alternate;
+}
+
+/* DYNAMIC CHANGING BACKGROUND ATMOSPHERE */
+@keyframes atmosphereShift {
+  0% {
+    filter: hue-rotate(0deg) brightness(1);
+  }
+  35% {
+    filter: hue-rotate(40deg) brightness(1.06); /* Astral Deep Sapphire */
+  }
+  70% {
+    filter: hue-rotate(-30deg) brightness(0.96); /* Royal Velvet Violet & Gold */
+  }
+  100% {
+    filter: hue-rotate(0deg) brightness(1); /* Return to Emerald Velvet */
+  }
+}
+
+/* ==========================================================================
+   MOVING CELESTIAL CONSTELLATIONS & SHOOTING STARS
+   ========================================================================== */
+.celestial-constellations {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.constellations-svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: constellationFloat 50s ease-in-out infinite alternate;
+}
+
+@keyframes constellationFloat {
+  0% { transform: translateY(0px) rotate(0deg) scale(1); }
+  50% { transform: translateY(-18px) rotate(1.2deg) scale(1.02); }
+  100% { transform: translateY(0px) rotate(0deg) scale(1); }
+}
+
+.c-star {
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.7));
+  transition: r 0.3s ease;
+}
+
+.c-star.alpha-star {
+  filter: drop-shadow(0 0 8px #fef08a) drop-shadow(0 0 14px #d4af37);
+  animation: alphaTwinkle 4s ease-in-out infinite alternate;
+}
+
+.c-star.pulse-s {
+  animation: starBlink 3.5s ease-in-out infinite alternate;
+}
+
+@keyframes alphaTwinkle {
+  0% { opacity: 0.7; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1.25); }
+}
+
+@keyframes starBlink {
+  0% { opacity: 0.3; }
+  50% { opacity: 0.95; }
+  100% { opacity: 0.3; }
+}
+
+/* Luminous Shooting Stars */
+.shooting-star {
+  position: absolute;
+  width: 120px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 240, 160, 0.8) 50%, #ffffff 100%);
+  border-radius: 2px;
+  filter: drop-shadow(0 0 6px #fff7a1);
+  transform: rotate(-35deg);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.shooting-star.ss-1 {
+  top: 15%;
+  left: 30%;
+  animation: shootStarOne 14s ease-in-out infinite;
+}
+
+.shooting-star.ss-2 {
+  top: 45%;
+  left: 65%;
+  animation: shootStarTwo 19s ease-in-out infinite 6s;
+}
+
+@keyframes shootStarOne {
+  0% { transform: translate(0, 0) rotate(-35deg); opacity: 0; }
+  2% { opacity: 1; }
+  5% { transform: translate(-300px, 200px) rotate(-35deg); opacity: 0; }
+  100% { transform: translate(-300px, 200px) rotate(-35deg); opacity: 0; }
+}
+
+@keyframes shootStarTwo {
+  0% { transform: translate(0, 0) rotate(-38deg); opacity: 0; }
+  2% { opacity: 1; }
+  5% { transform: translate(-320px, 220px) rotate(-38deg); opacity: 0; }
+  100% { transform: translate(-320px, 220px) rotate(-38deg); opacity: 0; }
 }
 
 .bg-light-beams {
@@ -274,12 +379,40 @@ body {
 }
 
 .crown-emblem {
-  font-size: 3rem;
-  filter: drop-shadow(0 0 20px var(--gold-glow)) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.7));
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
   animation: crownBob 3.5s ease-in-out infinite;
-  display: inline-block;
   position: relative;
   z-index: 1;
+}
+
+.royal-crown-svg {
+  width: 68px;
+  height: 52px;
+  display: block;
+  filter: drop-shadow(0 0 16px rgba(253, 224, 71, 0.65)) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.7));
+}
+
+.stat-svg {
+  display: inline-block;
+  vertical-align: middle;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+  transition: transform 0.25s ease;
+}
+
+.stat-pill:hover .stat-svg {
+  transform: scale(1.18);
+}
+
+.btn-svg-icon {
+  display: inline-block;
+  vertical-align: middle;
+  transition: transform 0.2s ease;
+}
+
+.menu-pill-btn:hover .btn-svg-icon {
+  transform: scale(1.15);
 }
 
 @keyframes crownBob {
@@ -1480,30 +1613,37 @@ body {
   font-weight: 800;
 }
 
-/* LUXURY ROYAL CARD BACK (Face-Down Cards - Impossible to look white!) */
+/* LUXURY ROYAL CARD BACK (Awesome Hand-Crafted Illustration) */
 .card.back,
 .card.card-hidden,
 .card-hidden {
-  background: radial-gradient(circle at center, #1e3a8a 0%, #0a1128 100%) !important;
-  background-image: 
-    radial-gradient(circle at center, #1e3a8a 0%, #0a1128 100%),
-    repeating-linear-gradient(45deg, rgba(212, 175, 55, 0.28) 0, rgba(212, 175, 55, 0.28) 2px, transparent 2px, transparent 8px),
-    repeating-linear-gradient(-45deg, rgba(212, 175, 55, 0.28) 0, rgba(212, 175, 55, 0.28) 2px, transparent 2px, transparent 8px) !important;
-  border: 2px solid #d4af37 !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.7), inset 0 0 0 2px #0a1128, inset 0 0 0 4px #d4af37 !important;
+  background: #070e22 !important;
+  border: 1.5px solid #d4af37 !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.75), 0 0 10px rgba(212, 175, 55, 0.25) !important;
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
   padding: 0 !important;
-  color: transparent !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+.card-back-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: inherit;
+  transition: transform 0.25s ease;
+}
+
+.card.back:hover .card-back-svg {
+  transform: scale(1.02);
 }
 
 .card.back::after,
 .card.card-hidden::after,
 .card-hidden::after {
-  content: "👑";
-  font-size: 1.7rem;
-  filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.8));
+  display: none !important;
 }
 
 .card.winning-highlight {
@@ -1530,34 +1670,92 @@ body {
 #seat-4 { top: calc(50% - 60px); right: -45px; }
 
 .avatar-ring {
-  width: 52px;
-  height: 52px;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
-  background: rgba(20, 26, 40, 0.9);
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: radial-gradient(circle at 35% 35%, #223252 0%, #0c1527 100%);
+  border: 2px solid rgba(212, 175, 55, 0.45);
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1.4rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  font-size: 1.5rem;
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.15), 0 6px 14px rgba(0, 0, 0, 0.65);
   position: relative;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .hero-ring {
-  border-color: var(--gold-primary);
-  box-shadow: 0 0 15px var(--gold-glow);
+  border: 2.2px solid #fde047;
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.25), 0 0 18px var(--gold-glow);
 }
 
 .player-seat.current-turn .avatar-ring {
-  border-color: #00f0ff;
-  box-shadow: 0 0 20px #00f0ff;
-  transform: scale(1.1);
+  border-color: #38bdf8;
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3), 0 0 22px #38bdf8;
+  transform: scale(1.12);
 }
 
 .player-seat.online-friend .avatar-ring {
   border-color: #2ec4b6;
-  box-shadow: 0 0 18px rgba(46, 196, 182, 0.6);
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.25), 0 0 18px rgba(46, 196, 182, 0.7);
+}
+
+/* ==========================================================================
+   FOLDED PLAYER STATE (HIGH VISIBILITY GRAYSCALE & DIMMED)
+   ========================================================================== */
+.player-seat.folded-seat {
+  opacity: 0.55;
+  transition: all 0.35s ease;
+}
+
+.player-seat.folded-seat .card {
+  filter: grayscale(100%) brightness(0.52) contrast(0.85) !important;
+  opacity: 0.38 !important;
+  transform: scale(0.9) !important;
+  border-color: #64748b !important;
+  box-shadow: none !important;
+  background: #1e293b !important;
+}
+
+.player-seat.folded-seat .card-back-svg {
+  filter: grayscale(100%) brightness(0.45) !important;
+  opacity: 0.35 !important;
+}
+
+.player-seat.folded-seat .avatar-ring {
+  border-color: #475569 !important;
+  box-shadow: none !important;
+  filter: grayscale(100%) brightness(0.6) !important;
+  opacity: 0.5;
+}
+
+.player-seat.folded-seat .player-card-info {
+  background: rgba(15, 23, 42, 0.75) !important;
+  border-color: #334155 !important;
+  opacity: 0.6;
+}
+
+.player-seat.folded-seat .player-hole-cards {
+  position: relative;
+}
+
+.player-seat.folded-seat .player-hole-cards::after {
+  content: 'FOLDED';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-8deg);
+  background: rgba(15, 23, 42, 0.95);
+  color: #cbd5e1;
+  border: 1.5px solid #64748b;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+  z-index: 10;
+  pointer-events: none;
 }
 
 .player-card-info {

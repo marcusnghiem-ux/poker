@@ -1406,7 +1406,9 @@ class PokerApp {
             <div class="empty-slot-badge">SLOT ${slotId}</div>
             <div class="empty-slot-title">NEW CAMPAIGN</div>
             <div class="empty-slot-starting-chips">
-              <span class="chips-icon">💰</span> $1,000 Starting Bankroll
+              <span class="chips-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" fill="rgba(16,185,129,0.2)" stroke="#10b981" stroke-width="1.8"/><circle cx="12" cy="12" r="5" stroke="#34d399" stroke-width="1.2"/><path d="M12 9v6M10 10.5c.8-.7 2.2-.7 3 0s-.5 1.5-1.5 1.5-1.5.8-.7 1.5 2.2.7 3 0" stroke="#fde047" stroke-width="1.4"/></svg>
+              </span> $1,000 Starting Bankroll
             </div>
             <div class="empty-slot-cta">Select Difficulty &bull; Start Run</div>
           </div>
@@ -1428,7 +1430,9 @@ class PokerApp {
           <div class="slot-corner-bracket top-right"></div>
           <div class="slot-header">
             <div class="slot-badge-wrap">
-              <span class="slot-crown-icon">👑</span>
+              <span class="slot-crown-icon">
+                <svg width="16" height="13" viewBox="0 0 72 54" fill="none"><path d="M14 38 Q36 22 58 38 L54 44 Q36 34 18 44 Z" fill="#b91c1c"/><rect x="10" y="42" width="52" height="8" rx="2" fill="#ffd54f" stroke="#fef08a" stroke-width="1"/><path d="M12 42 L8 22 L20 30 L36 12 L52 30 L64 22 L60 42 Z" fill="#ffd54f" stroke="#fef08a" stroke-width="1.5"/><circle cx="36" cy="11" r="3" fill="#fff"/></svg>
+              </span>
               <span class="slot-badge">SLOT ${slotId}</span>
             </div>
             <span class="slot-diff diff-${slotData.difficulty}">${slotData.difficulty.toUpperCase()}</span>
@@ -1457,7 +1461,9 @@ class PokerApp {
             <button class="slot-btn-play gold-action-btn">
               <span>Continue Run</span> <span class="play-arrow">▶</span>
             </button>
-            <button class="slot-btn-del" title="Delete Profile">🗑️</button>
+            <button class="slot-btn-del" title="Delete Profile">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m5 5v6m4-6v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
           </div>
           <div class="slot-corner-bracket bottom-left"></div>
           <div class="slot-corner-bracket bottom-right"></div>
@@ -1584,7 +1590,57 @@ class PokerApp {
     const cardEl = document.createElement('div');
     if (isHidden || !card) {
       cardEl.className = 'card back card-hidden';
-      cardEl.innerHTML = `<div class="card-back-pattern"></div>`;
+      cardEl.innerHTML = `
+        <svg class="card-back-svg" viewBox="0 0 100 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="100" height="140" rx="8" fill="#070e22" stroke="#d4af37" stroke-width="1.8"/>
+          <rect x="4" y="4" width="92" height="132" rx="6" fill="#0c1633" stroke="rgba(212, 175, 55, 0.45)" stroke-width="0.8"/>
+          <rect x="7" y="7" width="86" height="126" rx="4" fill="none" stroke="rgba(212, 175, 55, 0.25)" stroke-width="0.5" stroke-dasharray="2 2"/>
+          <g opacity="0.18" stroke="#fcd34d" stroke-width="0.5">
+            <path d="M7 20 L93 120 M7 40 L93 140 M7 60 L93 160 M7 0 L93 100"/>
+            <path d="M93 20 L7 120 M93 40 L7 140 M93 60 L7 160 M93 0 L7 100"/>
+          </g>
+          <path d="M10 14 Q14 10 18 10 M10 14 Q10 18 10 22 M14 14 A3 3 0 1 1 11 11" stroke="#fcd34d" stroke-width="0.9" fill="none"/>
+          <path d="M90 126 Q86 130 82 130 M90 126 Q90 122 90 118 M86 126 A3 3 0 1 1 89 129" stroke="#fcd34d" stroke-width="0.9" fill="none"/>
+          <path d="M90 14 Q86 10 82 10 M90 14 Q90 18 90 22 M86 14 A3 3 0 1 0 89 11" stroke="#fcd34d" stroke-width="0.9" fill="none"/>
+          <path d="M10 126 Q14 130 18 130 M10 126 Q10 122 10 118 M14 126 A3 3 0 1 0 11 129" stroke="#fcd34d" stroke-width="0.9" fill="none"/>
+          <circle cx="50" cy="70" r="26" stroke="#d4af37" stroke-width="1.2" fill="#09132c"/>
+          <circle cx="50" cy="70" r="23" stroke="rgba(253, 224, 71, 0.4)" stroke-width="0.7" stroke-dasharray="1.5 1.5"/>
+          <circle cx="50" cy="70" r="19" stroke="#d4af37" stroke-width="0.8" fill="#070e22"/>
+          <g stroke="rgba(253, 224, 71, 0.45)" stroke-width="0.7">
+            <line x1="50" y1="44" x2="50" y2="50"/>
+            <line x1="50" y1="96" x2="50" y2="90"/>
+            <line x1="24" y1="70" x2="30" y2="70"/>
+            <line x1="76" y1="70" x2="70" y2="70"/>
+            <line x1="32" y1="52" x2="36" y2="56"/>
+            <line x1="68" y1="88" x2="64" y2="84"/>
+            <line x1="68" y1="52" x2="64" y2="56"/>
+            <line x1="32" y1="88" x2="36" y2="84"/>
+          </g>
+          <g transform="translate(50, 70) scale(0.88)">
+            <line x1="-12" y1="-12" x2="12" y2="12" stroke="#d4af37" stroke-width="1.1"/>
+            <circle cx="-12" cy="-12" r="1.6" fill="#fcd34d"/>
+            <circle cx="12" cy="12" r="1.6" fill="#fcd34d"/>
+            <line x1="12" y1="-12" x2="-12" y2="12" stroke="#d4af37" stroke-width="1.1"/>
+            <circle cx="12" cy="-12" r="1.6" fill="#fcd34d"/>
+            <circle cx="-12" cy="12" r="1.6" fill="#fcd34d"/>
+            <path d="M-10 4 L-12 -6 L-5 -1 L0 -8 L5 -1 L12 -6 L10 4 Z" fill="url(#card-back-gold-crown)" stroke="#fef08a" stroke-width="0.8"/>
+            <circle cx="-12" cy="-6" r="1" fill="#fff"/>
+            <circle cx="0" cy="-8" r="1.2" fill="#fff"/>
+            <circle cx="12" cy="-6" r="1" fill="#fff"/>
+            <rect x="-9" y="4" width="18" height="3" rx="1" fill="#78350f" stroke="#fcd34d" stroke-width="0.5"/>
+            <circle cx="-5" cy="5.5" r="0.7" fill="#ef4444"/>
+            <circle cx="0" cy="5.5" r="0.7" fill="#38bdf8"/>
+            <circle cx="5" cy="5.5" r="0.7" fill="#10b981"/>
+          </g>
+          <defs>
+            <linearGradient id="card-back-gold-crown" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#fef08a"/>
+              <stop offset="50%" stop-color="#d4af37"/>
+              <stop offset="100%" stop-color="#854d0e"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      `;
       return cardEl;
     }
 
