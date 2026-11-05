@@ -504,6 +504,10 @@ class PokerApp {
     this.winRecord = { won: 0, total: 0 };
     this.allInAutoRunout = false;
     this.handInProgress = false;
+    this.turnTimerInterval = null;
+    this.turnSecondsLeft = 15;
+    this.remoteTurnWatchdog = null;
+    this.joiningCountdownTimer = null;
 
     // Multiplayer Online State
     this.isOnlineRoom = false;
@@ -579,6 +583,16 @@ class PokerApp {
     this.countdownNumber = document.getElementById('countdown-number');
     this.waitingRoundOverlay = document.getElementById('waiting-round-overlay');
     this.waitingRoundText = document.getElementById('waiting-round-text');
+    this.btnPauseLeaveRoom = document.getElementById('btn-pause-leave-room');
+
+    // 15-Second Turn Timer Elements
+    this.turnTimerBar = document.getElementById('turn-timer-bar');
+    this.turnTimerText = document.getElementById('turn-timer-text');
+    this.turnTimerFill = document.getElementById('turn-timer-fill');
+
+    // Back button elements
+    this.btnBackIcon = document.getElementById('btn-back-icon');
+    this.btnBackLabel = document.getElementById('btn-back-label');
 
     // Arena elements
     this.announcementEl = document.getElementById('dealer-announcement');
@@ -602,13 +616,27 @@ class PokerApp {
     this.btnNextHand = document.getElementById('btn-next-hand');
     this.heroHandBadge = document.getElementById('hero-hand-rank-badge');
 
-    // Back to Menu
+    // Back to Menu (Mid-round lockdown in online room!)
     this.btnBackMenu.addEventListener('click', () => {
+      if (this.isOnlineRoom && this.handInProgress) {
+        this.setAnnouncement('⚠️ Mid-round lockdown active! You can only leave during the 5-second pause between hands.');
+        sounds.playCheck();
+        return;
+      }
       if (!this.isOnlineRoom) {
         this.saveCurrentGame();
+      } else {
+        this.leaveOnlineRoom();
       }
       this.showMenuView();
     });
+
+    // Pause Screen Leave Room button
+    if (this.btnPauseLeaveRoom) {
+      this.btnPauseLeaveRoom.addEventListener('click', () => {
+        this.leaveOnlineRoom();
+      });
+    }
 
     // Rules Modal
     const openRules = () => this.rulesModal.classList.remove('hidden');
@@ -735,10 +763,12 @@ class PokerApp {
   // VIEW NAVIGATION & STATS
   // ==========================================================================
   showMenuView() {
+    this.clearTurnTimer();
     this.gameView.classList.add('hidden');
     this.mainMenuView.classList.remove('hidden');
     this.countdownOverlay.classList.add('hidden');
     this.waitingRoundOverlay.classList.add('hidden');
+    this.updateMenuLockState();
     this.updateGlobalStatsUI();
     this.renderMainMenuSlots();
   }
@@ -746,6 +776,95 @@ class PokerApp {
   showGameView() {
     this.mainMenuView.classList.add('hidden');
     this.gameView.classList.remove('hidden');
+    this.updateMenuLockState();
+  }
+
+  updateMenuLockState() {
+    if (!this.btnBackMenu) return;
+    if (this.isOnlineRoom && this.handInProgress) {
+      this.btnBackMenu.classList.add('menu-locked');
+      if (this.btnBackIcon) this.btnBackIcon.textContent = '🔒';
+      if (this.btnBackLabel) this.btnBackLabel.textContent = 'Locked';
+      this.btnBackMenu.title = 'You cannot leave while a hand is in progress!';
+    } else {
+      this.btnBackMenu.classList.remove('menu-locked');
+      if (this.btnBackIcon) this.btnBackIcon.textContent = '🏠';
+      if (this.btnBackLabel) this.btnBackLabel.textContent = 'Menu';
+      this.btnBackMenu.title = 'Return to Main Menu';
+    }
+  }
+
+  startTurnTimer(player) {
+    this.clearTurnTimer();
+    if (!this.isOnlineRoom) return; // 15-SECOND LIMIT ONLY IN THE PRIVATE ROOM!
+
+    if (!this.turnTimerBar) return;
+    this.turnTimerBar.classList.remove('hidden', 'urgent');
+    this.turnSecondsLeft = 15;
+    this.turnTimerText.textContent = '15s';
+    this.turnTimerFill.style.width = '100%';
+
+    this.turnTimerInterval = setInterval(() => {
+      this.turnSecondsLeft--;
+      if (this.turnSecondsLeft > 0) {
+        this.turnTimerText.textContent = `${this.turnSecondsLeft}s`;
+        this.turnTimerFill.style.width = `${(this.turnSecondsLeft / 15) * 100}%`;
+        if (this.turnSecondsLeft <= 5) {
+          this.turnTimerBar.classList.add('urgent');
+          sounds.playCheck();
+        }
+      } else {
+        this.clearTurnTimer();
+        // 15-second time limit expired: auto-act!
+        const toCall = this.currentBet - player.currentBet;
+        if (toCall === 0) {
+          this.handleActionClick('check_call');
+        } else {
+          this.handleActionClick('fold');
+        }
+      }
+    }, 1000);
+  }
+
+  clearTurnTimer() {
+    if (this.turnTimerInterval) {
+      clearInterval(this.turnTimerInterval);
+      this.turnTimerInterval = null;
+    }
+    if (this.turnTimerBar) {
+      this.turnTimerBar.classList.add('hidden');
+      this.turnTimerBar.classList.remove('urgent');
+    }
+  }
+
+  leaveOnlineRoom() {
+    this.clearTurnTimer();
+    if (this.remoteTurnWatchdog) {
+      clearTimeout(this.remoteTurnWatchdog);
+      this.remoteTurnWatchdog = null;
+    }
+    if (this.joiningCountdownTimer) {
+      clearInterval(this.joiningCountdownTimer);
+      this.joiningCountdownTimer = null;
+    }
+    this.countdownOverlay.classList.add('hidden');
+    this.waitingRoundOverlay.classList.add('hidden');
+    this.isOnlineRoom = false;
+    this.isHost = false;
+    this.handInProgress = false;
+    this.onlineRoomBadge.classList.add('hidden');
+
+    if (this.peer) {
+      try { this.peer.destroy(); } catch (e) {}
+      this.peer = null;
+    }
+    if (this.hostConn) {
+      try { this.hostConn.close(); } catch (e) {}
+      this.hostConn = null;
+    }
+    this.guestConnections = [];
+    this.updateMenuLockState();
+    this.showMenuView();
   }
 
   updateGlobalStatsUI() {
@@ -1191,9 +1310,13 @@ class PokerApp {
       this.sliderEl.disabled = true;
       this.btnRaise.disabled = true;
     }
+
+    // 15-SECOND LIMIT FOR GUEST TURN
+    this.startTurnTimer(player);
   }
 
   handleActionClick(action, amt = 0) {
+    this.clearTurnTimer();
     if (this.isOnlineRoom && !this.isHost) {
       // Send action to host
       if (this.hostConn && this.hostConn.open) {
@@ -1208,6 +1331,10 @@ class PokerApp {
   }
 
   handleGuestAction(conn, data) {
+    if (this.remoteTurnWatchdog) {
+      clearTimeout(this.remoteTurnWatchdog);
+      this.remoteTurnWatchdog = null;
+    }
     const guest = this.guestConnections.find(g => g.conn === conn);
     if (!guest || guest.seatIdx !== this.actingIdx) return;
     const player = this.players[guest.seatIdx];
@@ -1430,19 +1557,20 @@ class PokerApp {
   renderCardDOM(card, isHidden = false) {
     const cardEl = document.createElement('div');
     if (isHidden || !card) {
-      cardEl.className = 'card card-hidden';
+      cardEl.className = 'card back card-hidden';
       cardEl.innerHTML = `<div class="card-back-pattern"></div>`;
       return cardEl;
     }
 
-    cardEl.className = `card card-${card.suit.color}`;
+    const color = card.suit.color; // 'red' or 'black'
+    cardEl.className = `card ${color} card-${color}`;
     cardEl.innerHTML = `
-      <div class="card-corner top-left">
+      <div class="card-top">
         <span class="card-rank">${card.label}</span>
         <span class="card-suit">${card.suit.symbol}</span>
       </div>
-      <div class="card-center-suit">${card.suit.symbol}</div>
-      <div class="card-corner bottom-right">
+      <div class="card-center">${card.suit.symbol}</div>
+      <div class="card-bottom">
         <span class="card-rank">${card.label}</span>
         <span class="card-suit">${card.suit.symbol}</span>
       </div>
@@ -1524,6 +1652,7 @@ class PokerApp {
 
   startNewHand() {
     this.handInProgress = true;
+    this.updateMenuLockState();
     this.handNumber++;
     this.allInAutoRunout = false;
 
@@ -1678,9 +1807,17 @@ class PokerApp {
       const thinkTime = 700 + Math.random() * 500;
       setTimeout(() => this.runBotStrategicTurn(p), thinkTime);
     } else if (p.isRemote) {
-      // Remote guest friend's turn: Host waits for message from guest
+      // Remote guest friend's turn: Host waits for message from guest (15s limit)
       this.actionPanelEl.classList.add('disabled');
-      this.setAnnouncement(`Waiting for ${p.name}'s action...`);
+      this.setAnnouncement(`Waiting for ${p.name}'s action (15s limit)...`);
+      if (this.remoteTurnWatchdog) clearTimeout(this.remoteTurnWatchdog);
+      this.remoteTurnWatchdog = setTimeout(() => {
+        if (this.actingIdx === p.id && this.handInProgress) {
+          const toCall = this.currentBet - p.currentBet;
+          const autoAct = toCall === 0 ? 'check_call' : 'fold';
+          this.handleGuestAction(p.peerConn, { action: autoAct });
+        }
+      }, 16000);
     } else {
       // Hero (Local Host) turn
       this.promptHeroTurn(p);
@@ -1772,9 +1909,13 @@ class PokerApp {
     }
 
     this.setAnnouncement('Your turn! Select your action.');
+    if (this.isOnlineRoom) {
+      this.startTurnTimer(hero);
+    }
   }
 
   handleHeroAction(action, amt = 0) {
+    this.clearTurnTimer();
     const hero = this.players[0];
     this.actionPanelEl.classList.add('disabled');
     const toCall = this.currentBet - hero.currentBet;
@@ -2081,6 +2222,8 @@ class PokerApp {
   // ==========================================================================
   finishHand() {
     this.handInProgress = false;
+    this.clearTurnTimer();
+    this.updateMenuLockState();
     this.actionPanelEl.classList.remove('disabled');
     this.btnFold.disabled = true;
     this.btnCheckCall.disabled = true;
@@ -2147,7 +2290,7 @@ class PokerApp {
     this.btnNextHand.classList.remove('hidden');
   }
 
-  // 5-Second Joining Window countdown timer between hands
+  // 5-Second Pause Screen & Joining Window countdown timer between hands
   start5SecondJoiningCountdown(onComplete) {
     let seconds = 5;
     this.countdownOverlay.classList.remove('hidden');
@@ -2155,18 +2298,23 @@ class PokerApp {
     sounds.playCheck();
     this.broadcastCountdownTick(seconds);
 
-    const timer = setInterval(() => {
+    if (this.joiningCountdownTimer) clearInterval(this.joiningCountdownTimer);
+
+    this.joiningCountdownTimer = setInterval(() => {
       seconds--;
       if (seconds > 0) {
         this.countdownNumber.textContent = seconds;
         sounds.playCheck();
         this.broadcastCountdownTick(seconds);
       } else {
-        clearInterval(timer);
+        clearInterval(this.joiningCountdownTimer);
+        this.joiningCountdownTimer = null;
         this.countdownOverlay.classList.add('hidden');
         this.broadcastCountdownTick(0);
         if (onComplete) onComplete();
       }
+    }, 1000);
+  }
     }, 1000);
   }
 }

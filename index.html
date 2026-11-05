@@ -131,7 +131,7 @@
       <header id="game-header">
         <div class="header-left">
           <button id="btn-back-menu" class="icon-btn" title="Return to Main Menu">
-            <span>🏠</span> Menu
+            <span id="btn-back-icon">🏠</span> <span id="btn-back-label">Menu</span>
           </button>
           <div class="brand">
             <span class="suit-icon red">♦</span>
@@ -163,12 +163,17 @@
           <span class="banner-icon">🔥</span>
         </div>
 
-        <!-- 5-SECOND COUNTDOWN JOINING WINDOW (Between Hands) -->
+        <!-- 5-SECOND PAUSE SCREEN & JOINING WINDOW (Between Hands) -->
         <div id="dealer-countdown-overlay" class="dealer-countdown-overlay hidden">
-          <div class="countdown-card">
+          <div class="countdown-card pause-screen-card">
             <div class="countdown-timer-circle" id="countdown-number">5</div>
-            <h3>Next Hand Starting Soon</h3>
-            <p><strong>5-Second Joining Window Open!</strong> Friends can join now.</p>
+            <h3>Hand Finished &bull; Next Hand In 5s</h3>
+            <p>5-Second break &amp; joining window open. Waiting friends are dealt in!</p>
+            <div class="pause-actions-row">
+              <button id="btn-pause-leave-room" class="btn btn-secondary pause-leave-btn">
+                <span>🚪</span> Leave Room (Exit to Menu)
+              </button>
+            </div>
           </div>
         </div>
 
@@ -309,6 +314,18 @@
       <footer id="action-bar-footer">
         <div id="dealer-announcement" class="dealer-speech">
           Shuffle up and deal! Welcome to the table.
+        </div>
+
+        <!-- 15-SECOND TURN TIMER (Private Room Only) -->
+        <div id="turn-timer-bar" class="turn-timer-bar hidden">
+          <div class="turn-timer-info">
+            <span class="timer-icon">⏱️</span>
+            <span class="timer-label">YOUR TURN</span>
+            <span id="turn-timer-text" class="timer-val">15s</span>
+          </div>
+          <div class="turn-timer-track">
+            <div id="turn-timer-fill" class="turn-timer-fill"></div>
+          </div>
         </div>
 
         <div id="action-controls" class="action-controls-panel disabled">
