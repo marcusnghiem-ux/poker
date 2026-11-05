@@ -1,5 +1,7 @@
 import time
 import sys
+import random
+from itertools import combinations
 from typing import List, Optional
 from card import Deck, Card, render_cards_ascii, COLOR_RESET, COLOR_GOLD, COLOR_CYAN, COLOR_DIM
 from player import Player, HumanPlayer, AIPlayer
@@ -14,7 +16,7 @@ if hasattr(sys.stdout, 'reconfigure'):
 
 
 class TexasHoldemGame:
-    def __init__(self, players: List[Player], small_blind: int = 10, big_blind: int = 20):
+    def __init__(self, players: List[Player], small_blind: int = 10, big_blind: int = 20, fast_mode: bool = False):
         self.players = players
         self.small_blind = small_blind
         self.big_blind = big_blind
@@ -22,12 +24,140 @@ class TexasHoldemGame:
         self.deck = Deck()
         self.community_cards: List[Card] = []
         self.hand_number = 0
+        self.fast_mode = fast_mode
+        self.adrenaline_active: bool = False
+        self.last_hand_human_won: bool = False
+
+        if self.fast_mode:
+            for p in self.players:
+                p.fast_mode = True
 
     def print_banner(self, text: str):
         border = "═" * 56
         print(f"\n{COLOR_GOLD}╔{border}╗")
         print(f"║{text.center(56)}║")
         print(f"╚{border}╝{COLOR_RESET}")
+
+    def update_blinds(self) -> bool:
+        """Updates small and big blinds based on the current hand number.
+        Increases blinds every 5 hands:
+          Hands 1-5: 10/20
+          Hands 6-10: 20/40
+          Hands 11-15: 40/80
+          Hands 16-20: 80/160
+          Hands 21+: 160/320
+        Prints a banner when blinds increase.
+        Returns True if blinds increased, False otherwise.
+        """
+        old_sb, old_bb = self.small_blind, self.big_blind
+        if self.hand_number <= 5:
+            new_sb, new_bb = 10, 20
+        elif self.hand_number <= 10:
+            new_sb, new_bb = 20, 40
+        elif self.hand_number <= 15:
+            new_sb, new_bb = 40, 80
+        elif self.hand_number <= 20:
+            new_sb, new_bb = 80, 160
+        else:
+            new_sb, new_bb = 160, 320
+
+        self.small_blind = new_sb
+        self.big_blind = new_bb
+
+        if (new_sb, new_bb) != (old_sb, old_bb):
+            self.print_banner(f"⚡ BLINDS INCREASED: ${self.small_blind} / ${self.big_blind} ⚡")
+            return True
+        return False
+
+    def apply_adrenaline_mechanic(self) -> bool:
+        """Evaluates human player's hand tier. If Tier 1 or 2, picks one random bot
+        and swaps its cards for a competitive hand (75% same tier, 25% slightly better)
+        from remaining deck cards. The chosen bot gets +0.5 temporary aggression boost."""
+        self.adrenaline_active = False
+        human = next((p for p in self.players if not p.is_bot and not p.folded and len(p.cards) == 2), None)
+        if not human:
+            return False
+
+        human_tier = human.evaluate_preflop_tier()
+        if human_tier not in (1, 2):
+            return False
+
+        eligible_bots = [p for p in self.players if p.is_bot and not p.folded and len(p.cards) == 2]
+        if not eligible_bots:
+            return False
+
+        target_bot = random.choice(eligible_bots)
+
+        # 75% chance: same tier hand (close fight)
+        # 25% chance: slightly better hand (dramatic near-misses)
+        better_requested = (random.random() < 0.25)
+        if human_tier == 2:
+            target_tier = 1 if better_requested else 2
+        else:
+            target_tier = 1
+
+        # Return target bot's current 2 cards to the deck
+        self.deck.cards.extend(target_bot.cards)
+        target_bot.cards = []
+
+        # Helper to get tier of 2 cards
+        def get_tier(c1: Card, c2: Card) -> int:
+            r1, r2 = sorted([c1.rank, c2.rank], reverse=True)
+            is_p = (r1 == r2)
+            is_s = (c1.suit == c2.suit)
+            d = r1 - r2
+            if (is_p and r1 >= 11) or (is_s and r1 == 14 and r2 == 13):
+                return 1
+            if (is_p and r1 >= 8) or (r1 == 14 and r2 >= 12) or (is_s and r1 == 14 and r2 >= 10) or (is_s and r1 == 13 and r2 >= 11):
+                return 2
+            if is_p or (is_s and r1 == 14) or (is_s and d == 1 and r2 >= 5) or (is_s and r1 >= 11 and r2 >= 9) or (not is_s and r1 >= 13 and r2 >= 10):
+                return 3
+            return 4
+
+        def starting_hand_score(c1: Card, c2: Card) -> int:
+            r1, r2 = sorted([c1.rank, c2.rank], reverse=True)
+            if r1 == r2:
+                return r1 * 100
+            if c1.suit == c2.suit:
+                return r1 * 10 + r2 + 5
+            return r1 * 10 + r2
+
+        human_score = starting_hand_score(human.cards[0], human.cards[1])
+        candidate_pairs = list(combinations(self.deck.cards, 2))
+
+        matching_pairs = []
+        better_pairs = []
+        for c1, c2 in candidate_pairs:
+            t = get_tier(c1, c2)
+            if t == target_tier:
+                matching_pairs.append((c1, c2))
+                if starting_hand_score(c1, c2) > human_score:
+                    better_pairs.append((c1, c2))
+
+        chosen_pair = None
+        if better_requested and better_pairs:
+            chosen_pair = random.choice(better_pairs)
+        elif matching_pairs:
+            chosen_pair = random.choice(matching_pairs)
+        else:
+            # Fallback to any tier 1 or 2 pair available
+            tier_1_2 = [p for p in candidate_pairs if get_tier(p[0], p[1]) in (1, 2)]
+            if tier_1_2:
+                chosen_pair = random.choice(tier_1_2)
+
+        if chosen_pair is None:
+            target_bot.cards = self.deck.deal(2)
+            return False
+
+        # Remove chosen cards from deck
+        self.deck.cards.remove(chosen_pair[0])
+        self.deck.cards.remove(chosen_pair[1])
+        self.deck.shuffle()
+
+        target_bot.cards = [chosen_pair[0], chosen_pair[1]]
+        target_bot.adrenaline_active = True
+        self.adrenaline_active = True
+        return True
 
     def display_table(self, active_bet: int = 0):
         print("\n" + "─" * 60)
@@ -113,7 +243,6 @@ class TexasHoldemGame:
 
         num_players = len(self.players)
         curr_idx = start_idx
-        # Keep track of who has had a chance to act in this round
         has_acted = {p: False for p in self.players}
 
         while True:
@@ -121,11 +250,9 @@ class TexasHoldemGame:
             if self.count_active_players() <= 1:
                 return False
 
-            # Check if betting round is complete:
-            # All players who have not folded and are not all-in have acted AND have matched the current_high_bet
+            # Check if betting round is complete
             acting_players = [p for p in self.players if not p.folded and not p.all_in]
             if len(acting_players) == 0:
-                # Everyone left is all-in or folded
                 break
 
             all_matched = all(p.current_bet == current_high_bet for p in acting_players)
@@ -168,7 +295,6 @@ class TexasHoldemGame:
                         raise_diff = player.current_bet - current_high_bet
                         min_raise = raise_diff
                         current_high_bet = player.current_bet
-                        # Reset has_acted for other active players since bet was raised
                         for other in self.players:
                             if other != player and not other.folded and not other.all_in:
                                 has_acted[other] = False
@@ -177,9 +303,9 @@ class TexasHoldemGame:
                     else:
                         print(f"  🚀 {player.name} RAISES to ${player.current_bet}.")
 
-                time.sleep(0.4)
+                if not self.fast_mode:
+                    time.sleep(0.4)
 
-            # Move to next player
             curr_idx = (curr_idx + 1) % num_players
 
         return True
@@ -187,18 +313,26 @@ class TexasHoldemGame:
     def play_hand(self):
         """Plays one complete hand of Texas Hold'em."""
         self.hand_number += 1
-        self.print_banner(f"STARTING HAND #{self.hand_number}")
+        self.update_blinds()
+        self.adrenaline_active = False
+        self.last_hand_human_won = False
+        self.print_banner(f"STARTING HAND #{self.hand_number} (Blinds: ${self.small_blind}/${self.big_blind})")
 
         # Reset players and deck
         self.deck.reset()
         self.community_cards = []
         for p in self.players:
             p.reset_for_hand()
+            if self.fast_mode:
+                p.fast_mode = True
 
         # Deal 2 hole cards to each player
         for _ in range(2):
             for p in self.players:
                 p.cards.extend(self.deck.deal(1))
+
+        # Check and apply Adrenaline Mechanic
+        self.apply_adrenaline_mechanic()
 
         # 1. Pre-Flop
         active = self.run_betting_round("Pre-Flop", (self.dealer_idx + 1) % len(self.players))
@@ -247,6 +381,7 @@ class TexasHoldemGame:
         winner = next(p for p in self.players if not p.folded)
         total_pot = sum(p.total_bet for p in self.players)
         winner.chips += total_pot
+        self.last_hand_human_won = (not winner.is_bot)
         self.print_banner(f"🏆 {winner.name} WINS THE HAND!")
         print(f"  All opponents folded. {winner.name} collects the pot of ${total_pot}!")
         print(f"  {winner.name}'s new stack: ${winner.chips}\n")
@@ -303,6 +438,8 @@ class TexasHoldemGame:
             for i, w in enumerate(winners):
                 award = share + (1 if i < remainder else 0)
                 w.chips += award
+                if not w.is_bot:
+                    self.last_hand_human_won = True
                 print(f"     ➜ {w.name} receives ${award} (Total Stack: ${w.chips})")
 
         print("\n" + "═" * 60)
@@ -315,14 +452,15 @@ class TexasHoldemGame:
         """Removes AI players with 0 chips. Offers Human player rebuy if busted."""
         human = next((p for p in self.players if not p.is_bot), None)
         if human and human.chips == 0:
-            print(f"\n{COLOR_GOLD}💀 You ran out of chips!{COLOR_RESET}")
-            ans = input("Would you like to rebuy with $1000 chips? [y/n]: ").strip().lower()
-            if ans in ['y', 'yes']:
-                human.chips = 1000
-                human.all_in = False
-                print("  Rebuy successful! You're back in the game with $1000.")
-            else:
-                print("  Thanks for playing!")
+            if not self.fast_mode:
+                print(f"\n{COLOR_GOLD}💀 You ran out of chips!{COLOR_RESET}")
+                ans = input("Would you like to rebuy with $1000 chips? [y/n]: ").strip().lower()
+                if ans in ['y', 'yes']:
+                    human.chips = 1000
+                    human.all_in = False
+                    print("  Rebuy successful! You're back in the game with $1000.")
+                else:
+                    print("  Thanks for playing!")
 
         # Filter out busted bots
         survivors = []
@@ -330,5 +468,6 @@ class TexasHoldemGame:
             if p.chips > 0:
                 survivors.append(p)
             else:
-                print(f"  👋 {p.name} was eliminated from the table!")
+                if not self.fast_mode:
+                    print(f"  👋 {p.name} was eliminated from the table!")
         self.players = survivors

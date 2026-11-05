@@ -6,8 +6,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="description" content="Offline Texas Hold'em Poker with strategic AI opponents, real-time hand evaluator, and casino acoustics.">
-  <title>Royal Texas Hold'em - Offline Edition</title>
+  <meta name="description" content="Royal Texas Hold'em - Offline High Stakes Edition with aggressive AI, dynamic blinds, and adrenaline mechanics.">
+  <title>Royal Texas Hold'em - Luxury Casino Edition</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -15,202 +15,493 @@
 </head>
 <body>
   <div id="app-container">
-    <!-- Top Navigation / Status Header -->
-    <header id="game-header">
-      <div class="brand">
-        <span class="suit-icon red">♦</span>
-        <h1>ROYAL TEXAS HOLD'EM</h1>
-        <span class="suit-icon red">♥</span>
-      </div>
-      <div class="header-controls">
-        <div class="badge" id="hand-indicator">Hand #<span id="hand-number">1</span></div>
-        <div class="badge" id="blinds-indicator">Blinds: $10 / $20</div>
-        <button id="sound-toggle-btn" class="icon-btn" title="Toggle Sound">🔊 Sound</button>
-        <button id="rules-btn" class="icon-btn" title="View Poker Hands">📖 Hand Ranks</button>
-      </div>
-    </header>
 
-    <!-- Main Game Arena -->
-    <main id="poker-arena">
-      <div id="poker-table">
-        <!-- Table Center: Community Cards, Pot, Dealer Info -->
-        <div id="table-center">
-          <div class="logo-watermark">ROYAL HOLD'EM</div>
-
-          <div id="pot-display-wrapper">
-            <div class="pot-badge">
-              <span class="pot-label">TOTAL POT</span>
-              <span id="pot-amount" class="pot-value">$0</span>
-            </div>
-            <div id="side-pots-container" class="side-pots-container"></div>
-          </div>
-
-          <div id="community-cards-container" class="community-cards-box">
-            <div class="card-slot" id="flop-1"></div>
-            <div class="card-slot" id="flop-2"></div>
-            <div class="card-slot" id="flop-3"></div>
-            <div class="card-slot" id="turn"></div>
-            <div class="card-slot" id="river"></div>
-          </div>
-
-          <div id="round-stage-badge" class="round-badge">PRE-FLOP</div>
-        </div>
-
-        <!-- Seats around the table -->
-        <!-- Bot 1 (Left): Viper -->
-        <div class="player-seat" id="seat-1">
-          <div class="dealer-button hidden" id="dealer-btn-1">D</div>
-          <div class="avatar-ring">
-            <div class="avatar viper-avatar">🐍</div>
-          </div>
-          <div class="player-card-info">
-            <div class="name-row">
-              <span class="player-name">Viper</span>
-              <span class="player-style">Shark (TAG)</span>
-            </div>
-            <div class="chips-display">$<span id="chips-1">1000</span></div>
-          </div>
-          <div class="player-hole-cards" id="cards-1"></div>
-          <div class="action-bubble hidden" id="action-bubble-1">Check</div>
-          <div class="bet-chip-badge hidden" id="bet-badge-1">$0</div>
-        </div>
-
-        <!-- Bot 2 (Top Left): Atlas -->
-        <div class="player-seat" id="seat-2">
-          <div class="dealer-button hidden" id="dealer-btn-2">D</div>
-          <div class="avatar-ring">
-            <div class="avatar atlas-avatar">🛡️</div>
-          </div>
-          <div class="player-card-info">
-            <div class="name-row">
-              <span class="player-name">Atlas</span>
-              <span class="player-style">Solid (TAG)</span>
-            </div>
-            <div class="chips-display">$<span id="chips-2">1000</span></div>
-          </div>
-          <div class="player-hole-cards" id="cards-2"></div>
-          <div class="action-bubble hidden" id="action-bubble-2">Check</div>
-          <div class="bet-chip-badge hidden" id="bet-badge-2">$0</div>
-        </div>
-
-        <!-- Bot 3 (Top Right): Luna -->
-        <div class="player-seat" id="seat-3">
-          <div class="dealer-button hidden" id="dealer-btn-3">D</div>
-          <div class="avatar-ring">
-            <div class="avatar luna-avatar">🌙</div>
-          </div>
-          <div class="player-card-info">
-            <div class="name-row">
-              <span class="player-name">Luna</span>
-              <span class="player-style">Nit (Rock)</span>
-            </div>
-            <div class="chips-display">$<span id="chips-3">1000</span></div>
-          </div>
-          <div class="player-hole-cards" id="cards-3"></div>
-          <div class="action-bubble hidden" id="action-bubble-3">Check</div>
-          <div class="bet-chip-badge hidden" id="bet-badge-3">$0</div>
-        </div>
-
-        <!-- Bot 4 (Right): Duke -->
-        <div class="player-seat" id="seat-4">
-          <div class="dealer-button hidden" id="dealer-btn-4">D</div>
-          <div class="avatar-ring">
-            <div class="avatar duke-avatar">🦁</div>
-          </div>
-          <div class="player-card-info">
-            <div class="name-row">
-              <span class="player-name">Duke</span>
-              <span class="player-style">Maniac</span>
-            </div>
-            <div class="chips-display">$<span id="chips-4">1000</span></div>
-          </div>
-          <div class="player-hole-cards" id="cards-4"></div>
-          <div class="action-bubble hidden" id="action-bubble-4">Check</div>
-          <div class="bet-chip-badge hidden" id="bet-badge-4">$0</div>
-        </div>
-
-        <!-- User / Hero Seat (Bottom Center) -->
-        <div class="player-seat hero-seat" id="seat-0">
-          <div class="dealer-button hidden" id="dealer-btn-0">D</div>
-          <div class="avatar-ring hero-ring">
-            <div class="avatar hero-avatar">👑</div>
-          </div>
-          <div class="player-card-info">
-            <div class="name-row">
-              <span class="player-name" id="hero-name">You</span>
-              <span class="player-style">Hero</span>
-            </div>
-            <div class="chips-display gold-chips">$<span id="chips-0">1000</span></div>
-          </div>
-          <div class="player-hole-cards" id="cards-0"></div>
-          <div class="action-bubble hidden" id="action-bubble-0">Check</div>
-          <div class="bet-chip-badge hidden" id="bet-badge-0">$0</div>
-          <!-- Hero Hand Rank Indicator Badge -->
-          <div id="hero-hand-rank-badge" class="hand-rank-badge hidden">Starting Hand</div>
+    <!-- ======================================================================
+         1. MAIN MENU SCREEN (Shown before game)
+         ====================================================================== -->
+    <section id="main-menu" class="main-menu-view">
+      <div class="menu-hero">
+        <div class="crown-emblem">👑</div>
+        <h1 class="menu-title">ROYAL TEXAS HOLD'EM</h1>
+        <p class="menu-subtitle">HIGH STAKES CASINO EDITION</p>
+        <div class="menu-decor-line">
+          <span class="decor-suit">♠</span>
+          <span class="decor-suit red">♥</span>
+          <span class="decor-suit red">♦</span>
+          <span class="decor-suit">♣</span>
         </div>
       </div>
-    </main>
 
-    <!-- Bottom Controls & Action Bar -->
-    <footer id="action-bar-footer">
-      <div id="dealer-announcement" class="dealer-speech">
-        Shuffle up and deal! Welcome to the table.
+      <div class="menu-action-bar">
+        <button id="menu-rules-btn" class="menu-pill-btn" title="View Comprehensive Poker Rules & Flow">
+          <span class="btn-icon">📖</span> Rules & Poker Guide
+        </button>
+        <button id="menu-sound-btn" class="menu-pill-btn" title="Toggle Sound">
+          <span class="btn-icon">🔊</span> Sound: ON
+        </button>
       </div>
 
-      <div id="action-controls" class="action-controls-panel disabled">
-        <div class="bet-slider-row">
-          <span class="slider-label">Raise Amount:</span>
-          <input type="range" id="bet-slider" min="20" max="1000" step="10" value="20" disabled>
-          <span id="bet-slider-display" class="slider-val">$20</span>
-          <div class="quick-bet-buttons">
-            <button class="quick-btn" id="qb-min">Min</button>
-            <button class="quick-btn" id="qb-half-pot">1/2 Pot</button>
-            <button class="quick-btn" id="qb-pot">Pot</button>
-            <button class="quick-btn" id="qb-max">All-In</button>
+      <div class="save-slots-section">
+        <h2 class="section-title">SELECT A SAVE PROFILE</h2>
+        <div class="slots-grid" id="slots-container">
+          <!-- Save slots rendered dynamically or with initial template -->
+          <div class="slot-card" id="slot-card-1" data-slot="1"></div>
+          <div class="slot-card" id="slot-card-2" data-slot="2"></div>
+          <div class="slot-card" id="slot-card-3" data-slot="3"></div>
+        </div>
+      </div>
+
+      <footer class="menu-footer">
+        <span>Offline Texas Hold'em Engine &bull; Strategic AI &bull; Adrenaline Mechanics &bull; Auto-Save Enabled</span>
+      </footer>
+    </section>
+
+    <!-- ======================================================================
+         2. POKER ARENA GAME SCREEN (Hidden until game loaded)
+         ====================================================================== -->
+    <div id="game-view" class="game-view-container hidden">
+      <!-- Top Navigation / Status Header -->
+      <header id="game-header">
+        <div class="header-left">
+          <button id="btn-back-menu" class="icon-btn" title="Return to Main Menu">
+            <span>🏠</span> Menu
+          </button>
+          <div class="brand">
+            <span class="suit-icon red">♦</span>
+            <h1>ROYAL TEXAS HOLD'EM</h1>
+            <span class="suit-icon red">♥</span>
           </div>
         </div>
 
-        <div class="action-buttons-row">
-          <button id="btn-fold" class="btn btn-danger" disabled>
-            <span class="btn-icon">✖</span> Fold
-          </button>
-          <button id="btn-check-call" class="btn btn-primary" disabled>
-            <span class="btn-icon">✓</span> <span id="check-call-text">Check</span>
-          </button>
-          <button id="btn-raise" class="btn btn-warning" disabled>
-            <span class="btn-icon">▲</span> <span id="raise-text">Bet $20</span>
-          </button>
-          <button id="btn-allin" class="btn btn-purple" disabled>
-            <span class="btn-icon">🔥</span> All-In
-          </button>
-          <button id="btn-next-hand" class="btn btn-success hidden">
-            <span class="btn-icon">➔</span> Deal Next Hand
-          </button>
+        <div class="header-controls">
+          <div class="badge" id="difficulty-indicator">Medium</div>
+          <div class="badge" id="hand-indicator">Hand #<span id="hand-number">1</span></div>
+          <div class="badge" id="blinds-indicator">Blinds: $10 / $20</div>
+          <button id="sound-toggle-btn" class="icon-btn" title="Toggle Sound">🔊 Sound</button>
+          <button id="rules-btn" class="icon-btn" title="View Poker Rules">📖 Guide</button>
         </div>
-      </div>
-    </footer>
+      </header>
 
-    <!-- Hand Ranks Reference Modal -->
-    <div id="ranks-modal" class="modal-overlay hidden">
-      <div class="modal-card">
+      <!-- Main Game Arena -->
+      <main id="poker-arena">
+        <!-- Floating Blinds Increase Banner -->
+        <div id="blinds-banner" class="blinds-banner hidden">
+          <span class="banner-icon">🔥</span>
+          <span id="blinds-banner-text">BLINDS INCREASED! Blinds: $20 / $40</span>
+          <span class="banner-icon">🔥</span>
+        </div>
+
+        <div id="poker-table">
+          <!-- Table Center: Community Cards, Pot, Dealer Info -->
+          <div id="table-center">
+            <div class="logo-watermark">ROYAL HOLD'EM</div>
+
+            <div id="pot-display-wrapper">
+              <div class="pot-badge">
+                <span class="pot-label">TOTAL POT</span>
+                <span id="pot-amount" class="pot-value">$0</span>
+              </div>
+              <!-- Side Pots Container -->
+              <div id="side-pots-container" class="side-pots-container"></div>
+            </div>
+
+            <div id="community-cards-container" class="community-cards-box">
+              <div class="card-slot" id="flop-1"></div>
+              <div class="card-slot" id="flop-2"></div>
+              <div class="card-slot" id="flop-3"></div>
+              <div class="card-slot" id="turn"></div>
+              <div class="card-slot" id="river"></div>
+            </div>
+
+            <div id="round-stage-badge" class="round-badge">PRE-FLOP</div>
+          </div>
+
+          <!-- Seats around the table -->
+          <!-- Bot 1 (Left): Viper -->
+          <div class="player-seat" id="seat-1">
+            <div class="dealer-button hidden" id="dealer-btn-1">D</div>
+            <div class="avatar-ring">
+              <div class="avatar viper-avatar">🐍</div>
+            </div>
+            <div class="player-card-info">
+              <div class="name-row">
+                <span class="player-name">Viper</span>
+                <span class="player-style">Shark (TAG)</span>
+              </div>
+              <div class="chips-display">$<span id="chips-1">1000</span></div>
+            </div>
+            <div class="player-hole-cards" id="cards-1"></div>
+            <div class="action-bubble hidden" id="action-bubble-1">Check</div>
+            <div class="bet-chip-badge hidden" id="bet-badge-1">$0</div>
+          </div>
+
+          <!-- Bot 2 (Top Left): Atlas -->
+          <div class="player-seat" id="seat-2">
+            <div class="dealer-button hidden" id="dealer-btn-2">D</div>
+            <div class="avatar-ring">
+              <div class="avatar atlas-avatar">🛡️</div>
+            </div>
+            <div class="player-card-info">
+              <div class="name-row">
+                <span class="player-name">Atlas</span>
+                <span class="player-style">Solid (TAG)</span>
+              </div>
+              <div class="chips-display">$<span id="chips-2">1000</span></div>
+            </div>
+            <div class="player-hole-cards" id="cards-2"></div>
+            <div class="action-bubble hidden" id="action-bubble-2">Check</div>
+            <div class="bet-chip-badge hidden" id="bet-badge-2">$0</div>
+          </div>
+
+          <!-- Bot 3 (Top Right): Luna -->
+          <div class="player-seat" id="seat-3">
+            <div class="dealer-button hidden" id="dealer-btn-3">D</div>
+            <div class="avatar-ring">
+              <div class="avatar luna-avatar">🌙</div>
+            </div>
+            <div class="player-card-info">
+              <div class="name-row">
+                <span class="player-name">Luna</span>
+                <span class="player-style">Nit (Rock)</span>
+              </div>
+              <div class="chips-display">$<span id="chips-3">1000</span></div>
+            </div>
+            <div class="player-hole-cards" id="cards-3"></div>
+            <div class="action-bubble hidden" id="action-bubble-3">Check</div>
+            <div class="bet-chip-badge hidden" id="bet-badge-3">$0</div>
+          </div>
+
+          <!-- Bot 4 (Right): Duke -->
+          <div class="player-seat" id="seat-4">
+            <div class="dealer-button hidden" id="dealer-btn-4">D</div>
+            <div class="avatar-ring">
+              <div class="avatar duke-avatar">🦁</div>
+            </div>
+            <div class="player-card-info">
+              <div class="name-row">
+                <span class="player-name">Duke</span>
+                <span class="player-style">Maniac</span>
+              </div>
+              <div class="chips-display">$<span id="chips-4">1000</span></div>
+            </div>
+            <div class="player-hole-cards" id="cards-4"></div>
+            <div class="action-bubble hidden" id="action-bubble-4">Check</div>
+            <div class="bet-chip-badge hidden" id="bet-badge-4">$0</div>
+          </div>
+
+          <!-- User / Hero Seat (Bottom Center) -->
+          <div class="player-seat hero-seat" id="seat-0">
+            <div class="dealer-button hidden" id="dealer-btn-0">D</div>
+            <div class="avatar-ring hero-ring">
+              <div class="avatar hero-avatar">👑</div>
+            </div>
+            <div class="player-card-info">
+              <div class="name-row">
+                <span class="player-name" id="hero-name">You</span>
+                <span class="player-style">Hero</span>
+              </div>
+              <div class="chips-display gold-chips">$<span id="chips-0">1000</span></div>
+            </div>
+            <div class="player-hole-cards" id="cards-0"></div>
+            <div class="action-bubble hidden" id="action-bubble-0">Check</div>
+            <div class="bet-chip-badge hidden" id="bet-badge-0">$0</div>
+            <!-- Hero Hand Rank Indicator Badge -->
+            <div id="hero-hand-rank-badge" class="hand-rank-badge hidden">Starting Hand</div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Bottom Controls & Action Bar -->
+      <footer id="action-bar-footer">
+        <div id="dealer-announcement" class="dealer-speech">
+          Shuffle up and deal! Welcome to the table.
+        </div>
+
+        <div id="action-controls" class="action-controls-panel disabled">
+          <div class="bet-slider-row">
+            <span class="slider-label">Raise Amount:</span>
+            <input type="range" id="bet-slider" min="20" max="1000" step="10" value="20" disabled>
+            <span id="bet-slider-display" class="slider-val">$20</span>
+            <div class="quick-bet-buttons">
+              <button class="quick-btn" id="qb-min">Min</button>
+              <button class="quick-btn" id="qb-half-pot">1/2 Pot</button>
+              <button class="quick-btn" id="qb-pot">Pot</button>
+              <button class="quick-btn" id="qb-max">All-In</button>
+            </div>
+          </div>
+
+          <div class="action-buttons-row">
+            <button id="btn-fold" class="btn btn-danger" disabled>
+              <span class="btn-icon">✖</span> Fold
+            </button>
+            <button id="btn-check-call" class="btn btn-primary" disabled>
+              <span class="btn-icon">✓</span> <span id="check-call-text">Check</span>
+            </button>
+            <button id="btn-raise" class="btn btn-warning" disabled>
+              <span class="btn-icon">▲</span> <span id="raise-text">Bet $20</span>
+            </button>
+            <button id="btn-allin" class="btn btn-purple" disabled>
+              <span class="btn-icon">🔥</span> All-In
+            </button>
+            <button id="btn-next-hand" class="btn btn-success hidden">
+              <span class="btn-icon">➔</span> Deal Next Hand
+            </button>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- ======================================================================
+         3. DIFFICULTY SELECTION MODAL
+         ====================================================================== -->
+    <div id="difficulty-modal" class="modal-overlay hidden">
+      <div class="modal-card difficulty-modal-card">
         <div class="modal-header">
-          <h2>♠ Poker Hand Rankings ♠</h2>
-          <button id="close-modal-btn" class="close-btn">&times;</button>
+          <h2>Select Game Difficulty</h2>
+          <button id="close-diff-modal-btn" class="close-btn">&times;</button>
         </div>
         <div class="modal-body">
-          <div class="rank-item"><span class="r-badge">1</span> <strong>Royal Flush:</strong> A, K, Q, J, 10 of same suit</div>
-          <div class="rank-item"><span class="r-badge">2</span> <strong>Straight Flush:</strong> 5 consecutive cards of same suit</div>
-          <div class="rank-item"><span class="r-badge">3</span> <strong>Four of a Kind:</strong> 4 cards of same rank</div>
-          <div class="rank-item"><span class="r-badge">4</span> <strong>Full House:</strong> 3 of a kind + 1 pair</div>
-          <div class="rank-item"><span class="r-badge">5</span> <strong>Flush:</strong> Any 5 cards of same suit</div>
-          <div class="rank-item"><span class="r-badge">6</span> <strong>Straight:</strong> 5 consecutive ranks (Aces high or low)</div>
-          <div class="rank-item"><span class="r-badge">7</span> <strong>Three of a Kind:</strong> 3 cards of same rank</div>
-          <div class="rank-item"><span class="r-badge">8</span> <strong>Two Pair:</strong> Two distinct pairs</div>
-          <div class="rank-item"><span class="r-badge">9</span> <strong>One Pair:</strong> 2 cards of same rank</div>
-          <div class="rank-item"><span class="r-badge">10</span> <strong>High Card:</strong> Highest card in hand</div>
+          <p class="diff-intro-text">Choose the intensity of your opponents for this profile:</p>
+          <div class="diff-options-grid">
+            <div class="diff-card" data-difficulty="easy">
+              <div class="diff-icon">🍀</div>
+              <div class="diff-title diff-easy-text">Easy</div>
+              <div class="diff-subtitle">Casual Bettors</div>
+              <p class="diff-desc">Bots play conservatively, fold more often against pressure, and rarely bluff.</p>
+              <span class="diff-select-badge">Select Easy</span>
+            </div>
+            <div class="diff-card featured-diff" data-difficulty="medium">
+              <div class="diff-icon">⚖️</div>
+              <div class="diff-title diff-med-text">Medium</div>
+              <div class="diff-subtitle">Vegas Regulars</div>
+              <p class="diff-desc">Balanced strategic play with solid pot odds math, continuation bets, and opportunistic bluffs.</p>
+              <span class="diff-select-badge">Select Medium</span>
+            </div>
+            <div class="diff-card" data-difficulty="hard">
+              <div class="diff-icon">🦈</div>
+              <div class="diff-title diff-hard-text">Hard</div>
+              <div class="diff-subtitle">High-Stakes Sharks</div>
+              <p class="diff-desc">Maximum aggression. Ruthless 3-bets, frequent river bluffs, and stubborn calling stations.</p>
+              <span class="diff-select-badge">Select Hard</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- ======================================================================
+         4. DELETE CONFIRMATION MODAL
+         ====================================================================== -->
+    <div id="confirm-delete-modal" class="modal-overlay hidden">
+      <div class="modal-card delete-modal-card">
+        <div class="modal-header">
+          <h2>Delete Save Profile</h2>
+          <button id="close-delete-modal-btn" class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body delete-modal-body">
+          <p>Are you sure you want to delete <strong id="delete-slot-name">Save Slot 1</strong>?</p>
+          <p class="delete-warning">All chips, win records, and round progression will be permanently erased.</p>
+          <div class="modal-actions-row">
+            <button id="btn-cancel-delete" class="btn btn-secondary">Cancel</button>
+            <button id="btn-confirm-delete" class="btn btn-danger">Confirm Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         5. COMPREHENSIVE POKER RULES & GUIDE MODAL
+         ====================================================================== -->
+    <div id="rules-modal" class="modal-overlay hidden">
+      <div class="modal-card rules-modal-card">
+        <div class="modal-header">
+          <h2>♠ Royal Texas Hold'em Guide & Rules ♠</h2>
+          <button id="close-rules-btn" class="close-btn">&times;</button>
+        </div>
+        
+        <!-- Rules Tabs -->
+        <div class="rules-tabs-nav">
+          <button class="rules-tab-btn active" data-tab="tab-ranks">Hand Rankings</button>
+          <button class="rules-tab-btn" data-tab="tab-flow">Game Flow & Rounds</button>
+          <button class="rules-tab-btn" data-tab="tab-mechanics">Blinds & Adrenaline</button>
+          <button class="rules-tab-btn" data-tab="tab-ai">AI Opponents</button>
+        </div>
+
+        <div class="modal-body rules-modal-body">
+          <!-- TAB 1: Hand Rankings -->
+          <div class="rules-tab-pane active" id="tab-ranks">
+            <div class="rank-item">
+              <span class="r-badge">1</span>
+              <div>
+                <strong>Royal Flush:</strong>
+                <span class="rank-cards-demo">A♠ K♠ Q♠ J♠ 10♠</span>
+                <p class="rank-sub">The unbeatable hand. Ace-high straight flush of the same suit.</p>
+              </div>
+            </div>
+            <div class="rank-item">
+              <span class="r-badge">2</span>
+              <div>
+                <strong>Straight Flush:</strong>
+                <span class="rank-cards-demo">9♥ 8♥ 7♥ 6♥ 5♥</span>
+                <p class="rank-sub">Five consecutive cards of identical suit.</p>
+              </div>
+            </div>
+            <div class="rank-item">
+              <span class="r-badge">3</span>
+              <div>
+                <strong>Four of a Kind:</strong>
+                <span class="rank-cards-demo">K♠ K♥ K♦ K♣ 4♦</span>
+                <p class="rank-sub">Four cards of matching rank plus highest kicker.</p>
+              </div>
+            </div>
+            <div class="rank-item">
+              <span class="r-badge">4</span>
+              <div>
+                <strong>Full House:</strong>
+                <span class="rank-cards-demo">J♠ J♥ J♦ 8♣ 8♠</span>
+                <p class="rank-sub">Three cards of one rank combined with a pair of another rank.</p>
+              </div>
+            </div>
+            <div class="rank-item">
+              <span class="r-badge">5</span>
+              <div>
+                <strong>Flush:</strong>
+                <span class="rank-cards-demo">A♦ J♦ 9♦ 6♦ 3♦</span>
+                <p class="rank-sub">Any five cards of the same suit, not in sequence.</p>
+              </div>
+            </div>
+            <div class="rank-item">
+              <span class="r-badge">6</span>
+              <div>
+                <strong>Straight:</strong>
+                <span class="rank-cards-demo">10♠ 9♥ 8♦ 7♣ 6♠</span>
+                <p class="rank-sub">Five consecutive ranks of mixed suits. Ace can count high or low (A-2-3-4-5).</p>
+              </div>
+            </div>
+            <div class="rank-item">
+              <span class="r-badge">7</span>
+              <div>
+                <strong>Three of a Kind:</strong>
+                <span class="rank-cards-demo">7♠ 7♥ 7♦ K♣ 2♠</span>
+                <p class="rank-sub">Three cards of matching rank with two unmatched kickers.</p>
+              </div>
+            </div>
+            <div class="rank-item">
+              <span class="r-badge">8</span>
+              <div>
+                <strong>Two Pair:</strong>
+                <span class="rank-cards-demo">Q♠ Q♥ 9♦ 9♣ A♠</span>
+                <p class="rank-sub">Two distinct pairs with one kicker card.</p>
+              </div>
+            </div>
+            <div class="rank-item">
+              <span class="r-badge">9</span>
+              <div>
+                <strong>One Pair:</strong>
+                <span class="rank-cards-demo">10♥ 10♦ A♠ 8♣ 4♥</span>
+                <p class="rank-sub">Two cards of identical rank.</p>
+              </div>
+            </div>
+            <div class="rank-item">
+              <span class="r-badge">10</span>
+              <div>
+                <strong>High Card:</strong>
+                <span class="rank-cards-demo">A♠ J♥ 8♦ 6♣ 2♦</span>
+                <p class="rank-sub">No pair or sequence. Evaluated by highest single card down to fifth card.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: Game Flow & Rounds -->
+          <div class="rules-tab-pane" id="tab-flow">
+            <div class="guide-block">
+              <h3>1. The Dealer Button & Blinds</h3>
+              <p>The Dealer Button (D) rotates clockwise each hand. The player immediately left of the dealer posts the <strong>Small Blind</strong>, and the next player posts the <strong>Big Blind</strong>. These forced bets spark the action.</p>
+            </div>
+            <div class="guide-block">
+              <h3>2. Pre-Flop</h3>
+              <p>Each player receives 2 private hole cards. Betting begins with the player to the left of the Big Blind. Players may <strong>Fold</strong>, <strong>Call</strong> the big blind, or <strong>Raise</strong>.</p>
+            </div>
+            <div class="guide-block">
+              <h3>3. The Flop</h3>
+              <p>The dealer reveals 3 community cards face-up on the board. A second betting round commences starting with the first active player left of the button.</p>
+            </div>
+            <div class="guide-block">
+              <h3>4. The Turn</h3>
+              <p>A 4th community card is dealt face-up. Players evaluate their improving hands and draws before the third betting round.</p>
+            </div>
+            <div class="guide-block">
+              <h3>5. The River & Showdown</h3>
+              <p>The 5th and final community card is dealt. The final betting round occurs. If two or more players remain, they reveal their hole cards in the <strong>Showdown</strong>. The best 5-card combination wins the pot!</p>
+            </div>
+          </div>
+
+          <!-- TAB 3: Blinds & Adrenaline Mechanics -->
+          <div class="rules-tab-pane" id="tab-mechanics">
+            <div class="guide-block">
+              <h3>🔥 Dynamic Blind Structure</h3>
+              <p>Blinds automatically escalate every 5 hands to prevent stagnation and drive high-stakes confrontations:</p>
+              <div class="blinds-table">
+                <div class="bt-row bt-head"><span>Hands</span><span>Small Blind</span><span>Big Blind</span></div>
+                <div class="bt-row"><span>Rounds 1 – 5</span><span>$10</span><span>$20</span></div>
+                <div class="bt-row"><span>Rounds 6 – 10</span><span>$20</span><span>$40</span></div>
+                <div class="bt-row"><span>Rounds 11 – 15</span><span>$40</span><span>$80</span></div>
+                <div class="bt-row"><span>Rounds 16 – 20</span><span>$80</span><span>$160</span></div>
+                <div class="bt-row"><span>Rounds 21+</span><span>$160</span><span>$320</span></div>
+              </div>
+            </div>
+
+            <div class="guide-block">
+              <h3>⚡ Adrenaline Battle Mechanics</h3>
+              <p>Whenever you are dealt a Tier 1 (Monster) or Tier 2 (Strong) starting hand, the engine triggers an <strong>Adrenaline Confrontation</strong>:</p>
+              <ul class="bullet-list">
+                <li>An active opponent is chosen to receive a rival hand (75% same tier, 25% slightly better).</li>
+                <li>The rival bot receives an adrenaline aggression boost for that specific hand, firing bold raises and fighting for the pot.</li>
+                <li>Prepare for thrilling, cinematic showdowns!</li>
+              </ul>
+            </div>
+
+            <div class="guide-block">
+              <h3>💰 Side Pot Management</h3>
+              <p>When players go all-in with unequal chip stacks, the engine automatically splits the betting pool into a <strong>Main Pot</strong> and one or more <strong>Side Pots</strong>. All-in players only contest pots they contributed chips to, ensuring authentic tournament rules.</p>
+            </div>
+          </div>
+
+          <!-- TAB 4: AI Personalities -->
+          <div class="rules-tab-pane" id="tab-ai">
+            <div class="ai-profile-card">
+              <span class="ai-avatar">🐍</span>
+              <div class="ai-info">
+                <h4>Viper &bull; Shark (TAG)</h4>
+                <p>Calculated and predatory. Tight-aggressive style that capitalizes on continuation bets and ruthless value sizing with premium hands.</p>
+              </div>
+            </div>
+            <div class="ai-profile-card">
+              <span class="ai-avatar">🛡️</span>
+              <div class="ai-info">
+                <h4>Atlas &bull; Solid (TAG)</h4>
+                <p>Disciplined and mathematical. Respects pot odds and drawing equities. Rarely folds when getting proper value to call.</p>
+              </div>
+            </div>
+            <div class="ai-profile-card">
+              <span class="ai-avatar">🌙</span>
+              <div class="ai-info">
+                <h4>Luna &bull; Nit (Rock)</h4>
+                <p>Ultra-conservative. Only commits heavy chips with top-tier holdings. If Luna raises big, respect the monster hand!</p>
+              </div>
+            </div>
+            <div class="ai-profile-card">
+              <span class="ai-avatar">🦁</span>
+              <div class="ai-info">
+                <h4>Duke &bull; Maniac</h4>
+                <p>Hyper-aggressive table disruptor. Frequently 3-bets pre-flop, fires multi-street bluffs, and will relentlessly test your resolve.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script src="app.js"></script>

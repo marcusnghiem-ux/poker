@@ -1,6 +1,6 @@
 import time
 import random
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Dict
 from collections import Counter
 from card import Card, render_cards_ascii, COLOR_RESET, COLOR_GOLD, COLOR_CYAN, COLOR_DIM
 from evaluator import (
@@ -19,6 +19,8 @@ class Player:
         self.total_bet: int = 0
         self.folded: bool = False
         self.all_in: bool = False
+        self.fast_mode: bool = False
+        self.adrenaline_active: bool = False
 
     def reset_for_hand(self):
         self.cards = []
@@ -26,6 +28,7 @@ class Player:
         self.total_bet = 0
         self.folded = False
         self.all_in = (self.chips == 0)
+        self.adrenaline_active = False
 
     def reset_for_betting_round(self):
         self.current_bet = 0
@@ -42,46 +45,6 @@ class Player:
 
     def render_hand(self, hidden: bool = False) -> str:
         return render_cards_ascii(self.cards, hidden=hidden)
-
-    def __repr__(self) -> str:
-        status = " (Folded)" if self.folded else (" (All-in)" if self.all_in else "")
-        return f"{self.name} (${self.chips}){status}"
-
-
-class AIPlayer(Player):
-    PERSONALITIES = {
-        "Conservative": {
-            "cbet_freq": 0.40,
-            "bluff_freq": 0.05,
-            "aggression": 0.7,
-            "call_tightness": 1.25,
-            "semi_bluff": 0.20
-        },
-        "Balanced": {
-            "cbet_freq": 0.65,
-            "bluff_freq": 0.16,
-            "aggression": 1.1,
-            "call_tightness": 1.0,
-            "semi_bluff": 0.45
-        },
-        "Aggressive": {
-            "cbet_freq": 0.85,
-            "bluff_freq": 0.28,
-            "aggression": 1.6,
-            "call_tightness": 0.8,
-            "semi_bluff": 0.70
-        },
-    }
-
-    def __init__(self, name: str, chips: int, personality: str = "Balanced"):
-        super().__init__(name, chips, is_bot=True)
-        self.personality = personality
-        self.traits = self.PERSONALITIES.get(personality, self.PERSONALITIES["Balanced"])
-        self.was_preflop_raiser = False
-
-    def reset_for_hand(self):
-        super().reset_for_hand()
-        self.was_preflop_raiser = False
 
     def evaluate_preflop_tier(self) -> int:
         """Returns Tier from 1 (Monster) to 4 (Trash) based on standard Texas Hold'em starting hand charts."""
@@ -123,6 +86,64 @@ class AIPlayer(Player):
 
         # Tier 4: Trash
         return 4
+
+    def __repr__(self) -> str:
+        status = " (Folded)" if self.folded else (" (All-in)" if self.all_in else "")
+        return f"{self.name} (${self.chips}){status}"
+
+
+class AIPlayer(Player):
+    PERSONALITIES = {
+        "Conservative": {
+            "cbet_freq": 0.40,
+            "bluff_freq": 0.10,
+            "aggression": 0.9,
+            "call_tightness": 1.25,
+            "semi_bluff": 0.20
+        },
+        "Balanced": {
+            "cbet_freq": 0.65,
+            "bluff_freq": 0.22,
+            "aggression": 1.3,
+            "call_tightness": 1.0,
+            "semi_bluff": 0.45
+        },
+        "Aggressive": {
+            "cbet_freq": 0.85,
+            "bluff_freq": 0.38,
+            "aggression": 2.0,
+            "call_tightness": 0.8,
+            "semi_bluff": 0.70
+        },
+    }
+
+    def __init__(self, name: str, chips: int, personality: str = "Balanced", difficulty: str = "Medium"):
+        super().__init__(name, chips, is_bot=True)
+        self.personality = personality
+        self.difficulty = difficulty.capitalize()
+
+        base_traits = self.PERSONALITIES.get(personality, self.PERSONALITIES["Balanced"]).copy()
+        diff_lower = difficulty.lower()
+
+        if diff_lower == "easy":
+            base_traits["aggression"] = round(base_traits["aggression"] * 0.6, 3)
+            base_traits["bluff_freq"] = round(base_traits["bluff_freq"] * 0.3, 3)
+            base_traits["cbet_freq"] = round(base_traits["cbet_freq"] * 0.5, 3)
+            base_traits["call_tightness"] = round(base_traits["call_tightness"] * 1.4, 3)
+        elif diff_lower == "hard":
+            base_traits["aggression"] = round(base_traits["aggression"] * 1.5, 3)
+            base_traits["bluff_freq"] = min(1.0, round(base_traits["bluff_freq"] * 1.5, 3))
+            base_traits["cbet_freq"] = min(1.0, round(base_traits["cbet_freq"] * 1.2, 3))
+            base_traits["call_tightness"] = round(base_traits["call_tightness"] * 0.65, 3)
+        # Medium: base values unchanged
+
+        self.traits = base_traits
+        self.was_preflop_raiser = False
+
+    def reset_for_hand(self):
+        super().reset_for_hand()
+        self.was_preflop_raiser = False
+        self.adrenaline_active = False
 
     def detect_draws(self, community_cards: List[Card]) -> Tuple[bool, bool]:
         """Detects if bot has a flush draw (4 cards of same suit) or open-ended straight draw."""
@@ -195,12 +216,14 @@ class AIPlayer(Player):
         community_cards: List[Card]
     ) -> Tuple[str, int]:
         """Strategic decision making engine balancing math, pot odds, position, and personality."""
-        # Realistic deliberation pause: longer when facing big decisions
-        delay = random.uniform(0.7, 1.4) if to_call == 0 else random.uniform(1.0, 2.0)
-        time.sleep(delay)
+        # Realistic deliberation pause: skip if fast_mode is enabled
+        if not getattr(self, "fast_mode", False):
+            delay = random.uniform(0.7, 1.4) if to_call == 0 else random.uniform(1.0, 2.0)
+            time.sleep(delay)
 
         strength = self.evaluate_effective_strength(community_cards)
-        aggression = self.traits["aggression"]
+        # Temporary aggression boost of +0.5 if adrenaline is active on this bot
+        aggression = self.traits["aggression"] + (0.5 if getattr(self, "adrenaline_active", False) else 0.0)
         is_preflop = len(community_cards) == 0
 
         # Pre-Flop Strategy
@@ -248,8 +271,8 @@ class AIPlayer(Player):
                 if cbet_size > 0:
                     return ("raise", cbet_size)
 
-            # 2. Value bet with strong made hand
-            if strength >= 0.65:
+            # 2. Value bet with strong made hand (threshold lowered: 0.65 -> 0.55)
+            if strength >= 0.55:
                 # Sized value bet: 50% to 75% of pot
                 bet_size = min(self.chips, max(min_raise, int(pot * (0.55 + 0.15 * aggression))))
                 if bet_size > 0:
@@ -270,8 +293,8 @@ class AIPlayer(Player):
             return ("check", 0)
 
         # Option B: Facing a bet (to_call > 0)
-        # 1. Monster hand (>= 0.85): Value Raise / Re-raise
-        if strength >= 0.85:
+        # 1. Monster hand (threshold lowered: 0.85 -> 0.75): Value Raise / Re-raise
+        if strength >= 0.75:
             if random.random() < 0.7 * aggression and self.chips > to_call:
                 raise_size = min(self.chips, to_call + max(min_raise, int(pot * 0.7)))
                 return ("raise", raise_size)
@@ -285,9 +308,9 @@ class AIPlayer(Player):
                 return ("raise", raise_size)
             return ("call", min(to_call, self.chips))
 
-        # 3. Marginal Hand: Compare effective strength vs pot odds
+        # 3. Marginal Hand: Compare effective strength vs pot odds or marginal threshold (>= 0.35)
         required_equity = pot_odds * self.traits["call_tightness"]
-        if strength >= required_equity and to_call < self.chips * 0.35:
+        if (strength >= required_equity or strength >= 0.35) and to_call < self.chips * 0.35:
             return ("call", min(to_call, self.chips))
 
         # 4. Fold
@@ -323,7 +346,10 @@ class HumanPlayer(Player):
             options.append("[F]old")
 
             print(f"  Available Actions: {' | '.join(options)}")
-            choice = input("  Choose action: ").strip().lower()
+            try:
+                choice = input("  Choose action: ").strip().lower()
+            except EOFError:
+                return ("fold", 0)
 
             if choice in ['f', 'fold']:
                 return ("fold", 0)
@@ -345,7 +371,10 @@ class HumanPlayer(Player):
                 min_allowed = min_raise
                 max_allowed = self.chips
                 print(f"  Enter amount to raise/bet (between ${min_allowed} and ${max_allowed}): ")
-                amt_str = input("  Amount: $").strip()
+                try:
+                    amt_str = input("  Amount: $").strip()
+                except EOFError:
+                    return ("fold", 0)
                 try:
                     amt = int(amt_str)
                     if amt < min_allowed:
