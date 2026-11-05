@@ -6,24 +6,40 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="description" content="Royal Texas Hold'em - Offline High Stakes Edition with aggressive AI, dynamic blinds, and adrenaline mechanics.">
+  <meta name="description" content="Royal Texas Hold'em - Luxury Casino Edition. Play Solo or Online with Friends in Private Room 'helloworld'.">
   <title>Royal Texas Hold'em - Luxury Casino Edition</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <!-- PeerJS for Real-Time Online Multiplayer with Friends -->
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 </head>
 <body>
+  <!-- Ambient Casino Background Elements -->
+  <div class="casino-bg-effects">
+    <div class="bg-felt-texture"></div>
+    <div class="bg-vignette"></div>
+    <div class="floating-suits">
+      <span class="float-suit fs-1">♠</span>
+      <span class="float-suit fs-2">♥</span>
+      <span class="float-suit fs-3">♦</span>
+      <span class="float-suit fs-4">♣</span>
+      <span class="float-suit fs-5">♠</span>
+      <span class="float-suit fs-6">♥</span>
+    </div>
+  </div>
+
   <div id="app-container">
 
     <!-- ======================================================================
-         1. MAIN MENU SCREEN (Shown before game)
+         1. MAIN MENU SCREEN
          ====================================================================== -->
     <section id="main-menu" class="main-menu-view">
       <div class="menu-hero">
         <div class="crown-emblem">👑</div>
         <h1 class="menu-title">ROYAL TEXAS HOLD'EM</h1>
-        <p class="menu-subtitle">HIGH STAKES CASINO EDITION</p>
+        <p class="menu-subtitle">HIGH STAKES CASINO &bull; MULTIPLAYER EDITION</p>
         <div class="menu-decor-line">
           <span class="decor-suit">♠</span>
           <span class="decor-suit red">♥</span>
@@ -32,7 +48,35 @@
         </div>
       </div>
 
+      <!-- Live Global Games Counter Banner -->
+      <div class="global-stats-banner">
+        <div class="stat-pill">
+          <span class="stat-icon">🎮</span>
+          <span class="stat-label">Total Hands:</span>
+          <span class="stat-val" id="stat-total-hands">0</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-icon">🏆</span>
+          <span class="stat-label">Hands Won:</span>
+          <span class="stat-val" id="stat-hands-won">0</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-icon">💰</span>
+          <span class="stat-label">Biggest Pot:</span>
+          <span class="stat-val" id="stat-biggest-pot">$0</span>
+        </div>
+        <div class="stat-pill online-pill">
+          <span class="stat-icon pulse-dot">🟢</span>
+          <span class="stat-label">Online Room:</span>
+          <span class="stat-val">helloworld</span>
+        </div>
+      </div>
+
+      <!-- Navigation & Action Buttons -->
       <div class="menu-action-bar">
+        <button id="btn-open-online-room" class="menu-pill-btn gold-glow-btn" title="Play with Friends in Private Room">
+          <span class="btn-icon">🌐</span> Online Room (Code: helloworld)
+        </button>
         <button id="menu-rules-btn" class="menu-pill-btn" title="View Comprehensive Poker Rules & Flow">
           <span class="btn-icon">📖</span> Rules & Poker Guide
         </button>
@@ -41,10 +85,13 @@
         </button>
       </div>
 
+      <!-- Solo / Tournament Save Slots Section -->
       <div class="save-slots-section">
-        <h2 class="section-title">SELECT A SAVE PROFILE</h2>
+        <div class="section-title-wrap">
+          <h2 class="section-title">SOLO CAMPAIGN &bull; 3 SAVE PROFILES</h2>
+          <p class="section-desc">Progress, bankrolls, and bot difficulty are automatically saved.</p>
+        </div>
         <div class="slots-grid" id="slots-container">
-          <!-- Save slots rendered dynamically or with initial template -->
           <div class="slot-card" id="slot-card-1" data-slot="1"></div>
           <div class="slot-card" id="slot-card-2" data-slot="2"></div>
           <div class="slot-card" id="slot-card-3" data-slot="3"></div>
@@ -52,12 +99,12 @@
       </div>
 
       <footer class="menu-footer">
-        <span>Offline Texas Hold'em Engine &bull; Strategic AI &bull; Adrenaline Mechanics &bull; Auto-Save Enabled</span>
+        <span>Offline AI Tournament &bull; Real-Time Online Room &bull; Dynamic Blinds &bull; Auto-Save Enabled</span>
       </footer>
     </section>
 
     <!-- ======================================================================
-         2. POKER ARENA GAME SCREEN (Hidden until game loaded)
+         2. POKER ARENA GAME SCREEN
          ====================================================================== -->
     <div id="game-view" class="game-view-container hidden">
       <!-- Top Navigation / Status Header -->
@@ -70,6 +117,11 @@
             <span class="suit-icon red">♦</span>
             <h1>ROYAL TEXAS HOLD'EM</h1>
             <span class="suit-icon red">♥</span>
+          </div>
+          <!-- Room Indicator badge when playing online -->
+          <div id="online-room-badge" class="badge online-room-badge hidden">
+            <span>🌐 Room:</span> <strong id="online-room-name">helloworld</strong>
+            <button id="btn-copy-invite" class="mini-btn" title="Copy Invite Link">📋 Share</button>
           </div>
         </div>
 
@@ -91,20 +143,33 @@
           <span class="banner-icon">🔥</span>
         </div>
 
+        <!-- Waiting for next hand overlay (when joining mid-game) -->
+        <div id="waiting-round-overlay" class="waiting-round-overlay hidden">
+          <div class="waiting-box">
+            <span class="waiting-spinner">⏳</span>
+            <h3>Round in Progress</h3>
+            <p>You joined during an active hand. You will be dealt into the table as soon as this hand concludes!</p>
+          </div>
+        </div>
+
         <div id="poker-table">
-          <!-- Table Center: Community Cards, Pot, Dealer Info -->
+          <!-- Table Center: Community Cards, Single Main Pot, Dealer Info -->
           <div id="table-center">
             <div class="logo-watermark">ROYAL HOLD'EM</div>
 
+            <!-- Single Main Pot (Clean, Prominent) -->
             <div id="pot-display-wrapper">
-              <div class="pot-badge">
+              <div class="pot-badge" id="main-pot-badge">
                 <span class="pot-label">TOTAL POT</span>
                 <span id="pot-amount" class="pot-value">$0</span>
               </div>
-              <!-- Side Pots Container -->
-              <div id="side-pots-container" class="side-pots-container"></div>
+              <!-- Optional Side Pot Badge (Only shown if someone goes all-in) -->
+              <div id="side-pot-wrapper" class="side-pot-wrapper hidden">
+                <span class="side-pot-pill" id="side-pot-text">Side Pot: $0</span>
+              </div>
             </div>
 
+            <!-- 5 Community Cards -->
             <div id="community-cards-container" class="community-cards-box">
               <div class="card-slot" id="flop-1"></div>
               <div class="card-slot" id="flop-2"></div>
@@ -116,17 +181,17 @@
             <div id="round-stage-badge" class="round-badge">PRE-FLOP</div>
           </div>
 
-          <!-- Seats around the table -->
-          <!-- Bot 1 (Left): Viper -->
+          <!-- Seats around the table (5 Seats) -->
+          <!-- Seat 1 (Left): Viper / Friend 1 -->
           <div class="player-seat" id="seat-1">
             <div class="dealer-button hidden" id="dealer-btn-1">D</div>
             <div class="avatar-ring">
-              <div class="avatar viper-avatar">🐍</div>
+              <div class="avatar" id="avatar-1">🐍</div>
             </div>
             <div class="player-card-info">
               <div class="name-row">
-                <span class="player-name">Viper</span>
-                <span class="player-style">Shark (TAG)</span>
+                <span class="player-name" id="name-1">Viper</span>
+                <span class="player-style" id="style-1">Shark (TAG)</span>
               </div>
               <div class="chips-display">$<span id="chips-1">1000</span></div>
             </div>
@@ -135,16 +200,16 @@
             <div class="bet-chip-badge hidden" id="bet-badge-1">$0</div>
           </div>
 
-          <!-- Bot 2 (Top Left): Atlas -->
+          <!-- Seat 2 (Top Left): Atlas / Friend 2 -->
           <div class="player-seat" id="seat-2">
             <div class="dealer-button hidden" id="dealer-btn-2">D</div>
             <div class="avatar-ring">
-              <div class="avatar atlas-avatar">🛡️</div>
+              <div class="avatar" id="avatar-2">🛡️</div>
             </div>
             <div class="player-card-info">
               <div class="name-row">
-                <span class="player-name">Atlas</span>
-                <span class="player-style">Solid (TAG)</span>
+                <span class="player-name" id="name-2">Atlas</span>
+                <span class="player-style" id="style-2">Solid (TAG)</span>
               </div>
               <div class="chips-display">$<span id="chips-2">1000</span></div>
             </div>
@@ -153,16 +218,16 @@
             <div class="bet-chip-badge hidden" id="bet-badge-2">$0</div>
           </div>
 
-          <!-- Bot 3 (Top Right): Luna -->
+          <!-- Seat 3 (Top Right): Luna / Friend 3 -->
           <div class="player-seat" id="seat-3">
             <div class="dealer-button hidden" id="dealer-btn-3">D</div>
             <div class="avatar-ring">
-              <div class="avatar luna-avatar">🌙</div>
+              <div class="avatar" id="avatar-3">🌙</div>
             </div>
             <div class="player-card-info">
               <div class="name-row">
-                <span class="player-name">Luna</span>
-                <span class="player-style">Nit (Rock)</span>
+                <span class="player-name" id="name-3">Luna</span>
+                <span class="player-style" id="style-3">Nit (Rock)</span>
               </div>
               <div class="chips-display">$<span id="chips-3">1000</span></div>
             </div>
@@ -171,16 +236,16 @@
             <div class="bet-chip-badge hidden" id="bet-badge-3">$0</div>
           </div>
 
-          <!-- Bot 4 (Right): Duke -->
+          <!-- Seat 4 (Right): Duke / Friend 4 -->
           <div class="player-seat" id="seat-4">
             <div class="dealer-button hidden" id="dealer-btn-4">D</div>
             <div class="avatar-ring">
-              <div class="avatar duke-avatar">🦁</div>
+              <div class="avatar" id="avatar-4">🦁</div>
             </div>
             <div class="player-card-info">
               <div class="name-row">
-                <span class="player-name">Duke</span>
-                <span class="player-style">Maniac</span>
+                <span class="player-name" id="name-4">Duke</span>
+                <span class="player-style" id="style-4">Maniac</span>
               </div>
               <div class="chips-display">$<span id="chips-4">1000</span></div>
             </div>
@@ -189,23 +254,22 @@
             <div class="bet-chip-badge hidden" id="bet-badge-4">$0</div>
           </div>
 
-          <!-- User / Hero Seat (Bottom Center) -->
+          <!-- Seat 0 (Bottom Center): You / Hero -->
           <div class="player-seat hero-seat" id="seat-0">
             <div class="dealer-button hidden" id="dealer-btn-0">D</div>
             <div class="avatar-ring hero-ring">
-              <div class="avatar hero-avatar">👑</div>
+              <div class="avatar hero-avatar" id="avatar-0">👑</div>
             </div>
             <div class="player-card-info">
               <div class="name-row">
                 <span class="player-name" id="hero-name">You</span>
-                <span class="player-style">Hero</span>
+                <span class="player-style" id="hero-style-tag">Hero</span>
               </div>
               <div class="chips-display gold-chips">$<span id="chips-0">1000</span></div>
             </div>
             <div class="player-hole-cards" id="cards-0"></div>
             <div class="action-bubble hidden" id="action-bubble-0">Check</div>
             <div class="bet-chip-badge hidden" id="bet-badge-0">$0</div>
-            <!-- Hero Hand Rank Indicator Badge -->
             <div id="hero-hand-rank-badge" class="hand-rank-badge hidden">Starting Hand</div>
           </div>
         </div>
@@ -252,37 +316,63 @@
     </div>
 
     <!-- ======================================================================
-         3. DIFFICULTY SELECTION MODAL
+         3. ONLINE ROOM PASSWORD & JOIN MODAL (Code: "helloworld")
+         ====================================================================== -->
+    <div id="online-auth-modal" class="modal-overlay hidden">
+      <div class="modal-card auth-modal-card">
+        <div class="modal-header">
+          <h2>🔒 Private Friends Room</h2>
+          <button id="close-auth-modal-btn" class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body auth-modal-body">
+          <div class="auth-icon-wrap">🌐</div>
+          <p class="auth-desc">Enter the secret password to enter the private friends room. Everyone starts with <strong>$1,000</strong>.</p>
+          
+          <div class="input-group">
+            <label for="room-password-input">Room Password:</label>
+            <input type="password" id="room-password-input" class="modal-text-input" placeholder="Enter password (hint: helloworld)" autocomplete="off">
+            <span id="auth-error-msg" class="auth-error hidden">❌ Incorrect password. Try again!</span>
+          </div>
+
+          <div class="input-group">
+            <label for="room-player-name-input">Your Display Name:</label>
+            <input type="text" id="room-player-name-input" class="modal-text-input" placeholder="Enter your name" maxlength="14" value="Player">
+          </div>
+
+          <div class="modal-actions-row">
+            <button id="btn-cancel-auth" class="btn btn-secondary">Cancel</button>
+            <button id="btn-submit-auth" class="btn btn-primary">Join Room ($1,000)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         4. DIFFICULTY SELECTION MODAL (Solo Mode)
          ====================================================================== -->
     <div id="difficulty-modal" class="modal-overlay hidden">
-      <div class="modal-card difficulty-modal-card">
+      <div class="modal-card diff-modal-card">
         <div class="modal-header">
-          <h2>Select Game Difficulty</h2>
+          <h2>Select Bot Difficulty</h2>
           <button id="close-diff-modal-btn" class="close-btn">&times;</button>
         </div>
-        <div class="modal-body">
-          <p class="diff-intro-text">Choose the intensity of your opponents for this profile:</p>
+        <div class="modal-body diff-modal-body">
+          <p class="diff-modal-sub">Choose how fiercely the AI opponents will play against you:</p>
           <div class="diff-options-grid">
             <div class="diff-card" data-difficulty="easy">
-              <div class="diff-icon">🍀</div>
-              <div class="diff-title diff-easy-text">Easy</div>
-              <div class="diff-subtitle">Casual Bettors</div>
-              <p class="diff-desc">Bots play conservatively, fold more often against pressure, and rarely bluff.</p>
-              <span class="diff-select-badge">Select Easy</span>
+              <div class="diff-icon">🛡️</div>
+              <div class="diff-title">Easy</div>
+              <div class="diff-desc">Bots play conservatively, fold often to bets, rarely bluff, and avoid aggressive pots.</div>
             </div>
-            <div class="diff-card featured-diff" data-difficulty="medium">
+            <div class="diff-card active-diff" data-difficulty="medium">
               <div class="diff-icon">⚖️</div>
-              <div class="diff-title diff-med-text">Medium</div>
-              <div class="diff-subtitle">Vegas Regulars</div>
-              <p class="diff-desc">Balanced strategic play with solid pot odds math, continuation bets, and opportunistic bluffs.</p>
-              <span class="diff-select-badge">Select Medium</span>
+              <div class="diff-title">Medium</div>
+              <div class="diff-desc">Standard balanced strategy. Bots calculate pot odds, fire continuation bets, and call appropriately.</div>
             </div>
             <div class="diff-card" data-difficulty="hard">
-              <div class="diff-icon">🦈</div>
-              <div class="diff-title diff-hard-text">Hard</div>
-              <div class="diff-subtitle">High-Stakes Sharks</div>
-              <p class="diff-desc">Maximum aggression. Ruthless 3-bets, frequent river bluffs, and stubborn calling stations.</p>
-              <span class="diff-select-badge">Select Hard</span>
+              <div class="diff-icon">🔥</div>
+              <div class="diff-title">Hard / Aggressive</div>
+              <div class="diff-desc">Hyper-aggressive sharks! Frequent pre-flop 3-bets, ruthless multi-street bluffs, and relentless pressure.</div>
             </div>
           </div>
         </div>
@@ -290,7 +380,7 @@
     </div>
 
     <!-- ======================================================================
-         4. DELETE CONFIRMATION MODAL
+         5. CONFIRM DELETE SAVE SLOT MODAL
          ====================================================================== -->
     <div id="confirm-delete-modal" class="modal-overlay hidden">
       <div class="modal-card delete-modal-card">
@@ -310,7 +400,7 @@
     </div>
 
     <!-- ======================================================================
-         5. COMPREHENSIVE POKER RULES & GUIDE MODAL
+         6. COMPREHENSIVE POKER RULES & GUIDE MODAL
          ====================================================================== -->
     <div id="rules-modal" class="modal-overlay hidden">
       <div class="modal-card rules-modal-card">
@@ -323,15 +413,15 @@
         <div class="rules-tabs-nav">
           <button class="rules-tab-btn active" data-tab="tab-ranks">Hand Rankings</button>
           <button class="rules-tab-btn" data-tab="tab-flow">Game Flow & Rounds</button>
-          <button class="rules-tab-btn" data-tab="tab-mechanics">Blinds & Adrenaline</button>
-          <button class="rules-tab-btn" data-tab="tab-ai">AI Opponents</button>
+          <button class="rules-tab-btn" data-tab="tab-pots">Pots & All-In Rules</button>
+          <button class="rules-tab-btn" data-tab="tab-ai">AI & Online Room</button>
         </div>
 
         <div class="modal-body rules-modal-body">
           <!-- TAB 1: Hand Rankings -->
           <div class="rules-tab-pane active" id="tab-ranks">
             <div class="rank-item">
-              <span class="r-badge">1</span>
+              <span class="r-badge gold-bg">1</span>
               <div>
                 <strong>Royal Flush:</strong>
                 <span class="rank-cards-demo">A♠ K♠ Q♠ J♠ 10♠</span>
@@ -375,7 +465,7 @@
               <div>
                 <strong>Straight:</strong>
                 <span class="rank-cards-demo">10♠ 9♥ 8♦ 7♣ 6♠</span>
-                <p class="rank-sub">Five consecutive ranks of mixed suits. Ace can count high or low (A-2-3-4-5).</p>
+                <p class="rank-sub">Five consecutive ranks of mixed suits. Ace can count high (A-K-Q-J-10) or low (5-4-3-2-A).</p>
               </div>
             </div>
             <div class="rank-item">
@@ -407,7 +497,7 @@
               <div>
                 <strong>High Card:</strong>
                 <span class="rank-cards-demo">A♠ J♥ 8♦ 6♣ 2♦</span>
-                <p class="rank-sub">No pair or sequence. Evaluated by highest single card down to fifth card.</p>
+                <p class="rank-sub">No pair or sequence. Evaluated by highest single card down to fifth kicker.</p>
               </div>
             </div>
           </div>
@@ -415,32 +505,46 @@
           <!-- TAB 2: Game Flow & Rounds -->
           <div class="rules-tab-pane" id="tab-flow">
             <div class="guide-block">
-              <h3>1. The Dealer Button & Blinds</h3>
-              <p>The Dealer Button (D) rotates clockwise each hand. The player immediately left of the dealer posts the <strong>Small Blind</strong>, and the next player posts the <strong>Big Blind</strong>. These forced bets spark the action.</p>
+              <h3>1. The Dealer Button & Forced Blinds</h3>
+              <p>The Dealer Button (D) rotates clockwise each hand. The player left of the dealer posts the <strong>Small Blind</strong>, and the next player posts the <strong>Big Blind</strong>. These forced bets start the action.</p>
             </div>
             <div class="guide-block">
               <h3>2. Pre-Flop</h3>
-              <p>Each player receives 2 private hole cards. Betting begins with the player to the left of the Big Blind. Players may <strong>Fold</strong>, <strong>Call</strong> the big blind, or <strong>Raise</strong>.</p>
+              <p>Each player is dealt 2 private hole cards. Betting begins with the player to the left of the Big Blind. Players can <strong>Fold</strong>, <strong>Call</strong>, or <strong>Raise</strong>.</p>
             </div>
             <div class="guide-block">
               <h3>3. The Flop</h3>
-              <p>The dealer reveals 3 community cards face-up on the board. A second betting round commences starting with the first active player left of the button.</p>
+              <p>The dealer deals 3 community cards face-up in the center. The second round of betting takes place.</p>
             </div>
             <div class="guide-block">
               <h3>4. The Turn</h3>
-              <p>A 4th community card is dealt face-up. Players evaluate their improving hands and draws before the third betting round.</p>
+              <p>A 4th community card is dealt face-up. Players evaluate their made hands and drawing outs before betting.</p>
             </div>
             <div class="guide-block">
               <h3>5. The River & Showdown</h3>
-              <p>The 5th and final community card is dealt. The final betting round occurs. If two or more players remain, they reveal their hole cards in the <strong>Showdown</strong>. The best 5-card combination wins the pot!</p>
+              <p>The 5th and final community card is revealed. Final betting round ensues. If two or more players remain, all reveal their hole cards in the <strong>Showdown</strong>. The best 5-card combination wins the pot!</p>
             </div>
           </div>
 
-          <!-- TAB 3: Blinds & Adrenaline Mechanics -->
-          <div class="rules-tab-pane" id="tab-mechanics">
+          <!-- TAB 3: Pots & All-In Rules -->
+          <div class="rules-tab-pane" id="tab-pots">
+            <div class="guide-block">
+              <h3>💰 Single Main Pot & Side Pots Explained</h3>
+              <p>In standard play, there is <strong>one single central pot</strong> that all active players compete for. When a player pushes <strong>All-In</strong> with fewer chips than an opponent:</p>
+              <ul class="bullet-list">
+                <li><strong>Main Pot:</strong> Composed of the all-in player's chips matched by every active player. The all-in player is fully eligible to win this pot!</li>
+                <li><strong>Side Pot:</strong> Any extra chips bet by opponents with deeper stacks above the all-in amount form a separate side pot. The all-in player cannot win the side pot.</li>
+              </ul>
+            </div>
+
+            <div class="guide-block">
+              <h3>💀 Zero Money Busted Rule</h3>
+              <p>If you push all-in and lose, you drop to <strong>$0 completely</strong>. You are eliminated from the table and return to the Main Menu where you can reset your bankroll back to $1,000.</p>
+            </div>
+
             <div class="guide-block">
               <h3>🔥 Dynamic Blind Structure</h3>
-              <p>Blinds automatically escalate every 5 hands to prevent stagnation and drive high-stakes confrontations:</p>
+              <p>Blinds automatically escalate every 5 hands to keep action fast and competitive:</p>
               <div class="blinds-table">
                 <div class="bt-row bt-head"><span>Hands</span><span>Small Blind</span><span>Big Blind</span></div>
                 <div class="bt-row"><span>Rounds 1 – 5</span><span>$10</span><span>$20</span></div>
@@ -450,51 +554,50 @@
                 <div class="bt-row"><span>Rounds 21+</span><span>$160</span><span>$320</span></div>
               </div>
             </div>
-
-            <div class="guide-block">
-              <h3>⚡ Adrenaline Battle Mechanics</h3>
-              <p>Whenever you are dealt a Tier 1 (Monster) or Tier 2 (Strong) starting hand, the engine triggers an <strong>Adrenaline Confrontation</strong>:</p>
-              <ul class="bullet-list">
-                <li>An active opponent is chosen to receive a rival hand (75% same tier, 25% slightly better).</li>
-                <li>The rival bot receives an adrenaline aggression boost for that specific hand, firing bold raises and fighting for the pot.</li>
-                <li>Prepare for thrilling, cinematic showdowns!</li>
-              </ul>
-            </div>
-
-            <div class="guide-block">
-              <h3>💰 Side Pot Management</h3>
-              <p>When players go all-in with unequal chip stacks, the engine automatically splits the betting pool into a <strong>Main Pot</strong> and one or more <strong>Side Pots</strong>. All-in players only contest pots they contributed chips to, ensuring authentic tournament rules.</p>
-            </div>
           </div>
 
-          <!-- TAB 4: AI Personalities -->
+          <!-- TAB 4: AI & Online Room -->
           <div class="rules-tab-pane" id="tab-ai">
-            <div class="ai-profile-card">
-              <span class="ai-avatar">🐍</span>
-              <div class="ai-info">
-                <h4>Viper &bull; Shark (TAG)</h4>
-                <p>Calculated and predatory. Tight-aggressive style that capitalizes on continuation bets and ruthless value sizing with premium hands.</p>
-              </div>
+            <div class="guide-block">
+              <h3>🌐 Online Room: Code 'helloworld'</h3>
+              <p>Play with real friends over peer-to-peer WebRTC connections:</p>
+              <ul class="bullet-list">
+                <li>Click <strong>Online Room</strong> on the Main Menu and type password <code>helloworld</code>.</li>
+                <li>Share the room link with your friends to join the exact same table!</li>
+                <li>Each player joins with <strong>$1,000</strong>.</li>
+                <li>If you join while a hand is ongoing, you sit in the waiting queue and are automatically dealt into the next hand!</li>
+              </ul>
             </div>
-            <div class="ai-profile-card">
-              <span class="ai-avatar">🛡️</span>
-              <div class="ai-info">
-                <h4>Atlas &bull; Solid (TAG)</h4>
-                <p>Disciplined and mathematical. Respects pot odds and drawing equities. Rarely folds when getting proper value to call.</p>
+            
+            <div class="guide-block">
+              <h3>🤖 Solo Bot Personalities</h3>
+              <div class="ai-profile-card">
+                <span class="ai-avatar">🐍</span>
+                <div class="ai-info">
+                  <h4>Viper &bull; Shark (TAG)</h4>
+                  <p>Aggressive pre-flop raiser and value sizing expert with premium hands.</p>
+                </div>
               </div>
-            </div>
-            <div class="ai-profile-card">
-              <span class="ai-avatar">🌙</span>
-              <div class="ai-info">
-                <h4>Luna &bull; Nit (Rock)</h4>
-                <p>Ultra-conservative. Only commits heavy chips with top-tier holdings. If Luna raises big, respect the monster hand!</p>
+              <div class="ai-profile-card">
+                <span class="ai-avatar">🛡️</span>
+                <div class="ai-info">
+                  <h4>Atlas &bull; Solid (TAG)</h4>
+                  <p>Disciplined and mathematical. Respects pot odds and drawing equities.</p>
+                </div>
               </div>
-            </div>
-            <div class="ai-profile-card">
-              <span class="ai-avatar">🦁</span>
-              <div class="ai-info">
-                <h4>Duke &bull; Maniac</h4>
-                <p>Hyper-aggressive table disruptor. Frequently 3-bets pre-flop, fires multi-street bluffs, and will relentlessly test your resolve.</p>
+              <div class="ai-profile-card">
+                <span class="ai-avatar">🌙</span>
+                <div class="ai-info">
+                  <h4>Luna &bull; Nit (Rock)</h4>
+                  <p>Ultra-tight. Only puts serious money in with monster hands.</p>
+                </div>
+              </div>
+              <div class="ai-profile-card">
+                <span class="ai-avatar">🦁</span>
+                <div class="ai-info">
+                  <h4>Duke &bull; Maniac</h4>
+                  <p>Hyper-aggressive table disruptor. Shoves, 3-bets, and calls all-ins fearlessly.</p>
+                </div>
               </div>
             </div>
           </div>
