@@ -6,20 +6,22 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="description" content="Royal Texas Hold'em - Luxury Casino Edition. Play Solo or Online with Friends in Private Room 'helloworld'.">
+  <meta name="description" content="Royal Texas Hold'em - Luxury High Roller Edition. Play Solo Campaign or Online with Friends in Private Rooms.">
   <title>Royal Texas Hold'em - Luxury Casino Edition</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <!-- PeerJS for Real-Time Online Multiplayer with Friends -->
+  <!-- PeerJS for Real-Time P2P Online Multiplayer with Friends -->
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 </head>
 <body>
-  <!-- Ambient Casino Background Elements -->
+  <!-- Atmospheric Luxury Casino Background & Overhead Spotlight -->
   <div class="casino-bg-effects">
-    <div class="bg-felt-texture"></div>
+    <div class="bg-art-deco-lattice"></div>
+    <div class="bg-spotlight"></div>
     <div class="bg-vignette"></div>
+    <!-- Floating Gold Dust & Card Suits -->
     <div class="floating-suits">
       <span class="float-suit fs-1">♠</span>
       <span class="float-suit fs-2">♥</span>
@@ -27,6 +29,9 @@
       <span class="float-suit fs-4">♣</span>
       <span class="float-suit fs-5">♠</span>
       <span class="float-suit fs-6">♥</span>
+      <span class="float-sparkle sp-1">✨</span>
+      <span class="float-sparkle sp-2">✨</span>
+      <span class="float-sparkle sp-3">✨</span>
     </div>
   </div>
 
@@ -48,34 +53,49 @@
         </div>
       </div>
 
-      <!-- Live Global Games Counter Banner -->
+      <!-- Live Global Casino Stats Banner (Expanded Stats) -->
       <div class="global-stats-banner">
         <div class="stat-pill">
           <span class="stat-icon">🎮</span>
-          <span class="stat-label">Total Hands:</span>
+          <span class="stat-label">Hands:</span>
           <span class="stat-val" id="stat-total-hands">0</span>
         </div>
         <div class="stat-pill">
           <span class="stat-icon">🏆</span>
-          <span class="stat-label">Hands Won:</span>
+          <span class="stat-label">Won:</span>
           <span class="stat-val" id="stat-hands-won">0</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-icon">🎯</span>
+          <span class="stat-label">Win Rate:</span>
+          <span class="stat-val" id="stat-win-rate">0%</span>
         </div>
         <div class="stat-pill">
           <span class="stat-icon">💰</span>
           <span class="stat-label">Biggest Pot:</span>
           <span class="stat-val" id="stat-biggest-pot">$0</span>
         </div>
+        <div class="stat-pill">
+          <span class="stat-icon">🔥</span>
+          <span class="stat-label">Best Streak:</span>
+          <span class="stat-val" id="stat-best-streak">0</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-icon">🃏</span>
+          <span class="stat-label">Best Hand:</span>
+          <span class="stat-val" id="stat-best-hand">High Card</span>
+        </div>
         <div class="stat-pill online-pill">
           <span class="stat-icon pulse-dot">🟢</span>
-          <span class="stat-label">Online Room:</span>
-          <span class="stat-val">helloworld</span>
+          <span class="stat-label">Private Room:</span>
+          <span class="stat-val" id="stat-room-status">Joinable</span>
         </div>
       </div>
 
-      <!-- Navigation & Action Buttons -->
+      <!-- Action Navigation Buttons -->
       <div class="menu-action-bar">
-        <button id="btn-open-online-room" class="menu-pill-btn gold-glow-btn" title="Play with Friends in Private Room">
-          <span class="btn-icon">🌐</span> Online Room (Code: helloworld)
+        <button id="btn-open-online-room" class="menu-pill-btn gold-glow-btn" title="Enter Private Room with Friends">
+          <span class="btn-icon">🔒</span> Private Friends Room
         </button>
         <button id="menu-rules-btn" class="menu-pill-btn" title="View Comprehensive Poker Rules & Flow">
           <span class="btn-icon">📖</span> Rules & Poker Guide
@@ -85,11 +105,11 @@
         </button>
       </div>
 
-      <!-- Solo / Tournament Save Slots Section -->
+      <!-- 3 Private Solo Save Slots (Stored strictly on each player's device) -->
       <div class="save-slots-section">
         <div class="section-title-wrap">
-          <h2 class="section-title">SOLO CAMPAIGN &bull; 3 SAVE PROFILES</h2>
-          <p class="section-desc">Progress, bankrolls, and bot difficulty are automatically saved.</p>
+          <h2 class="section-title">YOUR PRIVATE CAMPAIGN &bull; 3 SAVE SLOTS</h2>
+          <p class="section-desc">Personal saves are private to your device. Online games never affect your solo bankroll.</p>
         </div>
         <div class="slots-grid" id="slots-container">
           <div class="slot-card" id="slot-card-1" data-slot="1"></div>
@@ -99,7 +119,7 @@
       </div>
 
       <footer class="menu-footer">
-        <span>Offline AI Tournament &bull; Real-Time Online Room &bull; Dynamic Blinds &bull; Auto-Save Enabled</span>
+        <span>Offline AI Tournament &bull; Real-Time Online Room &bull; Dynamic Blinds &bull; Private Device Saves</span>
       </footer>
     </section>
 
@@ -118,10 +138,10 @@
             <h1>ROYAL TEXAS HOLD'EM</h1>
             <span class="suit-icon red">♥</span>
           </div>
-          <!-- Room Indicator badge when playing online -->
+          <!-- Room Indicator badge when playing in online private room -->
           <div id="online-room-badge" class="badge online-room-badge hidden">
-            <span>🌐 Room:</span> <strong id="online-room-name">helloworld</strong>
-            <button id="btn-copy-invite" class="mini-btn" title="Copy Invite Link">📋 Share</button>
+            <span>🔒 Friends Room:</span> <strong id="online-room-status-text">Connected</strong>
+            <button id="btn-copy-invite" class="mini-btn" title="Copy Invite Link">📋 Share Link</button>
           </div>
         </div>
 
@@ -143,12 +163,22 @@
           <span class="banner-icon">🔥</span>
         </div>
 
-        <!-- Waiting for next hand overlay (when joining mid-game) -->
+        <!-- 5-SECOND COUNTDOWN JOINING WINDOW (Between Hands) -->
+        <div id="dealer-countdown-overlay" class="dealer-countdown-overlay hidden">
+          <div class="countdown-card">
+            <div class="countdown-timer-circle" id="countdown-number">5</div>
+            <h3>Next Hand Starting Soon</h3>
+            <p><strong>5-Second Joining Window Open!</strong> Friends can join now.</p>
+          </div>
+        </div>
+
+        <!-- Loading / Waiting Screen (When joining while a hand is actively running) -->
         <div id="waiting-round-overlay" class="waiting-round-overlay hidden">
           <div class="waiting-box">
-            <span class="waiting-spinner">⏳</span>
-            <h3>Round in Progress</h3>
-            <p>You joined during an active hand. You will be dealt into the table as soon as this hand concludes!</p>
+            <div class="waiting-spinner">🎲</div>
+            <h3>Hand in Progress</h3>
+            <p id="waiting-round-text">You joined during an active hand. Please wait for this round to finish—you will automatically be dealt into the table in the 5-second window!</p>
+            <div class="waiting-pulse-bar"></div>
           </div>
         </div>
 
@@ -163,7 +193,7 @@
                 <span class="pot-label">TOTAL POT</span>
                 <span id="pot-amount" class="pot-value">$0</span>
               </div>
-              <!-- Optional Side Pot Badge (Only shown if someone goes all-in) -->
+              <!-- Optional Side Pot Pill (Only shown if someone goes all-in) -->
               <div id="side-pot-wrapper" class="side-pot-wrapper hidden">
                 <span class="side-pot-pill" id="side-pot-text">Side Pot: $0</span>
               </div>
@@ -182,7 +212,7 @@
           </div>
 
           <!-- Seats around the table (5 Seats) -->
-          <!-- Seat 1 (Left): Viper / Friend 1 -->
+          <!-- Seat 1 (Left): Viper or Friend 1 -->
           <div class="player-seat" id="seat-1">
             <div class="dealer-button hidden" id="dealer-btn-1">D</div>
             <div class="avatar-ring">
@@ -200,7 +230,7 @@
             <div class="bet-chip-badge hidden" id="bet-badge-1">$0</div>
           </div>
 
-          <!-- Seat 2 (Top Left): Atlas / Friend 2 -->
+          <!-- Seat 2 (Top Left): Atlas or Friend 2 -->
           <div class="player-seat" id="seat-2">
             <div class="dealer-button hidden" id="dealer-btn-2">D</div>
             <div class="avatar-ring">
@@ -218,7 +248,7 @@
             <div class="bet-chip-badge hidden" id="bet-badge-2">$0</div>
           </div>
 
-          <!-- Seat 3 (Top Right): Luna / Friend 3 -->
+          <!-- Seat 3 (Top Right): Luna or Friend 3 -->
           <div class="player-seat" id="seat-3">
             <div class="dealer-button hidden" id="dealer-btn-3">D</div>
             <div class="avatar-ring">
@@ -236,7 +266,7 @@
             <div class="bet-chip-badge hidden" id="bet-badge-3">$0</div>
           </div>
 
-          <!-- Seat 4 (Right): Duke / Friend 4 -->
+          <!-- Seat 4 (Right): Duke or Friend 4 -->
           <div class="player-seat" id="seat-4">
             <div class="dealer-button hidden" id="dealer-btn-4">D</div>
             <div class="avatar-ring">
@@ -316,7 +346,7 @@
     </div>
 
     <!-- ======================================================================
-         3. ONLINE ROOM PASSWORD & JOIN MODAL (Code: "helloworld")
+         3. PRIVATE ONLINE ROOM PASSWORD & JOIN MODAL (No Password Leaked!)
          ====================================================================== -->
     <div id="online-auth-modal" class="modal-overlay hidden">
       <div class="modal-card auth-modal-card">
@@ -326,12 +356,12 @@
         </div>
         <div class="modal-body auth-modal-body">
           <div class="auth-icon-wrap">🌐</div>
-          <p class="auth-desc">Enter the secret password to enter the private friends room. Everyone starts with <strong>$1,000</strong>.</p>
+          <p class="auth-desc">Enter the private room password to play with friends. Everyone joins with a fresh <strong>$1,000</strong> chip stack.</p>
           
           <div class="input-group">
             <label for="room-password-input">Room Password:</label>
-            <input type="password" id="room-password-input" class="modal-text-input" placeholder="Enter password (hint: helloworld)" autocomplete="off">
-            <span id="auth-error-msg" class="auth-error hidden">❌ Incorrect password. Try again!</span>
+            <input type="password" id="room-password-input" class="modal-text-input" placeholder="Enter private password" autocomplete="off">
+            <span id="auth-error-msg" class="auth-error hidden">❌ Incorrect password. Access denied!</span>
           </div>
 
           <div class="input-group">
@@ -341,7 +371,7 @@
 
           <div class="modal-actions-row">
             <button id="btn-cancel-auth" class="btn btn-secondary">Cancel</button>
-            <button id="btn-submit-auth" class="btn btn-primary">Join Room ($1,000)</button>
+            <button id="btn-submit-auth" class="btn btn-primary">Enter Room ($1,000)</button>
           </div>
         </div>
       </div>
@@ -559,13 +589,14 @@
           <!-- TAB 4: AI & Online Room -->
           <div class="rules-tab-pane" id="tab-ai">
             <div class="guide-block">
-              <h3>🌐 Online Room: Code 'helloworld'</h3>
+              <h3>🌐 Private Friends Room (5-Second Joining Window)</h3>
               <p>Play with real friends over peer-to-peer WebRTC connections:</p>
               <ul class="bullet-list">
-                <li>Click <strong>Online Room</strong> on the Main Menu and type password <code>helloworld</code>.</li>
-                <li>Share the room link with your friends to join the exact same table!</li>
+                <li>Click <strong>Private Friends Room</strong> on the Main Menu and enter the secret room password.</li>
+                <li>Share the link with friends to sit at the exact same table!</li>
                 <li>Each player joins with <strong>$1,000</strong>.</li>
-                <li>If you join while a hand is ongoing, you sit in the waiting queue and are automatically dealt into the next hand!</li>
+                <li><strong>5-Second Joining Window:</strong> Between hands, an animated 5-second countdown timer runs where friends can join and take an open seat immediately.</li>
+                <li><strong>Loading Screen:</strong> If a friend connects while a hand is actively in progress, they see a loading screen waiting for the round to end, and get automatically dealt in on the next hand!</li>
               </ul>
             </div>
             
