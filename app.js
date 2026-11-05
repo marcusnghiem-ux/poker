@@ -2315,8 +2315,6 @@ class PokerApp {
       }
     }, 1000);
   }
-    }, 1000);
-  }
 }
 
 // Launch application on DOM ready
