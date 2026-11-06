@@ -218,6 +218,9 @@
             <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="11" rx="2.5" fill="rgba(253,224,71,0.2)" stroke="#fde047" stroke-width="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3" stroke="#fde047" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="15" r="1.5" fill="#fde047"/><path d="M12 16.5v2" stroke="#fde047" stroke-width="1.5"/></svg>
           </span> Private Friends Room
         </button>
+        <button id="btn-open-roulette" class="menu-pill-btn ruby-glow-btn" title="Play European Single-Zero Roulette Mini-Game">
+          <span class="btn-icon">🎰</span> European Roulette
+        </button>
         <button id="menu-rules-btn" class="menu-pill-btn" title="View Comprehensive Poker Rules & Flow">
           <span class="btn-icon">
             <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v18H6.5a2.5 2.5 0 0 0-2.5 2.5z" fill="rgba(56,189,248,0.15)" stroke="#93c5fd" stroke-width="2"/><path d="M6 6h10M6 10h10M6 14h6" stroke="#93c5fd" stroke-width="1.6" stroke-linecap="round"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="#93c5fd" stroke-width="2"/></svg>
@@ -228,6 +231,16 @@
             <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M11 5L6 9H2v6h4l5 4V5z" fill="rgba(253,224,71,0.2)" stroke="#fde047" stroke-width="2"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a9 9 0 0 1 0 14" stroke="#fde047" stroke-width="1.8" stroke-linecap="round"/></svg>
           </span> Sound: ON
         </button>
+      </div>
+
+      <!-- Player Profile & Custom Username Bar -->
+      <div class="player-profile-bar">
+        <div class="profile-input-wrap">
+          <span class="profile-icon">👤</span>
+          <label for="player-username-input" class="profile-label">Player Name:</label>
+          <input type="text" id="player-username-input" class="username-input" placeholder="Enter Your Name" maxlength="14" value="High Roller">
+          <button id="btn-save-username" class="btn-save-name" title="Save Username">✔</button>
+        </div>
       </div>
 
       <!-- 3 Private Solo Save Slots (Stored strictly on each player's device) -->
@@ -273,9 +286,13 @@
         </div>
 
         <div class="header-controls">
+          <div class="badge" id="stage-indicator">Stage 1</div>
           <div class="badge" id="difficulty-indicator">Medium</div>
           <div class="badge" id="hand-indicator">Hand #<span id="hand-number">1</span></div>
           <div class="badge" id="blinds-indicator">Blinds: $10 / $20</div>
+          <button id="btn-hand-history" class="icon-btn" title="View Hand History Log">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:3px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="#a78bfa" stroke-width="2"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="#a78bfa" stroke-width="1.5"/></svg> History
+          </button>
           <button id="sound-toggle-btn" class="icon-btn" title="Toggle Sound">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:3px"><path d="M11 5L6 9H2v6h4l5 4V5z" stroke="#fde047" stroke-width="2"/><path d="M15.5 8.5a5 5 0 0 1 0 7" stroke="#fde047" stroke-width="1.8" stroke-linecap="round"/></svg> Sound
           </button>
@@ -559,6 +576,11 @@
               <div class="diff-title">Hard / Aggressive</div>
               <div class="diff-desc">Hyper-aggressive sharks! Frequent pre-flop 3-bets, ruthless multi-street bluffs, and relentless pressure.</div>
             </div>
+            <div class="diff-card diff-nightmare" data-difficulty="nightmare">
+              <div class="diff-icon">💀</div>
+              <div class="diff-title">Nightmare</div>
+              <div class="diff-desc">Devastating AI advantage! Bots receive favored card deals (~55–60% equity edge), calculate precision pot odds, and execute brutal high-pressure bluffs.</div>
+            </div>
           </div>
         </div>
       </div>
@@ -787,6 +809,143 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         7. EUROPEAN ROULETTE MINI-GAME MODAL
+         ====================================================================== -->
+    <div id="roulette-modal" class="modal-overlay hidden">
+      <div class="modal-card roulette-modal-card">
+        <div class="modal-header">
+          <h2>🎰 European Single-Zero Roulette</h2>
+          <button id="close-roulette-btn" class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body roulette-modal-body">
+          <div class="roulette-top-bar">
+            <div class="roulette-stat-pill">
+              <span>Bankroll:</span> <strong id="roulette-bankroll">$1,000</strong>
+            </div>
+            <div id="roulette-status-pill" class="roulette-stat-pill status-pill">
+              Place your bets and click Spin!
+            </div>
+            <div class="roulette-stat-pill">
+              <span>Current Bet:</span> <strong id="roulette-total-bet">$0</strong>
+            </div>
+          </div>
+
+          <!-- Wheel and Ball Display -->
+          <div class="roulette-wheel-container">
+            <canvas id="roulette-canvas" width="320" height="320"></canvas>
+            <div class="roulette-pointer"></div>
+          </div>
+
+          <div id="roulette-result-display" class="roulette-result-banner hidden">
+            <span id="roulette-result-ball" class="roulette-ball-badge">0</span>
+            <span id="roulette-result-text">Ball landed on 0 Green!</span>
+          </div>
+
+          <!-- Chip Denomination Selector -->
+          <div class="roulette-chip-selector">
+            <span class="chip-sel-label">Select Chip:</span>
+            <button class="r-chip-btn active" data-chip="10"><span class="chip-circle c10">$10</span></button>
+            <button class="r-chip-btn" data-chip="25"><span class="chip-circle c25">$25</span></button>
+            <button class="r-chip-btn" data-chip="50"><span class="chip-circle c50">$50</span></button>
+            <button class="r-chip-btn" data-chip="100"><span class="chip-circle c100">$100</span></button>
+          </div>
+
+          <!-- European Roulette Betting Table -->
+          <div class="roulette-table-board">
+            <!-- Zero Row -->
+            <div class="r-grid-zero">
+              <button class="r-bet-spot r-spot-zero" data-bet-type="number" data-bet-val="0">0</button>
+            </div>
+            <!-- Numbers Grid 1-36 -->
+            <div class="r-grid-numbers" id="roulette-numbers-grid">
+              <!-- Dynamically populated 1 to 36 -->
+            </div>
+            <!-- Dozens -->
+            <div class="r-grid-dozens">
+              <button class="r-bet-spot r-spot-dozen" data-bet-type="dozen" data-bet-val="1">1st 12 (1-12)</button>
+              <button class="r-bet-spot r-spot-dozen" data-bet-type="dozen" data-bet-val="2">2nd 12 (13-24)</button>
+              <button class="r-bet-spot r-spot-dozen" data-bet-type="dozen" data-bet-val="3">3rd 12 (25-36)</button>
+            </div>
+            <!-- Outside Bets: 1-18, Even, Red, Black, Odd, 19-36 -->
+            <div class="r-grid-outside">
+              <button class="r-bet-spot r-spot-outside" data-bet-type="low" data-bet-val="low">1 to 18</button>
+              <button class="r-bet-spot r-spot-outside" data-bet-type="parity" data-bet-val="even">EVEN</button>
+              <button class="r-bet-spot r-spot-red" data-bet-type="color" data-bet-val="red">RED</button>
+              <button class="r-bet-spot r-spot-black" data-bet-type="color" data-bet-val="black">BLACK</button>
+              <button class="r-bet-spot r-spot-outside" data-bet-type="parity" data-bet-val="odd">ODD</button>
+              <button class="r-bet-spot r-spot-outside" data-bet-type="high" data-bet-val="high">19 to 36</button>
+            </div>
+          </div>
+
+          <div class="roulette-actions-row">
+            <button id="btn-clear-roulette" class="btn btn-secondary">Clear Bets</button>
+            <button id="btn-spin-roulette" class="btn btn-primary r-spin-btn">🎡 SPIN WHEEL</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         8. HAND HISTORY LOG PANEL (Collapsible Drawer / Modal)
+         ====================================================================== -->
+    <div id="hand-history-panel" class="modal-overlay hidden">
+      <div class="modal-card history-modal-card">
+        <div class="modal-header">
+          <h2>📜 Hand History & Action Log</h2>
+          <button id="close-history-btn" class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body history-modal-body">
+          <div class="history-controls-row">
+            <span id="history-total-count">0 hands recorded in this session</span>
+            <button id="btn-clear-history" class="mini-btn">Clear History</button>
+          </div>
+          <div id="hand-history-list" class="history-list-container">
+            <div class="history-empty-placeholder">No hands completed yet in this session. Play hands at the table to see real-time showdowns, hole cards, and pot payouts logged here!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         9. STAGE ADVANCEMENT / VICTORY MODAL (100% Table Dominance)
+         ====================================================================== -->
+    <div id="stage-victory-modal" class="modal-overlay hidden">
+      <div class="modal-card victory-modal-card">
+        <div class="victory-trophy-glow">🏆</div>
+        <h2>STAGE CONQUERED!</h2>
+        <p class="victory-subtitle">All opponents knocked out! You dominate 100% of the table chips.</p>
+        <div class="victory-stats-box">
+          <div class="v-stat-row"><span>Chips Won:</span> <strong id="v-chips-won">$5,000</strong></div>
+          <div class="v-stat-row"><span>Stage Completed:</span> <strong id="v-stage-completed">Stage 1</strong></div>
+          <div class="v-stat-row"><span>Next Stage Blinds:</span> <strong id="v-next-blinds">$25 / $50</strong></div>
+        </div>
+        <div class="modal-actions-row">
+          <button id="btn-victory-menu" class="btn btn-secondary">Main Menu</button>
+          <button id="btn-advance-stage" class="btn btn-primary victory-next-btn">Advance to Next Stage ⚔️</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         10. PERMADEATH GAME OVER & QUICK REBUY MODAL
+         ====================================================================== -->
+    <div id="game-over-modal" class="modal-overlay hidden">
+      <div class="modal-card gameover-modal-card">
+        <div class="gameover-skull-icon">💀</div>
+        <h2>YOU BUSTED OUT!</h2>
+        <p class="gameover-tagline">Your bankroll dropped to $0.</p>
+        <div class="permadeath-notice-box">
+          <strong>⚡ Permadeath Activated:</strong>
+          <p>This save profile has been permanently deleted from storage. Start fresh with a clean $1,000 bankroll to climb back to glory.</p>
+        </div>
+        <div class="modal-actions-row">
+          <button id="btn-gameover-menu" class="btn btn-secondary">Exit to Menu</button>
+          <button id="btn-quick-rebuy" class="btn btn-primary quick-rebuy-btn">Start New Run ($1,000) ⚡</button>
         </div>
       </div>
     </div>

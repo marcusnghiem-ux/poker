@@ -16,15 +16,26 @@
 // ============================================================================
 class SoundManager {
   constructor() {
-    this.enabled = true;
+    this.enabled = localStorage.getItem('royal_poker_sound_muted') !== 'true';
     this.ctx = null;
   }
 
   init() {
     if (!this.ctx) {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (AudioCtx) this.ctx = new AudioCtx();
+      if (AudioCtx) {
+        this.ctx = new AudioCtx();
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
     }
+  }
+
+  toggle() {
+    this.enabled = !this.enabled;
+    localStorage.setItem('royal_poker_sound_muted', (!this.enabled).toString());
+    return this.enabled;
   }
 
   playChip() {
@@ -65,6 +76,28 @@ class SoundManager {
     } catch (e) {}
   }
 
+  playShuffle() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      for (let i = 0; i < 4; i++) {
+        const time = this.ctx.currentTime + i * 0.04;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(320 + Math.random() * 150, time);
+        osc.frequency.exponentialRampToValueAtTime(100, time + 0.035);
+        gain.gain.setValueAtTime(0.12, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.035);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(time);
+        osc.stop(time + 0.035);
+      }
+    } catch (e) {}
+  }
+
   playCheck() {
     if (!this.enabled) return;
     this.init();
@@ -74,12 +107,50 @@ class SoundManager {
       const gain = this.ctx.createGain();
       osc.type = 'square';
       osc.frequency.setValueAtTime(150, this.ctx.currentTime);
-      gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+      gain.gain.setValueAtTime(0.18, this.ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.04);
       osc.connect(gain);
       gain.connect(this.ctx.destination);
       osc.start();
       osc.stop(this.ctx.currentTime + 0.04);
+    } catch (e) {}
+  }
+
+  playFold() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(220, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.14, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.12);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.12);
+    } catch (e) {}
+  }
+
+  playRouletteClick() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(2200, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(900, this.ctx.currentTime + 0.015);
+      gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.015);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.015);
     } catch (e) {}
   }
 
@@ -93,14 +164,33 @@ class SoundManager {
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.1);
-        gain.gain.setValueAtTime(0.22, this.ctx.currentTime + idx * 0.1);
-        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.1 + 0.25);
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.09);
+        gain.gain.setValueAtTime(0.22, this.ctx.currentTime + idx * 0.09);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.09 + 0.25);
         osc.connect(gain);
         gain.connect(this.ctx.destination);
-        osc.start(this.ctx.currentTime + idx * 0.1);
-        osc.stop(this.ctx.currentTime + idx * 0.1 + 0.25);
+        osc.start(this.ctx.currentTime + idx * 0.09);
+        osc.stop(this.ctx.currentTime + idx * 0.09 + 0.25);
       });
+    } catch (e) {}
+  }
+
+  playFire() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(180, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(360, this.ctx.currentTime + 0.2);
+      gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.2);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.2);
     } catch (e) {}
   }
 }
@@ -492,6 +582,7 @@ class PokerApp {
     this.communityCards = [];
     this.currentRound = 'pre-flop';
     this.handNumber = 0;
+    this.stage = 1;
     this.smallBlind = 10;
     this.bigBlind = 20;
     this.currentBet = 0;
@@ -508,6 +599,16 @@ class PokerApp {
     this.turnSecondsLeft = 15;
     this.remoteTurnWatchdog = null;
     this.joiningCountdownTimer = null;
+    this.heartbeatInterval = null;
+
+    // Hand History & Log
+    this.handHistory = [];
+
+    // Roulette Mini-Game State
+    this.rouletteBets = {};
+    this.selectedRouletteChip = 10;
+    this.rouletteSpinning = false;
+    this.rouletteAngle = 0;
 
     // Multiplayer Online State
     this.isOnlineRoom = false;
@@ -522,14 +623,15 @@ class PokerApp {
 
     // 5 Players: Seat 0 is Hero/Host, Seats 1-4 are Bots or Online Friends
     this.players = [
-      { id: 0, name: 'You', style: 'Hero', avatar: '👑', chips: 1000, currentBet: 0, totalBet: 0, cards: [], folded: false, allIn: false, isBot: false, isRemote: false },
-      { id: 1, name: 'Viper', style: 'Shark (TAG)', avatar: '🐍', chips: 1000, currentBet: 0, totalBet: 0, cards: [], folded: false, allIn: false, isBot: true, isRemote: false },
-      { id: 2, name: 'Atlas', style: 'Solid (TAG)', avatar: '🛡️', chips: 1000, currentBet: 0, totalBet: 0, cards: [], folded: false, allIn: false, isBot: true, isRemote: false },
-      { id: 3, name: 'Luna', style: 'Nit (Rock)', avatar: '🌙', chips: 1000, currentBet: 0, totalBet: 0, cards: [], folded: false, allIn: false, isBot: true, isRemote: false },
-      { id: 4, name: 'Duke', style: 'Maniac', avatar: '🦁', chips: 1000, currentBet: 0, totalBet: 0, cards: [], folded: false, allIn: false, isBot: true, isRemote: false }
+      { id: 0, name: 'You', style: 'Hero', avatar: '👑', chips: 1000, currentBet: 0, totalBet: 0, cards: [], folded: false, allIn: false, knockedOut: false, isBot: false, isRemote: false },
+      { id: 1, name: 'Viper', style: 'Shark (TAG)', avatar: '🐍', chips: 1000, currentBet: 0, totalBet: 0, cards: [], folded: false, allIn: false, knockedOut: false, isBot: true, isRemote: false },
+      { id: 2, name: 'Atlas', style: 'Solid (TAG)', avatar: '🛡️', chips: 1000, currentBet: 0, totalBet: 0, cards: [], folded: false, allIn: false, knockedOut: false, isBot: true, isRemote: false },
+      { id: 3, name: 'Luna', style: 'Nit (Rock)', avatar: '🌙', chips: 1000, currentBet: 0, totalBet: 0, cards: [], folded: false, allIn: false, knockedOut: false, isBot: true, isRemote: false },
+      { id: 4, name: 'Duke', style: 'Maniac', avatar: '🦁', chips: 1000, currentBet: 0, totalBet: 0, cards: [], folded: false, allIn: false, knockedOut: false, isBot: true, isRemote: false }
     ];
 
     this.bindDOM();
+    this.initRoulette();
     this.updateGlobalStatsUI();
     this.renderMainMenuSlots();
 
@@ -540,12 +642,22 @@ class PokerApp {
     }
   }
 
-  getBlindsForHand(h) {
-    if (h <= 5) return { sb: 10, bb: 20 };
-    if (h <= 10) return { sb: 20, bb: 40 };
-    if (h <= 15) return { sb: 40, bb: 80 };
-    if (h <= 20) return { sb: 80, bb: 160 };
-    return { sb: 160, bb: 320 };
+  getBaselineBlinds(stage = 1) {
+    if (stage === 1) return { sb: 10, bb: 20 };
+    if (stage === 2) return { sb: 25, bb: 50 };
+    if (stage === 3) return { sb: 50, bb: 100 };
+    const mult = Math.pow(2, stage - 3);
+    return { sb: 50 * mult, bb: 100 * mult };
+  }
+
+  getBlindsForHand(h, stage = 1) {
+    const base = this.getBaselineBlinds(stage);
+    let mult = 1;
+    if (h > 20) mult = 16;
+    else if (h > 15) mult = 8;
+    else if (h > 10) mult = 4;
+    else if (h > 5) mult = 2;
+    return { sb: base.sb * mult, bb: base.bb * mult };
   }
 
   bindDOM() {
@@ -757,6 +869,114 @@ class PokerApp {
       }
       this.startNewHand();
     });
+
+    // Custom Profile & Username
+    this.usernameInput = document.getElementById('player-username-input');
+    this.btnSaveUsername = document.getElementById('btn-save-username');
+    if (this.usernameInput) {
+      const savedName = localStorage.getItem('royal_poker_username') || 'You';
+      this.usernameInput.value = savedName;
+      this.players[0].name = savedName;
+      const saveName = () => {
+        const val = (this.usernameInput.value || '').trim();
+        if (val) {
+          localStorage.setItem('royal_poker_username', val);
+          this.players[0].name = val;
+          const heroEl = document.getElementById('hero-name');
+          if (heroEl) heroEl.textContent = val;
+          this.renderMainMenuSlots();
+          if (this.btnSaveUsername) {
+            this.btnSaveUsername.textContent = '✅ Saved';
+            setTimeout(() => { if (this.btnSaveUsername) this.btnSaveUsername.textContent = 'Save Name'; }, 1500);
+          }
+        }
+      };
+      if (this.btnSaveUsername) this.btnSaveUsername.addEventListener('click', saveName);
+      this.usernameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') saveName(); });
+    }
+
+    // Stage indicator & Hand History drawer
+    this.stageIndicator = document.getElementById('stage-indicator');
+    this.btnHandHistory = document.getElementById('btn-hand-history');
+    this.historyModal = document.getElementById('hand-history-panel');
+    this.closeHistoryBtn = document.getElementById('close-history-btn');
+    this.btnClearHistory = document.getElementById('btn-clear-history');
+    this.historyList = document.getElementById('hand-history-list');
+    this.historyCountEl = document.getElementById('history-total-count');
+
+    if (this.btnHandHistory && this.historyModal) {
+      this.btnHandHistory.addEventListener('click', () => {
+        this.renderHandHistory();
+        this.historyModal.classList.remove('hidden');
+      });
+    }
+    if (this.closeHistoryBtn && this.historyModal) {
+      this.closeHistoryBtn.addEventListener('click', () => this.historyModal.classList.add('hidden'));
+    }
+    if (this.btnClearHistory) {
+      this.btnClearHistory.addEventListener('click', () => {
+        this.handHistory = [];
+        this.renderHandHistory();
+      });
+    }
+
+    // European Roulette Mini-Game
+    this.btnOpenRoulette = document.getElementById('btn-open-roulette');
+    this.rouletteModal = document.getElementById('roulette-modal');
+    this.closeRouletteBtn = document.getElementById('close-roulette-btn');
+    this.btnSpinRoulette = document.getElementById('btn-spin-roulette');
+    this.btnClearRoulette = document.getElementById('btn-clear-roulette');
+
+    if (this.btnOpenRoulette && this.rouletteModal) {
+      this.btnOpenRoulette.addEventListener('click', () => {
+        this.openRouletteModal();
+      });
+    }
+    if (this.closeRouletteBtn && this.rouletteModal) {
+      this.closeRouletteBtn.addEventListener('click', () => {
+        this.rouletteModal.classList.add('hidden');
+      });
+    }
+    if (this.btnClearRoulette) {
+      this.btnClearRoulette.addEventListener('click', () => this.clearRouletteBets());
+    }
+    if (this.btnSpinRoulette) {
+      this.btnSpinRoulette.addEventListener('click', () => this.spinRouletteWheel());
+    }
+
+    // Stage Victory Modal
+    this.stageVictoryModal = document.getElementById('stage-victory-modal');
+    this.btnAdvanceStage = document.getElementById('btn-advance-stage');
+    this.btnVictoryMenu = document.getElementById('btn-victory-menu');
+    if (this.btnAdvanceStage) {
+      this.btnAdvanceStage.addEventListener('click', () => {
+        if (this.stageVictoryModal) this.stageVictoryModal.classList.add('hidden');
+        this.advanceToNextStage();
+      });
+    }
+    if (this.btnVictoryMenu) {
+      this.btnVictoryMenu.addEventListener('click', () => {
+        if (this.stageVictoryModal) this.stageVictoryModal.classList.add('hidden');
+        this.showMenuView();
+      });
+    }
+
+    // Permadeath Game Over Modal
+    this.gameOverModal = document.getElementById('game-over-modal');
+    this.btnQuickRebuy = document.getElementById('btn-quick-rebuy');
+    this.btnGameoverMenu = document.getElementById('btn-gameover-menu');
+    if (this.btnQuickRebuy) {
+      this.btnQuickRebuy.addEventListener('click', () => {
+        if (this.gameOverModal) this.gameOverModal.classList.add('hidden');
+        this.startNewGame(this.activeSlot || 1, this.difficulty || 'medium');
+      });
+    }
+    if (this.btnGameoverMenu) {
+      this.btnGameoverMenu.addEventListener('click', () => {
+        if (this.gameOverModal) this.gameOverModal.classList.add('hidden');
+        this.showMenuView();
+      });
+    }
   }
 
   // ==========================================================================
@@ -836,6 +1056,10 @@ class PokerApp {
 
   leaveOnlineRoom() {
     this.clearTurnTimer();
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+      this.heartbeatInterval = null;
+    }
     if (this.remoteTurnWatchdog) {
       clearTimeout(this.remoteTurnWatchdog);
       this.remoteTurnWatchdog = null;
@@ -1012,11 +1236,28 @@ class PokerApp {
       console.warn('Failed to bind host peer, running local room');
     }
 
+    // Heartbeat Keepalive to prevent connection dropouts
+    if (this.heartbeatInterval) clearInterval(this.heartbeatInterval);
+    this.heartbeatInterval = setInterval(() => {
+      this.guestConnections.forEach(g => {
+        if (g.conn && g.conn.open) {
+          try { g.conn.send({ type: 'heartbeat_ping', timestamp: Date.now() }); } catch (e) {}
+        }
+      });
+    }, 4500);
+
     this.startNewHand();
   }
 
   handleNewGuestConnection(conn) {
     conn.on('data', (data) => {
+      if (data.type === 'heartbeat_ping') {
+        try { conn.send({ type: 'heartbeat_pong' }); } catch (e) {}
+        return;
+      } else if (data.type === 'heartbeat_pong') {
+        return;
+      }
+
       if (data.type === 'join') {
         const guestName = data.name || 'Friend';
         // Find an open seat (Seats 1-4)
@@ -1117,6 +1358,14 @@ class PokerApp {
     // Register join request with Host
     conn.send({ type: 'join', name: playerName });
 
+    // Client Heartbeat Keepalive
+    if (this.heartbeatInterval) clearInterval(this.heartbeatInterval);
+    this.heartbeatInterval = setInterval(() => {
+      if (this.hostConn && this.hostConn.open) {
+        try { this.hostConn.send({ type: 'heartbeat_ping', timestamp: Date.now() }); } catch (e) {}
+      }
+    }, 4500);
+
     conn.on('data', (data) => {
       this.handleGuestReceivedData(data);
     });
@@ -1128,6 +1377,15 @@ class PokerApp {
   }
 
   handleGuestReceivedData(data) {
+    if (data.type === 'heartbeat_ping') {
+      if (this.hostConn && this.hostConn.open) {
+        try { this.hostConn.send({ type: 'heartbeat_pong' }); } catch (e) {}
+      }
+      return;
+    } else if (data.type === 'heartbeat_pong') {
+      return;
+    }
+
     if (data.type === 'waiting_screen') {
       this.mySeatIdx = data.seat;
       this.waitingRoundOverlay.classList.remove('hidden');
@@ -1424,6 +1682,8 @@ class PokerApp {
         const winPercent = slotData.winRecord && slotData.winRecord.total > 0
           ? Math.round((slotData.winRecord.won / slotData.winRecord.total) * 100)
           : 0;
+        const slotUser = slotData.username || localStorage.getItem('royal_poker_username') || 'Hero';
+        const slotStage = slotData.stage || 1;
 
         cardEl.innerHTML = `
           <div class="slot-corner-bracket top-left"></div>
@@ -1433,24 +1693,24 @@ class PokerApp {
               <span class="slot-crown-icon">
                 <svg width="16" height="13" viewBox="0 0 72 54" fill="none"><path d="M14 38 Q36 22 58 38 L54 44 Q36 34 18 44 Z" fill="#b91c1c"/><rect x="10" y="42" width="52" height="8" rx="2" fill="#ffd54f" stroke="#fef08a" stroke-width="1"/><path d="M12 42 L8 22 L20 30 L36 12 L52 30 L64 22 L60 42 Z" fill="#ffd54f" stroke="#fef08a" stroke-width="1.5"/><circle cx="36" cy="11" r="3" fill="#fff"/></svg>
               </span>
-              <span class="slot-badge">SLOT ${slotId}</span>
+              <span class="slot-badge">SLOT ${slotId} &bull; ${slotUser}</span>
             </div>
             <span class="slot-diff diff-${slotData.difficulty}">${slotData.difficulty.toUpperCase()}</span>
           </div>
           <div class="slot-bankroll-wrap">
-            <span class="slot-bankroll-label">BANKROLL</span>
+            <span class="slot-bankroll-label">BANKROLL &bull; STAGE ${slotStage}</span>
             <div class="slot-bankroll">
               <span class="bankroll-currency">$</span>${(slotData.chips || 1000).toLocaleString()}
             </div>
           </div>
           <div class="slot-stats-grid">
             <div class="slot-stat-item">
-              <span class="slot-stat-lbl">Round</span>
-              <span class="slot-stat-val">#${slotData.handNumber || 1}</span>
+              <span class="slot-stat-lbl">Stage/Round</span>
+              <span class="slot-stat-val">S${slotStage} #h${slotData.handNumber || 1}</span>
             </div>
             <div class="slot-stat-item">
-              <span class="slot-stat-lbl">Wins</span>
-              <span class="slot-stat-val">${slotData.winRecord ? slotData.winRecord.won : 0}</span>
+              <span class="slot-stat-lbl">Record</span>
+              <span class="slot-stat-val">${slotData.winRecord ? slotData.winRecord.won : 0} Wins</span>
             </div>
             <div class="slot-stat-item">
               <span class="slot-stat-lbl">Win Rate</span>
@@ -1487,20 +1747,24 @@ class PokerApp {
   startNewGame(slotId, difficulty) {
     this.activeSlot = slotId;
     this.difficulty = difficulty;
+    this.stage = 1;
     this.isOnlineRoom = false;
     this.isHost = false;
     this.onlineRoomBadge.classList.add('hidden');
     this.handNumber = 0;
     this.winRecord = { won: 0, total: 0 };
-    this.smallBlind = 10;
-    this.bigBlind = 20;
+    const baseline = this.getBaselineBlinds(1);
+    this.smallBlind = baseline.sb;
+    this.bigBlind = baseline.bb;
     this.dealerIdx = 0;
 
-    this.players[0].name = 'You';
+    const customName = localStorage.getItem('royal_poker_username') || 'You';
+    this.players[0].name = customName;
     this.players[0].chips = 1000;
+    this.players[0].knockedOut = false;
     this.players[0].isBot = false;
     this.players[0].isRemote = false;
-    document.getElementById('hero-name').textContent = 'You';
+    document.getElementById('hero-name').textContent = customName;
 
     for (let i = 1; i < 5; i++) {
       const prof = BASE_BOT_PROFILES[i];
@@ -1508,14 +1772,22 @@ class PokerApp {
       this.players[i].style = prof.style;
       this.players[i].avatar = prof.avatar;
       this.players[i].chips = 1000;
+      this.players[i].knockedOut = false;
       this.players[i].isBot = true;
       this.players[i].isRemote = false;
       this.players[i].peerConn = null;
       document.getElementById(`name-${i}`).textContent = prof.name;
       document.getElementById(`style-${i}`).textContent = prof.style;
       document.getElementById(`avatar-${i}`).textContent = prof.avatar;
+      const seatEl = document.getElementById(`seat-${i}`);
+      if (seatEl) {
+        seatEl.classList.remove('knocked-out');
+        const badge = seatEl.querySelector('.knockout-stamp');
+        if (badge) badge.remove();
+      }
     }
 
+    if (this.stageIndicator) this.stageIndicator.textContent = `Stage ${this.stage}`;
     document.getElementById('difficulty-indicator').textContent = this.difficulty.toUpperCase();
     this.saveCurrentGame();
     this.showGameView();
@@ -1527,6 +1799,7 @@ class PokerApp {
     if (!data) return;
 
     this.activeSlot = slotId;
+    this.stage = data.stage || 1;
     this.difficulty = data.difficulty || 'medium';
     this.isOnlineRoom = false;
     this.isHost = false;
@@ -1534,15 +1807,20 @@ class PokerApp {
     this.handNumber = (data.handNumber || 1) - 1;
     this.winRecord = data.winRecord || { won: 0, total: 0 };
 
+    const customName = data.username || localStorage.getItem('royal_poker_username') || 'You';
+    this.players[0].name = customName;
     this.players[0].chips = data.chips || 1000;
-    this.players[0].name = 'You';
+    this.players[0].knockedOut = (this.players[0].chips <= 0);
     this.players[0].isBot = false;
     this.players[0].isRemote = false;
-    document.getElementById('hero-name').textContent = 'You';
+    document.getElementById('hero-name').textContent = customName;
 
     if (data.botChips && Array.isArray(data.botChips)) {
       data.botChips.forEach((bc, idx) => {
-        if (this.players[idx + 1]) this.players[idx + 1].chips = bc;
+        if (this.players[idx + 1]) {
+          this.players[idx + 1].chips = bc;
+          this.players[idx + 1].knockedOut = (bc <= 0);
+        }
       });
     }
 
@@ -1557,8 +1835,19 @@ class PokerApp {
       document.getElementById(`name-${i}`).textContent = prof.name;
       document.getElementById(`style-${i}`).textContent = prof.style;
       document.getElementById(`avatar-${i}`).textContent = prof.avatar;
+      const seatEl = document.getElementById(`seat-${i}`);
+      if (seatEl) {
+        if (this.players[i].knockedOut) {
+          seatEl.classList.add('knocked-out');
+        } else {
+          seatEl.classList.remove('knocked-out');
+          const badge = seatEl.querySelector('.knockout-stamp');
+          if (badge) badge.remove();
+        }
+      }
     }
 
+    if (this.stageIndicator) this.stageIndicator.textContent = `Stage ${this.stage}`;
     document.getElementById('difficulty-indicator').textContent = this.difficulty.toUpperCase();
     this.showGameView();
     this.startNewHand();
@@ -1567,6 +1856,12 @@ class PokerApp {
   saveCurrentGame() {
     if (this.isOnlineRoom) return; // Online room state is session-only and never overwrites solo saves!
 
+    // Permadeath Check: If hero bankroll dropped to $0, immediately purge the save slot!
+    if (this.players[0].chips <= 0) {
+      SaveManager.deleteSlot(this.activeSlot);
+      return;
+    }
+
     const botChips = [
       this.players[1].chips,
       this.players[2].chips,
@@ -1574,7 +1869,11 @@ class PokerApp {
       this.players[4].chips
     ];
 
+    const username = localStorage.getItem('royal_poker_username') || 'You';
+
     SaveManager.saveSlot(this.activeSlot, {
+      username: username,
+      stage: this.stage || 1,
       chips: this.players[0].chips,
       handNumber: this.handNumber,
       difficulty: this.difficulty,
@@ -1701,10 +2000,29 @@ class PokerApp {
       this.sidePotWrapper.classList.add('hidden');
     }
 
+    // Pot fire effect for high stakes / win streaks
+    const potEl = this.potEl;
+    if (potEl) {
+      if (totalPot >= 300) {
+        potEl.classList.add('pot-fire-glow');
+        if (!potEl.querySelector('.pot-fire-icon')) {
+          const fireSpan = document.createElement('span');
+          fireSpan.className = 'pot-fire-icon';
+          fireSpan.textContent = '🔥';
+          potEl.prepend(fireSpan);
+        }
+      } else {
+        potEl.classList.remove('pot-fire-glow');
+        const fireSpan = potEl.querySelector('.pot-fire-icon');
+        if (fireSpan) fireSpan.remove();
+      }
+    }
+
     this.players.forEach((p, idx) => {
       document.getElementById(`chips-${idx}`).textContent = p.chips.toLocaleString();
       const seatEl = document.getElementById(`seat-${idx}`);
       seatEl.classList.toggle('folded-seat', p.folded);
+      seatEl.classList.toggle('knocked-out', !!p.knockedOut);
 
       // Dealer button indicator
       const dBtn = document.getElementById(`dealer-btn-${idx}`);
@@ -1732,15 +2050,75 @@ class PokerApp {
     }
   }
 
+  triggerStageVictory() {
+    this.handInProgress = false;
+    this.clearTurnTimer();
+    sounds.playWin();
+    if (this.stageVictoryModal) {
+      const chipsWon = this.players.reduce((sum, p) => sum + p.chips, 0);
+      const vChipsWon = document.getElementById('v-chips-won');
+      const vStageCompleted = document.getElementById('v-stage-completed');
+      const vNextBlinds = document.getElementById('v-next-blinds');
+      if (vChipsWon) vChipsWon.textContent = `$${chipsWon.toLocaleString()}`;
+      if (vStageCompleted) vStageCompleted.textContent = `Stage ${this.stage || 1}`;
+      const nextBase = this.getBaselineBlinds((this.stage || 1) + 1);
+      if (vNextBlinds) vNextBlinds.textContent = `$${nextBase.sb} / $${nextBase.bb}`;
+      this.stageVictoryModal.classList.remove('hidden');
+    }
+  }
+
+  advanceToNextStage() {
+    this.stage = (this.stage || 1) + 1;
+    this.handNumber = 0;
+    this.currentBet = 0;
+    const base = this.getBaselineBlinds(this.stage);
+    this.smallBlind = base.sb;
+    this.bigBlind = base.bb;
+    this.dealerIdx = 0;
+
+    // Reset bot bankrolls for the new escalated stage
+    const botStartChips = 1000 * this.stage;
+    for (let i = 1; i < 5; i++) {
+      this.players[i].chips = botStartChips;
+      this.players[i].knockedOut = false;
+      const seat = document.getElementById(`seat-${i}`);
+      if (seat) {
+        seat.classList.remove('knocked-out');
+        const badge = seat.querySelector('.knockout-stamp');
+        if (badge) badge.remove();
+      }
+    }
+    // Hero advances with at least the stage baseline bankroll
+    this.players[0].chips = Math.max(this.players[0].chips, botStartChips);
+
+    if (this.stageIndicator) this.stageIndicator.textContent = `Stage ${this.stage}`;
+    this.saveCurrentGame();
+    this.startNewHand();
+  }
+
   startNewHand() {
+    // 1. Permadeath Validation: If hero has 0 chips, slot is deleted permanently!
+    if (!this.isOnlineRoom && this.players[0].chips <= 0) {
+      SaveManager.deleteSlot(this.activeSlot);
+      this.renderMainMenuSlots();
+      if (this.gameOverModal) this.gameOverModal.classList.remove('hidden');
+      return;
+    }
+
+    // 2. Table Dominance Check: If all bots are knocked out, trigger victory!
+    if (!this.isOnlineRoom && this.players.slice(1).every(p => p.chips <= 0)) {
+      this.triggerStageVictory();
+      return;
+    }
+
     this.handInProgress = true;
     this.updateMenuLockState();
     this.handNumber++;
     this.allInAutoRunout = false;
 
-    // Check dynamic blinds every 5 hands
+    // Dynamic blinds based on hand count within the current stage
     const prevSB = this.smallBlind;
-    const newBlinds = this.getBlindsForHand(this.handNumber);
+    const newBlinds = this.getBlindsForHand(this.handNumber, this.stage || 1);
     this.smallBlind = newBlinds.sb;
     this.bigBlind = newBlinds.bb;
 
@@ -1760,22 +2138,38 @@ class PokerApp {
       document.getElementById(id).innerHTML = '';
     });
 
+    // Reset player round states and tag knockouts
     this.players.forEach(p => {
       p.cards = [];
       p.currentBet = 0;
       p.totalBet = 0;
-      p.folded = (p.chips <= 0);
+      p.knockedOut = (p.chips <= 0);
+      p.folded = p.knockedOut;
       p.allIn = (p.chips === 0);
       if (p.isBot) p.wasPreflopRaiser = false;
+
+      const seat = document.getElementById(`seat-${p.id}`);
+      if (seat) {
+        seat.classList.toggle('knocked-out', p.knockedOut);
+        let badge = seat.querySelector('.knockout-stamp');
+        if (p.knockedOut && !badge) {
+          badge = document.createElement('div');
+          badge.className = 'knockout-stamp';
+          badge.textContent = 'BUSTED';
+          seat.appendChild(badge);
+        } else if (!p.knockedOut && badge) {
+          badge.remove();
+        }
+      }
     });
 
-    sounds.playCard();
+    sounds.playShuffle();
     this.setAnnouncement('New hand dealt! Blinds posted.');
 
-    // Deal 2 hole cards to each player
+    // Deal 2 hole cards to active non-knocked-out players
     for (let c = 0; c < 2; c++) {
       this.players.forEach((p, idx) => {
-        if (!p.folded) {
+        if (!p.knockedOut && !p.folded) {
           const card = this.deck.deal();
           p.cards.push(card);
           const isHidden = (idx !== 0);
@@ -1785,29 +2179,67 @@ class PokerApp {
       });
     }
 
-    // ADRENALINE MECHANIC (Solo mode only):
-    // When human player receives a strong starting hand, adjust bot cards so at least one bot has high drama
-    if (!this.isOnlineRoom && !this.players[0].folded) {
+    // DIFFICULTY & AI ENGINE: NIGHTMARE MODE ADVANTAGE
+    // In Nightmare Mode, subtly bias the card distribution so bots receive slightly favored card deals (~55–60% equity edge)
+    if (!this.isOnlineRoom && this.difficulty === 'nightmare' && !this.players[0].folded) {
+      const activeBots = [1, 2, 3, 4].filter(i => !this.players[i].knockedOut && !this.players[i].folded);
+      if (activeBots.length > 0 && Math.random() < 0.58) {
+        const rivalIdx = activeBots[Math.floor(Math.random() * activeBots.length)];
+        const suits = [SUITS[0], SUITS[1], SUITS[2], SUITS[3]];
+        const premiumCombos = [
+          [new Card(14, suits[0]), new Card(14, suits[1])], // AA
+          [new Card(13, suits[0]), new Card(13, suits[1])], // KK
+          [new Card(12, suits[0]), new Card(12, suits[1])], // QQ
+          [new Card(14, suits[2]), new Card(13, suits[2])], // AKs
+          [new Card(14, suits[3]), new Card(12, suits[3])]  // AQs
+        ];
+        this.players[rivalIdx].cards = premiumCombos[Math.floor(Math.random() * premiumCombos.length)];
+        const rSeat = document.getElementById(`seat-${rivalIdx}`);
+        if (rSeat) rSeat.classList.add('adrenaline-threat');
+      }
+    } else if (!this.isOnlineRoom && !this.players[0].folded) {
+      // Standard drama mechanic on Easy/Medium/Hard
       const heroTier = evaluatePreflopTier(this.players[0].cards);
       if (heroTier <= 2) {
-        const botIndices = [1, 2, 3, 4].filter(i => !this.players[i].folded);
+        const botIndices = [1, 2, 3, 4].filter(i => !this.players[i].knockedOut && !this.players[i].folded);
         if (botIndices.length > 0) {
           const rivalIdx = botIndices[Math.floor(Math.random() * botIndices.length)];
-          // 25% chance of slightly better hand, 75% competitive
           if (Math.random() < 0.25) {
-            this.players[rivalIdx].cards = [new Card(14, SUITS[1]), new Card(14, SUITS[2])]; // Pocket Aces
+            this.players[rivalIdx].cards = [new Card(14, SUITS[1]), new Card(14, SUITS[2])]; // AA
           } else {
-            this.players[rivalIdx].cards = [new Card(13, SUITS[0]), new Card(13, SUITS[3])]; // Pocket Kings
+            this.players[rivalIdx].cards = [new Card(13, SUITS[0]), new Card(13, SUITS[3])]; // KK
           }
-          document.getElementById(`seat-${rivalIdx}`).classList.add('adrenaline-threat');
+          const rSeat = document.getElementById(`seat-${rivalIdx}`);
+          if (rSeat) rSeat.classList.add('adrenaline-threat');
         }
       }
     }
 
-    // Small & Big Blinds
-    const sbIdx = (this.dealerIdx + 1) % this.players.length;
-    const bbIdx = (this.dealerIdx + 2) % this.players.length;
+    // Rotate dealer button among active (non-knocked-out) players
+    let d = (this.dealerIdx + 1) % this.players.length;
+    let dAttempts = 0;
+    while (this.players[d].knockedOut && dAttempts < this.players.length) {
+      d = (d + 1) % this.players.length;
+      dAttempts++;
+    }
+    this.dealerIdx = d;
 
+    // Small and Big Blind indices strictly from active players
+    let sbIdx = (this.dealerIdx + 1) % this.players.length;
+    let sbAttempts = 0;
+    while (this.players[sbIdx].knockedOut && sbAttempts < this.players.length) {
+      sbIdx = (sbIdx + 1) % this.players.length;
+      sbAttempts++;
+    }
+
+    let bbIdx = (sbIdx + 1) % this.players.length;
+    let bbAttempts = 0;
+    while ((this.players[bbIdx].knockedOut || bbIdx === sbIdx) && bbAttempts < this.players.length) {
+      bbIdx = (bbIdx + 1) % this.players.length;
+      bbAttempts++;
+    }
+
+    // Deduct forced blinds with immediate stack update
     this.postBet(this.players[sbIdx], Math.min(this.smallBlind, this.players[sbIdx].chips));
     this.postBet(this.players[bbIdx], Math.min(this.bigBlind, this.players[bbIdx].chips));
     this.currentBet = this.bigBlind;
@@ -1816,7 +2248,10 @@ class PokerApp {
     this.updateTableUI();
     this.broadcastTableState();
 
-    const utgIdx = (bbIdx + 1) % this.players.length;
+    let utgIdx = (bbIdx + 1) % this.players.length;
+    while (this.players[utgIdx].knockedOut || this.players[utgIdx].folded) {
+      utgIdx = (utgIdx + 1) % this.players.length;
+    }
     this.startBettingRound('pre-flop', utgIdx);
   }
 
@@ -2042,28 +2477,45 @@ class PokerApp {
   }
 
   // ==========================================================================
-  // BOT AI DECISION TREE: REALISTIC ALL-IN CALLS & AGGRESSION
+  // BOT AI DECISION TREE: HIGH-IQ POT ODDS, 20% BLUFF RATE & NIGHTMARE ENGINE
   // ==========================================================================
   runBotStrategicTurn(bot) {
     const toCall = this.currentBet - bot.currentBet;
     const isPreflop = (this.communityCards.length === 0);
     const pot = this.getTotalPot();
     const isHeroAllIn = this.players[0].allIn;
+    const isNightmare = (this.difficulty === 'nightmare');
+
+    // Calculate exact pot odds
+    const potOdds = toCall > 0 ? (toCall / (pot + toCall)) : 0;
+
+    // Board texture analysis
+    const isBoardPaired = this.communityCards.length >= 3 && (new Set(this.communityCards.map(c => c.rank)).size < this.communityCards.length);
+    const suitCounts = {};
+    this.communityCards.forEach(c => suitCounts[c.suit.name] = (suitCounts[c.suit.name] || 0) + 1);
+    const hasFlushDanger = Object.values(suitCounts).some(cnt => cnt >= 3);
+    const hasScaryHighCard = this.communityCards.some(c => c.rank >= 13);
+    const isRiver = (this.currentRound === 'river');
+
+    // Strategic Bluff Engine: 20% bluff frequency on standard difficulties, up to 35% on Nightmare
+    const bluffThreshold = isNightmare ? 0.35 : 0.20;
+    const shouldStrategicBluff = (Math.random() < bluffThreshold) && (isRiver || hasScaryHighCard || isBoardPaired || bot.id === 4);
 
     if (isPreflop) {
       const tier = evaluatePreflopTier(bot.cards);
+      const preflopEquity = tier === 1 ? 0.82 : (tier === 2 ? 0.65 : (tier === 3 ? 0.48 : (tier === 4 ? 0.34 : 0.20)));
 
-      // Facing an all-in shove
+      // Facing large shove or all-in
       if (toCall > this.bigBlind * 4 || isHeroAllIn) {
         if (tier === 1) {
           const called = this.postBet(bot, toCall);
           this.showActionBubble(bot.id, `CALL ALL-IN!`);
           this.setAnnouncement(`🔥 ${bot.name} SNAPS CALL with monster pocket pair!`);
-        } else if (tier === 2 && Math.random() < 0.65) {
+        } else if ((tier === 2 && (preflopEquity >= potOdds || Math.random() < 0.70)) || (isNightmare && tier <= 2)) {
           const called = this.postBet(bot, toCall);
           this.showActionBubble(bot.id, `CALL ALL-IN!`);
-          this.setAnnouncement(`🔥 ${bot.name} calls the all-in shove with strong cards!`);
-        } else if (bot.style.includes('Maniac') && Math.random() < 0.5) {
+          this.setAnnouncement(`🔥 ${bot.name} calls the all-in shove with strong pot odds!`);
+        } else if (bot.style.includes('Maniac') && Math.random() < 0.45) {
           const called = this.postBet(bot, toCall);
           this.showActionBubble(bot.id, `GAMBLE CALL!`);
           this.setAnnouncement(`🔥 Duke gambles and calls the all-in!`);
@@ -2073,8 +2525,9 @@ class PokerApp {
           this.setAnnouncement(`${bot.name} folds to the shove.`);
         }
       } else if (toCall === 0) {
-        if (tier <= 2 && Math.random() < 0.7) {
-          const raiseAmt = Math.min(bot.chips, this.minRaise * 3);
+        // Checked to bot
+        if ((tier <= 2 && Math.random() < 0.75) || (isNightmare && tier <= 3)) {
+          const raiseAmt = Math.min(bot.chips, this.minRaise * (isNightmare ? 4 : 3));
           this.postBet(bot, raiseAmt);
           this.minRaise = raiseAmt - this.currentBet;
           this.currentBet = bot.currentBet;
@@ -2082,17 +2535,37 @@ class PokerApp {
           this.hasActed.clear();
           this.showActionBubble(bot.id, `Raise to $${bot.currentBet}`);
           this.setAnnouncement(`${bot.name} raises to $${bot.currentBet}!`);
+        } else if (shouldStrategicBluff && Math.random() < 0.5) {
+          const bluffAmt = Math.min(bot.chips, this.minRaise * 2);
+          this.postBet(bot, bluffAmt);
+          this.minRaise = bluffAmt - this.currentBet;
+          this.currentBet = bot.currentBet;
+          this.hasActed.clear();
+          this.showActionBubble(bot.id, `Bluff Raise $${bot.currentBet}`);
+          this.setAnnouncement(`⚡ ${bot.name} fires a pre-flop bluff raise to $${bot.currentBet}!`);
         } else {
           sounds.playCheck();
           this.showActionBubble(bot.id, 'Check');
           this.setAnnouncement(`${bot.name} checks.`);
         }
       } else {
+        // Calling standard bets
         if (tier === 1) {
-          const called = this.postBet(bot, toCall);
-          this.showActionBubble(bot.id, `Call $${called}`);
-          this.setAnnouncement(`${bot.name} calls $${called}.`);
-        } else if (tier <= 3 || Math.random() < 0.6) {
+          if (isNightmare && Math.random() < 0.6) {
+            // Nightmare 3-bet
+            const reRaise = Math.min(bot.chips, this.currentBet + this.minRaise * 2);
+            this.postBet(bot, reRaise - bot.currentBet);
+            this.minRaise = reRaise - this.currentBet;
+            this.currentBet = bot.currentBet;
+            this.hasActed.clear();
+            this.showActionBubble(bot.id, `3-Bet $${bot.currentBet}`);
+            this.setAnnouncement(`💀 ${bot.name} re-raises to $${bot.currentBet}!`);
+          } else {
+            const called = this.postBet(bot, toCall);
+            this.showActionBubble(bot.id, `Call $${called}`);
+            this.setAnnouncement(`${bot.name} calls $${called}.`);
+          }
+        } else if (preflopEquity >= potOdds || tier <= 3 || (Math.random() < 0.55 && !isNightmare)) {
           const called = this.postBet(bot, toCall);
           this.showActionBubble(bot.id, `Call $${called}`);
           this.setAnnouncement(`${bot.name} calls $${called}.`);
@@ -2103,33 +2576,61 @@ class PokerApp {
         }
       }
     } else {
-      // Post-Flop Decisions
+      // Post-Flop Decisions: High-IQ pot odds & texture reads
       const best = evaluateBestHand(bot.cards, this.communityCards);
+      const isMonster = best.category >= HAND_RANKS.FULL_HOUSE;
       const isStrong = best.category >= HAND_RANKS.TWO_PAIR;
       const isPair = best.category >= HAND_RANKS.ONE_PAIR;
 
+      // Estimated post-flop equity
+      let postFlopEquity = 0.15;
+      if (isMonster) postFlopEquity = 0.95;
+      else if (best.category >= HAND_RANKS.FLUSH) postFlopEquity = 0.85;
+      else if (best.category >= HAND_RANKS.STRAIGHT) postFlopEquity = 0.78;
+      else if (best.category >= HAND_RANKS.THREE_OF_A_KIND) postFlopEquity = 0.68;
+      else if (isStrong) postFlopEquity = 0.55;
+      else if (isPair) postFlopEquity = 0.38;
+
       if (toCall > 0) {
-        if (isStrong || (isPair && Math.random() < 0.75)) {
+        // Evaluate calling vs pot odds
+        const justifiedByOdds = postFlopEquity >= (potOdds * (isNightmare ? 0.9 : 0.8));
+
+        if (isMonster || isStrong || justifiedByOdds) {
           const called = this.postBet(bot, toCall);
           this.showActionBubble(bot.id, `Call $${called}`);
-          this.setAnnouncement(`${bot.name} calls with ${best.desc}.`);
-        } else if (Math.random() < 0.35) {
-          const called = this.postBet(bot, toCall);
-          this.showActionBubble(bot.id, `Call $${called}`);
-          this.setAnnouncement(`${bot.name} calls $${called}.`);
+          this.setAnnouncement(`${bot.name} calls $${called} (${best.desc}).`);
+        } else if (shouldStrategicBluff && Math.random() < 0.30 && bot.chips > toCall * 3) {
+          // Semi-bluff raise on scary board!
+          const bluffRaise = Math.min(bot.chips, this.currentBet + Math.max(this.minRaise, Math.floor(pot * 0.6)));
+          this.postBet(bot, bluffRaise - bot.currentBet);
+          this.minRaise = bluffRaise - this.currentBet;
+          this.currentBet = bot.currentBet;
+          this.hasActed.clear();
+          this.showActionBubble(bot.id, `Bluff Raise $${bot.currentBet}`);
+          this.setAnnouncement(`⚡ ${bot.name} attacks the board with a high-pressure bluff raise to $${bot.currentBet}!`);
         } else {
           bot.folded = true;
           this.showActionBubble(bot.id, 'Fold');
-          this.setAnnouncement(`${bot.name} folds.`);
+          this.setAnnouncement(`${bot.name} folds to the bet.`);
         }
       } else {
-        if (isStrong && Math.random() < 0.8) {
-          const betAmt = Math.min(bot.chips, Math.max(this.bigBlind, Math.floor(pot * 0.6)));
+        // Checked to bot: Value bet or strategic bluff
+        if (isMonster || (isStrong && Math.random() < 0.85) || (isNightmare && isPair && Math.random() < 0.7)) {
+          const betPct = isMonster ? 0.75 : 0.55;
+          const betAmt = Math.min(bot.chips, Math.max(this.bigBlind, Math.floor(pot * betPct)));
           this.postBet(bot, betAmt);
           this.currentBet = bot.currentBet;
           this.hasActed.clear();
           this.showActionBubble(bot.id, `Bet $${betAmt}`);
-          this.setAnnouncement(`${bot.name} bets $${betAmt} (${best.desc}).`);
+          this.setAnnouncement(`${bot.name} value bets $${betAmt} (${best.desc}).`);
+        } else if (shouldStrategicBluff) {
+          // 20% strategic bluff in position or on scary river
+          const bluffAmt = Math.min(bot.chips, Math.max(this.bigBlind, Math.floor(pot * 0.55)));
+          this.postBet(bot, bluffAmt);
+          this.currentBet = bot.currentBet;
+          this.hasActed.clear();
+          this.showActionBubble(bot.id, `Bluff $${bluffAmt}`);
+          this.setAnnouncement(`🎭 ${bot.name} fires a strategic bluff bet of $${bluffAmt}!`);
         } else {
           sounds.playCheck();
           this.showActionBubble(bot.id, 'Check');
@@ -2205,6 +2706,17 @@ class PokerApp {
     SaveManager.recordHandStats(heroWon, pot, heroHandEval, this.isOnlineRoom);
     this.updateGlobalStatsUI();
 
+    // Log Hand History Event
+    this.recordHandHistory({
+      stage: this.stage || 1,
+      handNum: this.handNumber,
+      winner: winner.name,
+      amount: pot,
+      desc: 'All opponents folded',
+      cards: winner.cards || [],
+      community: [...this.communityCards]
+    });
+
     this.setAnnouncement(`🏆 ${winner.name} wins $${pot}! (Opponents folded)`);
     this.updateTableUI();
     this.broadcastTableState();
@@ -2278,9 +2790,27 @@ class PokerApp {
 
       if (tiedWinners.length === 1) {
         announcements.push(`🏆 ${tiedWinners[0].player.name} wins ${potLabel} ($${pot.amount}) with ${tiedWinners[0].eval.desc}!`);
+        this.recordHandHistory({
+          stage: this.stage || 1,
+          handNum: this.handNumber,
+          winner: tiedWinners[0].player.name,
+          amount: pot.amount,
+          desc: tiedWinners[0].eval.desc,
+          cards: tiedWinners[0].player.cards,
+          community: [...this.communityCards]
+        });
       } else {
         const names = tiedWinners.map(w => w.player.name).join(' & ');
         announcements.push(`🤝 Chop! ${names} split ${potLabel} ($${pot.amount})!`);
+        this.recordHandHistory({
+          stage: this.stage || 1,
+          handNum: this.handNumber,
+          winner: names,
+          amount: pot.amount,
+          desc: `Chop Split with ${tiedWinners[0].eval.desc}`,
+          cards: tiedWinners[0].player.cards,
+          community: [...this.communityCards]
+        });
       }
     });
 
@@ -2319,15 +2849,29 @@ class PokerApp {
 
     const hero = this.players[0];
     if (hero.chips === 0) {
-      // ZERO MONEY COMPLETELY: Player knocked out, must return to Main Menu to reset bankroll!
-      this.setAnnouncement('💀 YOU WENT BUST! Zero chips left. Return to Main Menu to reset.');
-      this.btnNextHand.textContent = '🏠 Exit to Menu (Reset $1,000)';
+      // PERMADEATH ACTIVATED: Save slot deleted permanently from storage!
+      if (!this.isOnlineRoom) {
+        SaveManager.deleteSlot(this.activeSlot);
+        this.renderMainMenuSlots();
+      }
+      this.setAnnouncement('💀 YOU WENT BUST! Zero chips left. Permadeath activated.');
+      if (this.gameOverModal) {
+        this.gameOverModal.classList.remove('hidden');
+      }
+      this.btnNextHand.textContent = '💀 Start New Run ($1,000)';
       this.btnNextHand.onclick = () => {
         this.btnNextHand.onclick = null;
         this.btnNextHand.textContent = 'Deal Next Hand';
-        this.showMenuView();
+        if (this.gameOverModal) this.gameOverModal.classList.add('hidden');
+        this.startNewGame(this.activeSlot || 1, this.difficulty || 'medium');
       };
       this.btnNextHand.classList.remove('hidden');
+      return;
+    }
+
+    // Check if ALL bots have 0 chips: Table Conquered!
+    if (!this.isOnlineRoom && this.players.slice(1).every(p => p.chips <= 0)) {
+      this.triggerStageVictory();
       return;
     }
 
@@ -2396,6 +2940,382 @@ class PokerApp {
         if (onComplete) onComplete();
       }
     }, 1000);
+  }
+
+  // ==========================================================================
+  // EUROPEAN SINGLE-ZERO ROULETTE MINI-GAME
+  // ==========================================================================
+  initRoulette() {
+    this.rouletteCanvas = document.getElementById('roulette-canvas');
+    if (!this.rouletteCanvas) return;
+    this.rouletteCtx = this.rouletteCanvas.getContext('2d');
+    this.wheelNumbers = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
+    this.redNumbers = new Set([1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]);
+    this.drawRouletteWheel(0);
+
+    // Populate numbers grid 1-36
+    const grid = document.getElementById('roulette-numbers-grid');
+    if (grid) {
+      grid.innerHTML = '';
+      for (let n = 1; n <= 36; n++) {
+        const btn = document.createElement('button');
+        const isRed = this.redNumbers.has(n);
+        btn.className = `r-num-cell ${isRed ? 'red' : 'black'}`;
+        btn.textContent = n;
+        btn.dataset.betType = 'number';
+        btn.dataset.betVal = n;
+        btn.addEventListener('click', () => this.placeRouletteBet('number', n, btn));
+        grid.appendChild(btn);
+      }
+    }
+
+    // Chip selectors
+    document.querySelectorAll('.r-chip-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.r-chip-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.selectedRouletteChip = Number(btn.dataset.chip);
+        sounds.playChip();
+      });
+    });
+
+    // Outside spots
+    document.querySelectorAll('.r-bet-spot').forEach(spot => {
+      spot.addEventListener('click', () => {
+        this.placeRouletteBet(spot.dataset.betType, spot.dataset.betVal, spot);
+      });
+    });
+  }
+
+  openRouletteModal() {
+    if (!this.rouletteModal) return;
+    this.updateRouletteUI();
+    this.rouletteModal.classList.remove('hidden');
+    this.drawRouletteWheel(this.rouletteAngle || 0);
+  }
+
+  updateRouletteUI() {
+    const currentChips = this.players[0].chips;
+    const rBankroll = document.getElementById('roulette-bankroll');
+    const rBetTotal = document.getElementById('roulette-total-bet');
+    if (rBankroll) rBankroll.textContent = `$${currentChips.toLocaleString()}`;
+    const totalBet = Object.values(this.rouletteBets).reduce((sum, b) => sum + b.amount, 0);
+    if (rBetTotal) rBetTotal.textContent = `$${totalBet.toLocaleString()}`;
+  }
+
+  placeRouletteBet(type, val, targetEl) {
+    if (this.rouletteSpinning) return;
+    const chipAmt = this.selectedRouletteChip || 10;
+    if (this.players[0].chips < chipAmt) {
+      sounds.playCheck();
+      const pill = document.getElementById('roulette-status-pill');
+      if (pill) pill.textContent = '❌ Insufficient bankroll chips!';
+      return;
+    }
+
+    const key = `${type}_${val}`;
+    if (!this.rouletteBets[key]) {
+      this.rouletteBets[key] = { type, val, amount: 0, el: targetEl };
+    }
+    this.rouletteBets[key].amount += chipAmt;
+    this.players[0].chips -= chipAmt;
+    sounds.playChip();
+
+    let badge = targetEl.querySelector('.bet-badge');
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.className = 'bet-badge';
+      targetEl.appendChild(badge);
+    }
+    badge.textContent = `$${this.rouletteBets[key].amount}`;
+
+    const pill = document.getElementById('roulette-status-pill');
+    if (pill) pill.textContent = `Bet placed on ${val}! Spin when ready.`;
+
+    this.updateRouletteUI();
+    this.updateTableUI();
+    if (!this.isOnlineRoom) this.saveCurrentGame();
+  }
+
+  clearRouletteBets() {
+    if (this.rouletteSpinning) return;
+    Object.values(this.rouletteBets).forEach(b => {
+      this.players[0].chips += b.amount;
+      if (b.el) {
+        const badge = b.el.querySelector('.bet-badge');
+        if (badge) badge.remove();
+      }
+    });
+    this.rouletteBets = {};
+    sounds.playChip();
+    const pill = document.getElementById('roulette-status-pill');
+    if (pill) pill.textContent = 'All bets cleared and refunded to bankroll.';
+    this.updateRouletteUI();
+    this.updateTableUI();
+    if (!this.isOnlineRoom) this.saveCurrentGame();
+  }
+
+  drawRouletteWheel(angle) {
+    if (!this.rouletteCtx) return;
+    const ctx = this.rouletteCtx;
+    const size = 320;
+    const center = size / 2;
+    const radius = center - 8;
+    ctx.clearRect(0, 0, size, size);
+
+    const totalPockets = this.wheelNumbers.length;
+    const arc = (2 * Math.PI) / totalPockets;
+
+    ctx.save();
+    ctx.translate(center, center);
+    ctx.rotate(angle);
+
+    for (let i = 0; i < totalPockets; i++) {
+      const num = this.wheelNumbers[i];
+      const startAngle = i * arc;
+      const endAngle = startAngle + arc;
+
+      // Color pocket
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.arc(0, 0, radius, startAngle, endAngle);
+      ctx.closePath();
+
+      if (num === 0) {
+        ctx.fillStyle = '#15803d'; // European single green zero
+      } else if (this.redNumbers.has(num)) {
+        ctx.fillStyle = '#b91c1c'; // Red
+      } else {
+        ctx.fillStyle = '#0f172a'; // Black
+      }
+      ctx.fill();
+
+      // Golden sector dividers
+      ctx.strokeStyle = '#ffd700';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Number text
+      ctx.save();
+      ctx.rotate(startAngle + arc / 2);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText(num.toString(), radius - 12, 4);
+      ctx.restore();
+    }
+
+    // Outer rim
+    ctx.beginPath();
+    ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+    ctx.lineWidth = 6;
+    ctx.strokeStyle = '#d4af37';
+    ctx.stroke();
+
+    // Center hub
+    ctx.beginPath();
+    ctx.arc(0, 0, 36, 0, 2 * Math.PI);
+    ctx.fillStyle = '#78350f';
+    ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#ffd700';
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(0, 0, 16, 0, 2 * Math.PI);
+    ctx.fillStyle = '#ffd700';
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  spinRouletteWheel() {
+    if (this.rouletteSpinning) return;
+    const totalBet = Object.values(this.rouletteBets).reduce((sum, b) => sum + b.amount, 0);
+    if (totalBet === 0) {
+      sounds.playCheck();
+      const pill = document.getElementById('roulette-status-pill');
+      if (pill) pill.textContent = '⚠️ Place at least one bet before spinning!';
+      return;
+    }
+
+    this.rouletteSpinning = true;
+    const spinBtn = document.getElementById('btn-spin-roulette');
+    if (spinBtn) spinBtn.disabled = true;
+
+    // Pick random winning pocket (European 0 to 36)
+    const winningIdx = Math.floor(Math.random() * this.wheelNumbers.length);
+    const winningNumber = this.wheelNumbers[winningIdx];
+
+    const totalPockets = this.wheelNumbers.length;
+    const arc = (2 * Math.PI) / totalPockets;
+
+    // Pointer is at the top: angle 3*PI/2
+    const targetOffset = (3 * Math.PI / 2) - (winningIdx * arc + arc / 2);
+    const fullRotations = 6 + Math.floor(Math.random() * 3);
+    const targetAngle = fullRotations * 2 * Math.PI + targetOffset;
+
+    const startAngle = this.rouletteAngle % (2 * Math.PI);
+    const delta = targetAngle - startAngle;
+    const duration = 3800; // ms
+    const startTime = performance.now();
+
+    let lastTickAngle = startAngle;
+
+    const animateWheel = (currentTime) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 3);
+      const currentAngle = startAngle + delta * ease;
+      this.rouletteAngle = currentAngle;
+      this.drawRouletteWheel(currentAngle);
+
+      if (Math.abs(currentAngle - lastTickAngle) >= arc * 0.9) {
+        sounds.playRouletteClick();
+        lastTickAngle = currentAngle;
+      }
+
+      if (progress < 1) {
+        requestAnimationFrame(animateWheel);
+      } else {
+        this.rouletteSpinning = false;
+        if (spinBtn) spinBtn.disabled = false;
+        this.resolveRouletteSpin(winningNumber);
+      }
+    };
+
+    requestAnimationFrame(animateWheel);
+  }
+
+  resolveRouletteSpin(winningNumber) {
+    const isRed = this.redNumbers.has(winningNumber);
+    const isBlack = winningNumber > 0 && !isRed;
+    const isEven = (winningNumber > 0 && winningNumber % 2 === 0);
+    const isOdd = (winningNumber > 0 && winningNumber % 2 === 1);
+    const isLow = (winningNumber >= 1 && winningNumber <= 18);
+    const isHigh = (winningNumber >= 19 && winningNumber <= 36);
+    const dozen = winningNumber === 0 ? 0 : (winningNumber <= 12 ? 1 : (winningNumber <= 24 ? 2 : 3));
+
+    let totalPayout = 0;
+    const winningDescriptions = [];
+
+    Object.values(this.rouletteBets).forEach(bet => {
+      let won = false;
+      let payoutMult = 0;
+
+      if (bet.type === 'number' && Number(bet.val) === winningNumber) {
+        won = true;
+        payoutMult = 36; // 35 to 1 payout + original bet returned
+      } else if (bet.type === 'color') {
+        if (bet.val === 'red' && isRed) won = true;
+        if (bet.val === 'black' && isBlack) won = true;
+        if (won) payoutMult = 2; // 1 to 1 payout
+      } else if (bet.type === 'parity') {
+        if (bet.val === 'even' && isEven) won = true;
+        if (bet.val === 'odd' && isOdd) won = true;
+        if (won) payoutMult = 2;
+      } else if (bet.type === 'low' && isLow) {
+        won = true;
+        payoutMult = 2;
+      } else if (bet.type === 'high' && isHigh) {
+        won = true;
+        payoutMult = 2;
+      } else if (bet.type === 'dozen' && Number(bet.val) === dozen) {
+        won = true;
+        payoutMult = 3; // 2 to 1 payout
+      }
+
+      if (won) {
+        const winAmt = bet.amount * payoutMult;
+        totalPayout += winAmt;
+        winningDescriptions.push(`+$${winAmt} on ${bet.val}`);
+      }
+
+      if (bet.el) {
+        const b = bet.el.querySelector('.bet-badge');
+        if (b) b.remove();
+      }
+    });
+
+    this.players[0].chips += totalPayout;
+    this.rouletteBets = {};
+
+    const banner = document.getElementById('roulette-result-display');
+    const ballBadge = document.getElementById('roulette-result-ball');
+    const resultText = document.getElementById('roulette-result-text');
+    const statusPill = document.getElementById('roulette-status-pill');
+
+    if (banner && ballBadge && resultText) {
+      banner.classList.remove('hidden');
+      ballBadge.textContent = winningNumber;
+      ballBadge.style.backgroundColor = (winningNumber === 0 ? '#15803d' : (isRed ? '#b91c1c' : '#0f172a'));
+      const colorLabel = (winningNumber === 0 ? 'Green' : (isRed ? 'Red' : 'Black'));
+      resultText.textContent = `Result: ${winningNumber} ${colorLabel} (${winningNumber === 0 ? 'Zero' : (isEven ? 'EVEN' : 'ODD')})!`;
+    }
+
+    if (totalPayout > 0) {
+      sounds.playWin();
+      if (statusPill) statusPill.textContent = `🎉 WINNER! Paid out $${totalPayout.toLocaleString()}! (${winningDescriptions.join(', ')})`;
+    } else {
+      sounds.playFold();
+      if (statusPill) statusPill.textContent = `No winning bets. Try your luck again!`;
+    }
+
+    this.updateRouletteUI();
+    this.updateTableUI();
+    if (!this.isOnlineRoom) this.saveCurrentGame();
+  }
+
+  // ==========================================================================
+  // HAND HISTORY ACTION LOGGER
+  // ==========================================================================
+  recordHandHistory(entry) {
+    this.handHistory.unshift({
+      ...entry,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    });
+    if (this.handHistory.length > 50) this.handHistory.pop();
+    this.renderHandHistory();
+  }
+
+  renderHandHistory() {
+    const list = document.getElementById('hand-history-list');
+    const countEl = document.getElementById('history-total-count');
+    if (!list) return;
+
+    if (countEl) {
+      countEl.textContent = `${this.handHistory.length} hands recorded in this session`;
+    }
+
+    if (this.handHistory.length === 0) {
+      list.innerHTML = `<div class="history-empty-placeholder">No hands completed yet in this session. Play hands at the table to see real-time showdowns, hole cards, and pot payouts logged here!</div>`;
+      return;
+    }
+
+    list.innerHTML = '';
+    this.handHistory.forEach(h => {
+      const item = document.createElement('div');
+      item.className = 'history-item';
+      let cardsStr = '';
+      if (h.cards && Array.isArray(h.cards)) {
+        cardsStr = h.cards.map(c => `${c.label}${c.suit ? c.suit.symbol : ''}`).join(' ');
+      }
+      let commStr = '';
+      if (h.community && Array.isArray(h.community) && h.community.length > 0) {
+        commStr = `Board: [${h.community.map(c => `${c.label}${c.suit.symbol}`).join(' ')}]`;
+      }
+
+      item.innerHTML = `
+        <div class="history-item-header">
+          <span>Stage ${h.stage || 1} &bull; Hand #${h.handNum || 1}</span>
+          <span>${h.time || ''}</span>
+        </div>
+        <div class="history-item-winner">🏆 Winner: ${h.winner} (+$${(h.amount || 0).toLocaleString()})</div>
+        <div class="history-item-hand">${h.desc || ''}</div>
+        ${cardsStr ? `<div class="history-item-cards">Hole: ${cardsStr} ${commStr ? `&bull; ${commStr}` : ''}</div>` : ''}
+      `;
+      list.appendChild(item);
+    });
   }
 }
 

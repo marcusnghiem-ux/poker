@@ -48,7 +48,7 @@ body {
 }
 
 /* ==========================================================================
-   ENHANCED LUXURY CASINO BACKGROUND & SPOTLIGHT
+   MINIMALIST "SOLAR FLARE" SPACE THEME & AMBIENT GLOW
    ========================================================================== */
 .casino-bg-effects {
   position: fixed;
@@ -56,122 +56,127 @@ body {
   pointer-events: none;
   z-index: 0;
   overflow: hidden;
+  background: #03050a;
 }
 
+/* Solar Flare Subtle Core & Deep Obsidian Cosmic Gradient */
 .bg-art-deco-lattice {
   position: absolute;
   inset: 0;
   background: 
-    radial-gradient(ellipse 90% 65% at 50% 15%, rgba(13, 62, 38, 0.55) 0%, rgba(4, 20, 13, 0.88) 55%, rgba(1, 6, 9, 0.98) 100%),
-    radial-gradient(circle at 20% 80%, rgba(9, 36, 45, 0.4) 0%, transparent 60%),
-    radial-gradient(circle at 80% 80%, rgba(35, 12, 30, 0.25) 0%, transparent 60%),
-    repeating-linear-gradient(60deg, rgba(212, 175, 55, 0.025) 0px, rgba(212, 175, 55, 0.025) 1px, transparent 1px, transparent 24px),
-    repeating-linear-gradient(-60deg, rgba(212, 175, 55, 0.025) 0px, rgba(212, 175, 55, 0.025) 1px, transparent 1px, transparent 24px);
-  animation: atmosphereShift 45s ease-in-out infinite alternate;
+    radial-gradient(ellipse 70% 45% at 50% 0%, rgba(245, 158, 11, 0.13) 0%, rgba(180, 83, 9, 0.05) 45%, transparent 75%),
+    radial-gradient(circle at 50% 50%, rgba(8, 14, 28, 0.85) 0%, #03050a 100%);
+  opacity: 0.95;
 }
 
-/* DYNAMIC CHANGING BACKGROUND ATMOSPHERE */
-@keyframes atmosphereShift {
-  0% {
-    filter: hue-rotate(0deg) brightness(1);
-  }
-  35% {
-    filter: hue-rotate(40deg) brightness(1.06); /* Astral Deep Sapphire */
-  }
-  70% {
-    filter: hue-rotate(-30deg) brightness(0.96); /* Royal Velvet Violet & Gold */
-  }
-  100% {
-    filter: hue-rotate(0deg) brightness(1); /* Return to Emerald Velvet */
-  }
+.bg-light-beams {
+  position: absolute;
+  top: -15%;
+  left: 20%;
+  width: 60%;
+  height: 100%;
+  background: radial-gradient(ellipse at 50% 0%, rgba(251, 191, 36, 0.04) 0%, transparent 60%);
+  filter: blur(24px);
+  pointer-events: none;
 }
 
-/* ==========================================================================
-   MOVING CELESTIAL CONSTELLATIONS & SHOOTING STARS
-   ========================================================================== */
+.bg-spotlight {
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 900px;
+  height: 550px;
+  background: radial-gradient(ellipse at center, rgba(254, 240, 138, 0.06) 0%, rgba(245, 158, 11, 0.02) 40%, transparent 70%);
+  filter: blur(16px);
+  pointer-events: none;
+}
+
+/* Subtle Low-Contrast Constellations */
 .celestial-constellations {
   position: absolute;
   inset: 0;
   pointer-events: none;
   overflow: hidden;
   z-index: 1;
+  opacity: 0.65;
 }
 
 .constellations-svg {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  animation: constellationFloat 50s ease-in-out infinite alternate;
+  animation: constellationFloat 60s ease-in-out infinite alternate;
 }
 
 @keyframes constellationFloat {
-  0% { transform: translateY(0px) rotate(0deg) scale(1); }
-  50% { transform: translateY(-18px) rotate(1.2deg) scale(1.02); }
-  100% { transform: translateY(0px) rotate(0deg) scale(1); }
+  0% { transform: translateY(0px) rotate(0deg); }
+  100% { transform: translateY(-10px) rotate(0.8deg); }
 }
 
 .c-star {
-  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.7));
-  transition: r 0.3s ease;
+  opacity: 0.5;
+  transition: opacity 0.5s ease;
 }
 
 .c-star.alpha-star {
-  filter: drop-shadow(0 0 8px #fef08a) drop-shadow(0 0 14px #d4af37);
-  animation: alphaTwinkle 4s ease-in-out infinite alternate;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 4px rgba(253, 224, 71, 0.6));
+  animation: alphaTwinkle 5s ease-in-out infinite alternate;
 }
 
 .c-star.pulse-s {
-  animation: starBlink 3.5s ease-in-out infinite alternate;
+  animation: starBlink 4s ease-in-out infinite alternate;
 }
 
 @keyframes alphaTwinkle {
-  0% { opacity: 0.7; transform: scale(0.9); }
-  100% { opacity: 1; transform: scale(1.25); }
+  0% { opacity: 0.6; }
+  100% { opacity: 0.95; }
 }
 
 @keyframes starBlink {
-  0% { opacity: 0.3; }
-  50% { opacity: 0.95; }
-  100% { opacity: 0.3; }
+  0% { opacity: 0.25; }
+  50% { opacity: 0.7; }
+  100% { opacity: 0.25; }
 }
 
-/* Luminous Shooting Stars */
+/* Faint Solar Shooting Star */
 .shooting-star {
   position: absolute;
-  width: 120px;
-  height: 2px;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 240, 160, 0.8) 50%, #ffffff 100%);
+  width: 80px;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent 0%, rgba(254, 240, 138, 0.6) 50%, #ffffff 100%);
   border-radius: 2px;
-  filter: drop-shadow(0 0 6px #fff7a1);
+  filter: drop-shadow(0 0 4px #fbbf24);
   transform: rotate(-35deg);
   opacity: 0;
   pointer-events: none;
 }
 
 .shooting-star.ss-1 {
-  top: 15%;
-  left: 30%;
-  animation: shootStarOne 14s ease-in-out infinite;
+  top: 18%;
+  left: 28%;
+  animation: shootStarOne 22s ease-in-out infinite;
 }
 
 .shooting-star.ss-2 {
-  top: 45%;
-  left: 65%;
-  animation: shootStarTwo 19s ease-in-out infinite 6s;
+  top: 40%;
+  left: 70%;
+  animation: shootStarTwo 28s ease-in-out infinite 10s;
 }
 
 @keyframes shootStarOne {
   0% { transform: translate(0, 0) rotate(-35deg); opacity: 0; }
-  2% { opacity: 1; }
-  5% { transform: translate(-300px, 200px) rotate(-35deg); opacity: 0; }
-  100% { transform: translate(-300px, 200px) rotate(-35deg); opacity: 0; }
+  2% { opacity: 0.85; }
+  5% { transform: translate(-220px, 150px) rotate(-35deg); opacity: 0; }
+  100% { transform: translate(-220px, 150px) rotate(-35deg); opacity: 0; }
 }
 
 @keyframes shootStarTwo {
   0% { transform: translate(0, 0) rotate(-38deg); opacity: 0; }
-  2% { opacity: 1; }
-  5% { transform: translate(-320px, 220px) rotate(-38deg); opacity: 0; }
-  100% { transform: translate(-320px, 220px) rotate(-38deg); opacity: 0; }
+  2% { opacity: 0.75; }
+  5% { transform: translate(-240px, 160px) rotate(-38deg); opacity: 0; }
+  100% { transform: translate(-240px, 160px) rotate(-38deg); opacity: 0; }
 }
 
 .bg-light-beams {
@@ -2373,4 +2378,611 @@ body {
   .quick-btn { flex: 1; text-align: center; padding: 6px 4px; }
   .countdown-card { padding: 8px 16px; gap: 10px; }
   .countdown-timer-circle { width: 36px; height: 36px; font-size: 1.2rem; }
+}
+
+/* ==========================================================================
+   PLAYER PROFILE & USERNAME CUSTOMIZATION
+   ========================================================================== */
+.player-profile-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(14, 22, 38, 0.75);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 14px;
+  padding: 10px 20px;
+  max-width: 540px;
+  margin: 0 auto 20px auto;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+}
+
+.profile-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.profile-input-wrap label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gold-bright);
+  white-space: nowrap;
+}
+
+#player-username-input {
+  flex: 1;
+  background: rgba(5, 10, 18, 0.85);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 8px;
+  color: #f8fafc;
+  padding: 8px 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#player-username-input:focus {
+  border-color: var(--gold-bright);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+}
+
+.btn-save-name {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   NIGHTMARE DIFFICULTY CARD
+   ========================================================================== */
+.diff-card.diff-nightmare {
+  border-color: rgba(220, 38, 38, 0.5) !important;
+  background: linear-gradient(145deg, rgba(35, 10, 15, 0.9) 0%, rgba(15, 5, 8, 0.95) 100%) !important;
+}
+
+.diff-card.diff-nightmare:hover,
+.diff-card.diff-nightmare.active-diff {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.6), inset 0 0 15px rgba(239, 68, 68, 0.2) !important;
+}
+
+.diff-card.diff-nightmare .diff-title {
+  color: #fca5a5 !important;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.diff-card.diff-nightmare .diff-icon {
+  animation: skullPulse 1.8s infinite ease-in-out;
+}
+
+@keyframes skullPulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px #ef4444); }
+  50% { transform: scale(1.15); filter: drop-shadow(0 0 12px #dc2626); }
+}
+
+/* ==========================================================================
+   STAGE INDICATOR & HEADER LOGS
+   ========================================================================== */
+#stage-indicator {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.3) 0%, rgba(91, 33, 182, 0.4) 100%);
+  border-color: rgba(167, 139, 250, 0.6);
+  color: #ddd6fe;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+#btn-hand-history {
+  color: #c4b5fd;
+  border-color: rgba(167, 139, 250, 0.4);
+}
+
+#btn-hand-history:hover {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: #a78bfa;
+  box-shadow: 0 0 10px rgba(167, 139, 250, 0.4);
+}
+
+/* ==========================================================================
+   POT FIRE GLOW & WIN STREAK EFFECTS
+   ========================================================================== */
+.pot-fire-glow {
+  position: relative;
+  animation: potFirePulse 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes potFirePulse {
+  0% {
+    box-shadow: 0 0 12px rgba(249, 115, 22, 0.5), inset 0 0 8px rgba(251, 191, 36, 0.4);
+    border-color: #f97316;
+  }
+  100% {
+    box-shadow: 0 0 26px rgba(239, 68, 68, 0.85), inset 0 0 16px rgba(245, 158, 11, 0.7);
+    border-color: #fbbf24;
+  }
+}
+
+.pot-fire-icon {
+  font-size: 1.15rem;
+  margin-right: 4px;
+  animation: flameFlicker 0.8s infinite alternate;
+  display: inline-block;
+}
+
+@keyframes flameFlicker {
+  0% { transform: scale(1) rotate(-3deg); filter: drop-shadow(0 0 4px #f97316); }
+  100% { transform: scale(1.18) rotate(3deg); filter: drop-shadow(0 0 10px #ef4444); }
+}
+
+/* Knocked out player seat state */
+.player-seat.knocked-out {
+  opacity: 0.32;
+  filter: grayscale(0.95);
+  pointer-events: none;
+  transition: opacity 0.5s ease, filter 0.5s ease;
+}
+
+.knockout-stamp {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-12deg);
+  background: rgba(220, 38, 38, 0.9);
+  color: #ffffff;
+  border: 2px solid #fecaca;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-shadow: 0 1px 2px #000;
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.8);
+  z-index: 25;
+}
+
+/* ==========================================================================
+   EUROPEAN ROULETTE MINI-GAME
+   ========================================================================== */
+.roulette-modal-card {
+  max-width: 760px;
+  width: 95vw;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: radial-gradient(circle at 50% 20%, #0e1e2d 0%, #060c14 100%);
+  border: 2px solid var(--gold-primary);
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.95), 0 0 30px rgba(212, 175, 55, 0.35);
+}
+
+.roulette-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 10px 16px;
+  margin-bottom: 14px;
+}
+
+.roulette-stat-pill {
+  font-size: 0.9rem;
+  color: #cbd5e1;
+}
+
+.roulette-stat-pill strong {
+  color: var(--gold-bright);
+  font-size: 1.05rem;
+  font-family: 'Cinzel', serif;
+}
+
+.status-pill {
+  color: #38bdf8;
+  font-weight: 600;
+}
+
+.roulette-wheel-container {
+  position: relative;
+  width: 320px;
+  height: 320px;
+  margin: 0 auto 14px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#roulette-canvas {
+  border-radius: 50%;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.9), 0 0 15px rgba(212, 175, 55, 0.4);
+}
+
+.roulette-pointer {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 18px solid #ffd700;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+  z-index: 10;
+}
+
+.roulette-result-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid #10b981;
+  border-radius: 10px;
+  padding: 8px 16px;
+  margin-bottom: 14px;
+  font-weight: 700;
+  color: #a7f3d0;
+  animation: fadeIn 0.3s ease;
+}
+
+.roulette-ball-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #fff;
+  border: 2px solid #ffd700;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+.roulette-chip-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.chip-sel-label {
+  font-size: 0.85rem;
+  color: var(--gold-bright);
+  font-weight: 700;
+}
+
+.r-chip-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.2s;
+}
+
+.r-chip-btn:hover {
+  transform: scale(1.12);
+}
+
+.r-chip-btn.active .chip-circle {
+  border-color: #ffffff;
+  box-shadow: 0 0 14px #ffd700, inset 0 0 6px #ffffff;
+  transform: scale(1.15);
+}
+
+.chip-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: #fff;
+  border: 3px dashed #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+  transition: all 0.2s ease;
+}
+
+.c10 { background: radial-gradient(circle, #3b82f6 30%, #1e3a8a 100%); }
+.c25 { background: radial-gradient(circle, #10b981 30%, #064e3b 100%); }
+.c50 { background: radial-gradient(circle, #ef4444 30%, #7f1d1d 100%); }
+.c100 { background: radial-gradient(circle, #0f172a 30%, #000000 100%); border-color: #ffd700; color: #ffd700; }
+
+.roulette-table-board {
+  background: #064e3b;
+  border: 3px solid #b45309;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.7);
+  margin-bottom: 16px;
+}
+
+.r-grid-zero {
+  margin-bottom: 6px;
+}
+
+.r-spot-zero {
+  width: 100%;
+  background: #15803d !important;
+  color: #fff !important;
+  font-weight: 900;
+  font-size: 1.1rem;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  position: relative;
+}
+
+.r-grid-numbers {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.r-num-cell {
+  background: #1e293b;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+  padding: 8px 2px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: transform 0.15s, background-color 0.15s;
+  position: relative;
+}
+
+.r-num-cell.red { background: #b91c1c; }
+.r-num-cell.black { background: #111827; }
+
+.r-num-cell:hover, .r-bet-spot:hover {
+  filter: brightness(1.25);
+  transform: translateY(-1px);
+}
+
+.r-grid-dozens, .r-grid-outside {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.r-grid-outside {
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.r-bet-spot {
+  background: rgba(0, 0, 0, 0.45);
+  color: #f1f5f9;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  padding: 8px 4px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-align: center;
+  position: relative;
+  transition: all 0.15s ease;
+}
+
+.r-spot-red { background: #b91c1c !important; }
+.r-spot-black { background: #111827 !important; }
+
+.bet-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #ffd700;
+  color: #0b141e;
+  border-radius: 10px;
+  padding: 1px 5px;
+  font-size: 0.65rem;
+  font-weight: 900;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  animation: popIn 0.2s ease;
+}
+
+.roulette-actions-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.r-spin-btn {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+  color: #0b141e !important;
+  font-weight: 900 !important;
+  font-size: 1rem !important;
+  padding: 10px 24px !important;
+}
+
+/* ==========================================================================
+   HAND HISTORY LOG PANEL
+   ========================================================================== */
+.history-modal-card {
+  max-width: 620px;
+  width: 92vw;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.history-controls-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.history-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  max-height: 55vh;
+  padding-right: 4px;
+}
+
+.history-item {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 10px;
+  padding: 10px 14px;
+  transition: border-color 0.2s;
+}
+
+.history-item:hover {
+  border-color: rgba(212, 175, 55, 0.6);
+}
+
+.history-item-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-bottom: 4px;
+}
+
+.history-item-winner {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--gold-bright);
+}
+
+.history-item-hand {
+  font-size: 0.82rem;
+  color: #e2e8f0;
+}
+
+.history-item-cards {
+  font-family: monospace;
+  font-size: 0.95rem;
+  color: #f1f5f9;
+  letter-spacing: 2px;
+  margin-top: 4px;
+}
+
+.history-empty-placeholder {
+  text-align: center;
+  color: #64748b;
+  font-size: 0.9rem;
+  padding: 30px 15px;
+  line-height: 1.5;
+}
+
+/* ==========================================================================
+   STAGE VICTORY & GAME OVER MODALS
+   ========================================================================== */
+.victory-modal-card {
+  max-width: 460px;
+  text-align: center;
+  border: 2px solid #ffd700;
+  box-shadow: 0 0 40px rgba(255, 215, 0, 0.4), inset 0 0 20px rgba(255, 215, 0, 0.15);
+}
+
+.victory-trophy-glow {
+  font-size: 3.5rem;
+  margin-bottom: 6px;
+  animation: trophyFloat 2s infinite ease-in-out alternate;
+}
+
+@keyframes trophyFloat {
+  0% { transform: translateY(0); filter: drop-shadow(0 0 10px #ffd700); }
+  100% { transform: translateY(-8px); filter: drop-shadow(0 0 24px #f59e0b); }
+}
+
+.victory-subtitle {
+  font-size: 0.9rem;
+  color: #cbd5e1;
+  margin-bottom: 16px;
+}
+
+.victory-stats-box {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 10px;
+  padding: 12px 18px;
+  margin-bottom: 20px;
+}
+
+.v-stat-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  color: #94a3b8;
+  padding: 4px 0;
+}
+
+.v-stat-row strong {
+  color: #ffd700;
+}
+
+.victory-next-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  color: #fff !important;
+  font-weight: 800 !important;
+}
+
+.gameover-modal-card {
+  max-width: 440px;
+  text-align: center;
+  border: 2px solid #ef4444;
+  box-shadow: 0 0 40px rgba(239, 68, 68, 0.4), inset 0 0 20px rgba(239, 68, 68, 0.2);
+}
+
+.gameover-skull-icon {
+  font-size: 3.5rem;
+  margin-bottom: 6px;
+  animation: skullPulse 1.5s infinite ease-in-out;
+}
+
+.gameover-tagline {
+  font-size: 0.92rem;
+  color: #fca5a5;
+  margin-bottom: 16px;
+}
+
+.permadeath-notice-box {
+  background: rgba(220, 38, 38, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.permadeath-notice-box strong {
+  color: #ef4444;
+  font-size: 0.88rem;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.permadeath-notice-box p {
+  font-size: 0.82rem;
+  color: #f1f5f9;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.quick-rebuy-btn {
+  background: linear-gradient(135deg, #e11d48 0%, #be123c 100%) !important;
+  color: #fff !important;
+  font-weight: 900 !important;
 }
