@@ -204,3 +204,4 @@ def run_graphics_and_alerts_25_tests():
 
 if __name__ == '__main__':
     run_graphics_and_alerts_25_tests()
+

@@ -387,3 +387,4 @@ def run_performance_25_tests():
 
 if __name__ == '__main__':
     run_performance_25_tests()
+
