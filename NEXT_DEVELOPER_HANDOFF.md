@@ -137,6 +137,29 @@ try { this.renderMainMenuSlots(); } catch (err) { console.error("renderSlots err
 - Absolute stack deduction strictly enforces full depletion of called all-in chips into the pot.
 - Immediate permanent elimination tags losing all-in bots (`knockedOut = true; folded = true; allIn = false; cards = [];`), preventing zero-chip ghost play on subsequent hands.
 
+### 9. Dedicated Texas Hold'em Main Page & Animated Casino Page Transition ✅ COMPLETED & VERIFIED
+- Main menu streamlined strictly for Texas Hold'em poker: active 3 save slots, player profile, daily poker run stipend ($5,000 / 24h), and career statistics.
+- Added prominent, visually rich Casino Resort action portal card (`#btn-enter-casino-portal`) on the right side of the main menu.
+- Implemented smooth, hardware-accelerated animated page transition (`.page-slide-left-out`, `.page-slide-left-in`, `.page-slide-right-out`, `.page-slide-right-in`) between `#main-menu` and the dedicated `#casino-view`.
+- Full Dedicated Casino Page environment (`#casino-view`): houses European single-zero Roulette alongside 3 Slot Machine variant cabinets with live Mini-Games Wallet balance, daily claim, and bankroll transfer.
+
+### 10. Complete Factory Reset (Settings Menu Danger Zone) ✅ COMPLETED & VERIFIED
+- Implemented `#btn-factory-reset` inside `#settings-modal` with prominent crimson danger-zone styling.
+- Accompanied by strict confirmation prompt `window.confirm()`.
+- On execution, completely purges all stored user data: all 3 save slots (`royal_poker_device_saves_v4`), cumulative savings vault (`royal_poker_cumulative_savings_v1`), mini-games wallet (`royal_poker_minigame_wallet_v2`), career statistics (`royal_poker_device_stats_v4`), and resets all 24h daily cooldown timers to `0` so allowances can be claimed fresh immediately.
+
+### 11. Multi-Variant Slot Machine Cabinets ✅ COMPLETED & VERIFIED
+- Dynamic variant switching with tab controls:
+  1. **Classic 3-Reel:** Traditional 7s, Bells, Cherries, Bars with balanced medium volatility and 40x top jackpot.
+  2. **Solar Multipliers:** Cosmic solar flares, stars, and wilds with up to 30x wild boost.
+  3. **High-Stakes 100x Jackpot:** Extreme volatility with 100x Grand Casino Jackpot on triple 777, 50x on Diamond Vaults, and 30x on Crown Spades.
+- Dynamic live paytable display updating instantly on tab switch.
+
+### 12. Complete Graphic Overhaul & Zero Emojis Across Application ✅ COMPLETED & VERIFIED
+- Exactly 0 system emojis in `index.html` and `style.css`.
+- All user-facing announcements, badges, notifications, logs, and button labels converted to clean brackets or high-definition SVG vector assets.
+- Enhanced Solar Flare & Constellation theme with glowing amber accents, warm cosmic nebulae, and crisp radiant star fields in the background layer while preserving table felt contrast.
+
 ---
 
 ## 🚀 Git & Deployment Quick Reference
@@ -149,4 +172,7 @@ try { this.renderMainMenuSlots(); } catch (err) { console.error("renderSlots err
   - `python verify_syntax.py`
   - `python simulate_10_runs.py`
   - `python test_poker.py`
+  - `python scratch/check_index_ids.py`
+  - `python scratch/test_allin_elimination.py`
+  - `python scratch/test_factory_reset_and_variants.py`
 
