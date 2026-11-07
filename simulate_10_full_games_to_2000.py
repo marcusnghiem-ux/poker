@@ -163,7 +163,9 @@ def play_one_hand(players, dealer_idx, hand_num, sb_amt, bb_amt):
     # Pre-flop action
     acting_idx = (bb_idx + 1) % n
     all_acted = set()
-    while True:
+    loop_safety = 0
+    while loop_safety < 25:
+        loop_safety += 1
         p = players[acting_idx]
         if not p.folded and not p.all_in and p.chips > 0:
             to_call = current_bet - p.current_bet
