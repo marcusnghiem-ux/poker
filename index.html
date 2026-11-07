@@ -18,7 +18,7 @@
 <body>
   <!-- Atmospheric Luxury Casino Background & Overhead Spotlight -->
   <div class="casino-bg-effects">
-      <!-- LAYER 0: Solar Flare Celestial Grid & Cosmic Motifs (Images 1, 2, 3 & 4) -->
+      <!-- LAYER 0: Authentic Solar Flare Geometric Architecture & Cosmic Sky (No GD Wave) -->
       <div class="layer0-cosmic-grid"></div>
       <div class="layer0-starfield-container">
         <svg class="layer0-starfield-svg" width="100%" height="100%" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
@@ -35,9 +35,9 @@
               <stop offset="100%" stop-color="rgba(180, 83, 9, 0)"/>
             </radialGradient>
             <radialGradient id="celestialBlueGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="#1e3a8a" stop-opacity="0.8"/>
-              <stop offset="45%" stop-color="#0c1938" stop-opacity="0.88"/>
-              <stop offset="80%" stop-color="#020617" stop-opacity="0.94"/>
+              <stop offset="0%" stop-color="#1e3a8a" stop-opacity="0.82"/>
+              <stop offset="45%" stop-color="#0c1938" stop-opacity="0.90"/>
+              <stop offset="80%" stop-color="#020617" stop-opacity="0.95"/>
               <stop offset="100%" stop-color="rgba(2, 6, 23, 0)"/>
             </radialGradient>
             <radialGradient id="starGlowCyan" cx="50%" cy="50%" r="50%">
@@ -45,10 +45,19 @@
               <stop offset="40%" stop-color="#38bdf8"/>
               <stop offset="100%" stop-color="rgba(56, 189, 248, 0)"/>
             </radialGradient>
+            <linearGradient id="goldBevelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#fde047"/>
+              <stop offset="50%" stop-color="#f59e0b"/>
+              <stop offset="100%" stop-color="#b45309"/>
+            </linearGradient>
+            <linearGradient id="amberBevelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#f59e0b"/>
+              <stop offset="50%" stop-color="#ea580c"/>
+              <stop offset="100%" stop-color="#78350f"/>
+            </linearGradient>
             <filter id="neonGlowWhite" x="-50%" y="-50%" width="200%" height="200%">
               <feGaussianBlur stdDeviation="4" result="blur"/>
               <feMerge>
-                <feMergeNode in="blur"/>
                 <feMergeNode in="blur"/>
                 <feMergeNode in="SourceGraphic"/>
               </feMerge>
@@ -63,58 +72,92 @@
           </defs>
 
           <!-- TOP & BOTTOM SAWTOOTH BORDERS (Image 4 Motif) -->
-          <g class="sawtooth-border-top" opacity="0.4">
-            <path d="M0,0 L30,22 L60,0 L90,22 L120,0 L150,22 L180,0 L210,22 L240,0 L270,22 L300,0 L330,22 L360,0 L390,22 L420,0 L450,22 L480,0 L510,22 L540,0 L570,22 L600,0 L630,22 L660,0 L690,22 L720,0 L750,22 L780,0 L810,22 L840,0 L870,22 L900,0 L930,22 L960,0 L990,22 L1020,0 L1050,22 L1080,0 L1110,22 L1140,0 L1170,22 L1200,0 L1230,22 L1260,0 L1290,22 L1320,0 L1350,22 L1380,0 L1410,22 L1440,0 L1470,22 L1500,0 L1530,22 L1560,0 L1590,22 L1620,0 L1650,22 L1680,0 L1710,22 L1740,0 L1770,22 L1800,0 L1830,22 L1860,0 L1890,22 L1920,0" fill="none" stroke="#f59e0b" stroke-width="1.8"/>
+          <g class="sawtooth-border-top" opacity="0.45">
+            <path d="M0,0 L30,22 L60,0 L90,22 L120,0 L150,22 L180,0 L210,22 L240,0 L270,22 L300,0 L330,22 L360,0 L390,22 L420,0 L450,22 L480,0 L510,22 L540,0 L570,22 L600,0 L630,22 L660,0 L690,22 L720,0 L750,22 L780,0 L810,22 L840,0 L870,22 L900,0 L930,22 L960,0 L990,22 L1020,0 L1050,22 L1080,0 L1110,22 L1140,0 L1170,22 L1200,0 L1230,22 L1260,0 L1290,22 L1320,0 L1350,22 L1380,0 L1410,22 L1440,0 L1470,22 L1500,0 L1530,22 L1560,0 L1590,22 L1620,0 L1650,22 L1680,0 L1710,22 L1740,0 L1770,22 L1800,0 L1830,22 L1860,0 L1890,22 L1920,0" fill="none" stroke="#f59e0b" stroke-width="2"/>
           </g>
-          <g class="sawtooth-border-bottom" opacity="0.4">
-            <path d="M0,1080 L30,1058 L60,1080 L90,1058 L120,1080 L150,1058 L180,1080 L210,1058 L240,1080 L270,1058 L300,1080 L330,1058 L360,1080 L390,1058 L420,1080 L450,1058 L480,1080 L510,1058 L540,1080 L570,1058 L600,1080 L630,1058 L660,1080 L690,1058 L720,1080 L750,1058 L780,1080 L810,1058 L840,1080 L870,1058 L900,1080 L930,1058 L960,1080 L990,1058 L1020,1080 L1050,1058 L1080,1080 L1110,1058 L1140,1080 L1170,1058 L1200,1080 L1230,1058 L1260,1080 L1290,1058 L1320,1080 L1350,1058 L1380,1080 L1410,1058 L1440,1080 L1470,1058 L1500,1080 L1530,1058 L1560,1080 L1590,1058 L1620,1080 L1650,1058 L1680,1080 L1710,1058 L1740,1080 L1770,1058 L1800,1080 L1830,1058 L1860,1080 L1890,1058 L1920,1080" fill="none" stroke="#f59e0b" stroke-width="1.8"/>
+          <g class="sawtooth-border-bottom" opacity="0.45">
+            <path d="M0,1080 L30,1058 L60,1080 L90,1058 L120,1080 L150,1058 L180,1080 L210,1058 L240,1080 L270,1058 L300,1080 L330,1058 L360,1080 L390,1058 L420,1080 L450,1058 L480,1080 L510,1058 L540,1080 L570,1058 L600,1080 L630,1058 L660,1080 L690,1058 L720,1080 L750,1058 L780,1080 L810,1058 L840,1080 L870,1058 L900,1080 L930,1058 L960,1080 L990,1058 L1020,1080 L1050,1058 L1080,1080 L1110,1058 L1140,1080 L1170,1058 L1200,1080 L1230,1058 L1260,1080 L1290,1058 L1320,1080 L1350,1058 L1380,1080 L1410,1058 L1440,1080 L1470,1058 L1500,1080 L1530,1058 L1560,1080 L1590,1058 L1620,1080 L1650,1058 L1680,1080 L1710,1058 L1740,1080 L1770,1058 L1800,1080 L1830,1058 L1860,1080 L1890,1058 L1920,1080" fill="none" stroke="#f59e0b" stroke-width="2"/>
+          </g>
+
+          <!-- ============================================================== -->
+          <!-- MONUMENTAL SOLAR FLARE DIAMOND STRUCTURES (Images 1, 3 & 4)    -->
+          <!-- ============================================================== -->
+          
+          <!-- LEFT WING DIAMOND TOWER -->
+          <g class="solar-diamond-structure left-pillar" transform="translate(140, 540)">
+            <!-- Outer Obsidian Diamond Shell -->
+            <polygon points="0,-360 220,0 0,360 -220,0" fill="#140801" stroke="#78350f" stroke-width="3" opacity="0.85"/>
+            <!-- Outer Gold Bevel -->
+            <polygon points="0,-310 185,0 0,310 -185,0" fill="#260f02" stroke="url(#goldBevelGrad)" stroke-width="3.5" opacity="0.9"/>
+            <!-- Amber Inner Chevron Ring -->
+            <polygon points="0,-250 145,0 0,250 -145,0" fill="#1a0a02" stroke="url(#amberBevelGrad)" stroke-width="2.5"/>
+            <!-- Dark Core Diamond -->
+            <polygon points="0,-180 100,0 0,180 -100,0" fill="#0d0400" stroke="#f59e0b" stroke-width="2"/>
+            <!-- Glowing Inner Sun-Diamond Matrix -->
+            <polygon points="0,-80 45,0 0,80 -45,0" fill="#fde047" filter="url(#goldFlareGlow)"/>
+            <!-- Flanking Outer Spike Brackets -->
+            <path d="M-240,-80 L-280,0 L-240,80 L-255,80 L-295,0 L-255,-80 Z" fill="#ea580c"/>
+            <path d="M240,-80 L280,0 L240,80 L255,80 L295,0 L255,-80 Z" fill="#ea580c"/>
+          </g>
+
+          <!-- RIGHT WING DIAMOND TOWER -->
+          <g class="solar-diamond-structure right-pillar" transform="translate(1780, 540)">
+            <!-- Outer Obsidian Diamond Shell -->
+            <polygon points="0,-360 220,0 0,360 -220,0" fill="#140801" stroke="#78350f" stroke-width="3" opacity="0.85"/>
+            <!-- Outer Gold Bevel -->
+            <polygon points="0,-310 185,0 0,310 -185,0" fill="#260f02" stroke="url(#goldBevelGrad)" stroke-width="3.5" opacity="0.9"/>
+            <!-- Amber Inner Chevron Ring -->
+            <polygon points="0,-250 145,0 0,250 -145,0" fill="#1a0a02" stroke="url(#amberBevelGrad)" stroke-width="2.5"/>
+            <!-- Dark Core Diamond -->
+            <polygon points="0,-180 100,0 0,180 -100,0" fill="#0d0400" stroke="#f59e0b" stroke-width="2"/>
+            <!-- Glowing Inner Sun-Diamond Matrix -->
+            <polygon points="0,-80 45,0 0,80 -45,0" fill="#fde047" filter="url(#goldFlareGlow)"/>
+            <!-- Flanking Outer Spike Brackets -->
+            <path d="M-240,-80 L-280,0 L-240,80 L-255,80 L-295,0 L-255,-80 Z" fill="#ea580c"/>
+            <path d="M240,-80 L280,0 L240,80 L255,80 L295,0 L255,-80 Z" fill="#ea580c"/>
           </g>
 
           <!-- DEEP CELESTIAL BLUE CONSTELLATION PORTAL (Image 2 Motif) -->
-          <g class="celestial-portal-group" transform="translate(380, 500)">
-            <circle cx="0" cy="0" r="260" fill="url(#celestialBlueGlow)"/>
+          <g class="celestial-portal-group" transform="translate(960, 520)">
+            <circle cx="0" cy="0" r="230" fill="url(#celestialBlueGlow)"/>
             <!-- Surrounding golden diamond teeth border -->
-            <polygon points="0,-275 22,-258 0,-240 -22,-258" fill="#f59e0b" opacity="0.65"/>
-            <polygon points="0,275 22,258 0,240 -22,258" fill="#f59e0b" opacity="0.65"/>
-            <polygon points="-275,0 -258,22 -240,0 -258,-22" fill="#f59e0b" opacity="0.65"/>
-            <polygon points="275,0 258,22 240,0 258,-22" fill="#f59e0b" opacity="0.65"/>
+            <polygon points="0,-250 20,-235 0,-220 -20,-235" fill="#f59e0b" opacity="0.75"/>
+            <polygon points="0,250 20,235 0,220 -20,235" fill="#f59e0b" opacity="0.75"/>
+            <polygon points="-250,0 -235,20 -220,0 -235,-20" fill="#f59e0b" opacity="0.75"/>
+            <polygon points="250,0 235,20 220,0 235,-20" fill="#f59e0b" opacity="0.75"/>
             <!-- Constellation Lines -->
-            <path d="M-140,-100 L-60,-40 L20,-110 L100,-60 L140,-120 M-60,-40 L-20,60 L80,30 L130,90 M-140,50 L-20,60" stroke="#38bdf8" stroke-width="1.4" stroke-opacity="0.65" stroke-dasharray="4,3" fill="none"/>
+            <path d="M-120,-80 L-50,-30 L20,-90 L90,-50 L120,-100 M-50,-30 L-20,50 L70,25 L110,80 M-120,40 L-20,50" stroke="#38bdf8" stroke-width="1.4" stroke-opacity="0.7" stroke-dasharray="4,3" fill="none"/>
             <!-- Constellation Star Nodes -->
-            <circle cx="-140" cy="-100" r="6" fill="url(#starGlowCyan)"/>
-            <circle cx="-60" cy="-40" r="8" fill="#ffffff" filter="url(#neonGlowWhite)"/>
-            <circle cx="20" cy="-110" r="5" fill="url(#starGlowCyan)"/>
-            <circle cx="100" cy="-60" r="9" fill="#ffffff" filter="url(#neonGlowWhite)"/>
-            <circle cx="140" cy="-120" r="5" fill="url(#starGlowCyan)"/>
-            <circle cx="-20" cy="60" r="10" fill="#ffffff" filter="url(#neonGlowWhite)"/>
-            <circle cx="80" cy="30" r="6" fill="url(#starGlowCyan)"/>
-            <circle cx="130" cy="90" r="8" fill="#ffffff" filter="url(#neonGlowWhite)"/>
-            <circle cx="-140" cy="50" r="5" fill="url(#starGlowCyan)"/>
+            <circle cx="-120" cy="-80" r="6" fill="url(#starGlowCyan)"/>
+            <circle cx="-50" cy="-30" r="8" fill="#ffffff" filter="url(#neonGlowWhite)"/>
+            <circle cx="20" cy="-90" r="5" fill="url(#starGlowCyan)"/>
+            <circle cx="90" cy="-50" r="9" fill="#ffffff" filter="url(#neonGlowWhite)"/>
+            <circle cx="120" cy="-100" r="5" fill="url(#starGlowCyan)"/>
+            <circle cx="-20" cy="50" r="10" fill="#ffffff" filter="url(#neonGlowWhite)"/>
+            <circle cx="70" cy="25" r="6" fill="url(#starGlowCyan)"/>
+            <circle cx="110" cy="80" r="8" fill="#ffffff" filter="url(#neonGlowWhite)"/>
+            <circle cx="-120" cy="40" r="5" fill="url(#starGlowCyan)"/>
             <!-- 4-Pointed Sparkle Stars inside Portal -->
-            <path d="M-60 -55 Q-60 -40 -45 -40 Q-60 -40 -60 -25 Q-60 -40 -75 -40 Q-60 -40 -60 -55 Z" fill="#ffffff"/>
-            <path d="M100 -75 Q100 -60 115 -60 Q100 -60 100 -45 Q100 -60 85 -60 Q100 -60 100 -75 Z" fill="#ffffff"/>
-            <path d="M-20 45 Q-20 60 -5 60 Q-20 60 -20 75 Q-20 60 -35 60 Q-20 60 -20 45 Z" fill="#ffffff"/>
+            <path d="M-50 -45 Q-50 -30 -35 -30 Q-50 -30 -50 -15 Q-50 -30 -65 -30 Q-50 -30 -50 -45 Z" fill="#ffffff"/>
+            <path d="M90 -65 Q90 -50 105 -50 Q90 -50 90 -35 Q90 -50 75 -50 Q90 -50 90 -65 Z" fill="#ffffff"/>
+            <path d="M-20 35 Q-20 50 -5 50 Q-20 50 -20 65 Q-20 50 -35 50 Q-20 50 -20 35 Z" fill="#ffffff"/>
           </g>
 
           <!-- BLAZING SOLAR SUN & CORONA RAYS (Images 1, 3, 4 Motif) -->
-          <g class="solar-blazing-core" transform="translate(1480, 260)">
-            <!-- Corona Halo -->
-            <circle cx="0" cy="0" r="130" fill="url(#solarLunarGlow)" class="solar-lunar-orb" opacity="0.85"/>
-            <!-- Outer Flare Rings -->
-            <circle cx="0" cy="0" r="70" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="8,6" opacity="0.7"/>
-            <circle cx="0" cy="0" r="95" fill="none" stroke="#ea580c" stroke-width="1.5" opacity="0.5"/>
-            <!-- Sun Core -->
-            <circle cx="0" cy="0" r="42" fill="#fef08a" stroke="#f59e0b" stroke-width="3" filter="drop-shadow(0 0 16px #f59e0b)"/>
-            <!-- Diamond Flare Satellites -->
-            <polygon points="0,-110 8,-95 0,-80 -8,-95" fill="#fde047"/>
-            <polygon points="0,110 8,95 0,80 -8,95" fill="#fde047"/>
-            <polygon points="-110,0 -95,8 -80,0 -95,-8" fill="#fde047"/>
-            <polygon points="110,0 95,8 80,0 95,-8" fill="#fde047"/>
+          <g class="solar-blazing-core" transform="translate(1380, 220)">
+            <circle cx="0" cy="0" r="120" fill="url(#solarLunarGlow)" class="solar-lunar-orb" opacity="0.85"/>
+            <circle cx="0" cy="0" r="65" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="8,6" opacity="0.7"/>
+            <circle cx="0" cy="0" r="88" fill="none" stroke="#ea580c" stroke-width="1.5" opacity="0.5"/>
+            <circle cx="0" cy="0" r="38" fill="#fef08a" stroke="#f59e0b" stroke-width="3" filter="drop-shadow(0 0 16px #f59e0b)"/>
+            <polygon points="0,-100 8,-85 0,-70 -8,-85" fill="#fde047"/>
+            <polygon points="0,100 8,85 0,70 -8,85" fill="#fde047"/>
+            <polygon points="-100,0 -85,8 -70,0 -85,-8" fill="#fde047"/>
+            <polygon points="100,0 85,8 70,0 85,-8" fill="#fde047"/>
           </g>
 
-          <!-- ROTATING SOLAR SUNBURST SPIKY COGS / GEARS (Images 1, 3, 4 Motif) -->
+          <!-- ROTATING SOLAR SUNBURST SPIKY COGS (Images 1, 3, 4 Motif) -->
           <!-- Cog 1 (Bottom Left) -->
-          <g class="solar-spiky-cog cog-spin-cw" transform="translate(220, 880)">
+          <g class="solar-spiky-cog cog-spin-cw" transform="translate(480, 880)">
             <circle cx="0" cy="0" r="75" fill="none" stroke="#d97706" stroke-width="2.5" opacity="0.6"/>
             <circle cx="0" cy="0" r="48" fill="#78350f" stroke="#f59e0b" stroke-width="2" opacity="0.7"/>
             <circle cx="0" cy="0" r="16" fill="#fde047" filter="url(#goldFlareGlow)"/>
@@ -129,46 +172,23 @@
             <polygon points="-62,-62 -50,-50 -68,-44" fill="#f59e0b"/>
           </g>
 
-          <!-- Cog 2 (Right Center) -->
-          <g class="solar-spiky-cog cog-spin-ccw" transform="translate(1740, 720)">
-            <circle cx="0" cy="0" r="90" fill="none" stroke="#ea580c" stroke-width="2" opacity="0.55"/>
-            <circle cx="0" cy="0" r="60" fill="#451a03" stroke="#fde047" stroke-width="1.8" opacity="0.75"/>
-            <circle cx="0" cy="0" r="22" fill="#f59e0b" filter="url(#goldFlareGlow)"/>
-            <!-- 8 Spikes -->
-            <polygon points="0,-105 14,-88 -14,-88" fill="#ea580c"/>
-            <polygon points="74,-74 80,-54 60,-60" fill="#ea580c"/>
-            <polygon points="105,0 88,14 88,-14" fill="#ea580c"/>
-            <polygon points="74,74 60,60 80,54" fill="#ea580c"/>
-            <polygon points="0,105 14,88 -14,88" fill="#ea580c"/>
-            <polygon points="-74,74 -80,54 -60,60" fill="#ea580c"/>
-            <polygon points="-105,0 -88,14 -88,-14" fill="#ea580c"/>
-            <polygon points="-74,-74 -60,-60 -80,-54" fill="#ea580c"/>
-          </g>
-
-          <!-- Cog 3 (Top Center Subtle Accent) -->
-          <g class="solar-spiky-cog cog-spin-cw" transform="translate(960, 110)" opacity="0.4">
-            <circle cx="0" cy="0" r="52" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
-            <circle cx="0" cy="0" r="28" fill="#1c1917" stroke="#fde047" stroke-width="1"/>
-            <polygon points="0,-62 8,-50 -8,-50" fill="#f59e0b"/>
-            <polygon points="62,0 50,8 50,-8" fill="#f59e0b"/>
-            <polygon points="0,62 8,50 -8,50" fill="#f59e0b"/>
-            <polygon points="-62,0 -50,8 -50,-8" fill="#f59e0b"/>
-          </g>
-
-          <!-- SIGNATURE SOLAR FLARE NEON WAVE TRAIL (Images 1, 2, 3, 4 Motif) -->
-          <g class="solar-wave-trail-group" opacity="0.8">
-            <!-- Wave zigzag line slicing through scene -->
-            <polyline points="100,560 220,440 340,560 460,440 580,560 700,440 820,560 940,440" fill="none" stroke="#ffffff" stroke-width="3.5" filter="url(#neonGlowWhite)"/>
-            <polyline points="100,560 220,440 340,560 460,440 580,560 700,440 820,560 940,440" fill="none" stroke="#38bdf8" stroke-width="1.5"/>
-            <!-- Wave Arrow Ship Head (Image 1 Motif) -->
-            <g transform="translate(940, 440) rotate(-45)">
-              <polygon points="0,0 -24,-12 -16,0 -24,12" fill="#ffffff" filter="url(#neonGlowWhite)"/>
-              <polygon points="-4,0 -20,-8 -14,0 -20,8" fill="#f43f5e"/>
-            </g>
+          <!-- Cog 2 (Right Lower) -->
+          <g class="solar-spiky-cog cog-spin-ccw" transform="translate(1440, 840)">
+            <circle cx="0" cy="0" r="85" fill="none" stroke="#ea580c" stroke-width="2" opacity="0.55"/>
+            <circle cx="0" cy="0" r="56" fill="#451a03" stroke="#fde047" stroke-width="1.8" opacity="0.75"/>
+            <circle cx="0" cy="0" r="20" fill="#f59e0b" filter="url(#goldFlareGlow)"/>
+            <polygon points="0,-100 14,-84 -14,-84" fill="#ea580c"/>
+            <polygon points="70,-70 76,-52 56,-58" fill="#ea580c"/>
+            <polygon points="100,0 84,14 84,-14" fill="#ea580c"/>
+            <polygon points="70,70 56,58 76,52" fill="#ea580c"/>
+            <polygon points="0,100 14,84 -14,84" fill="#ea580c"/>
+            <polygon points="-70,70 -76,52 -56,58" fill="#ea580c"/>
+            <polygon points="-100,0 -84,14 -84,-14" fill="#ea580c"/>
+            <polygon points="-70,-70 -56,-58 -76,-52" fill="#ea580c"/>
           </g>
 
           <!-- GLOWING CHEVRON FLOW ARROWS (Images 1, 2, 3 Motif) -->
-          <g class="chevron-flow-group" opacity="0.55">
+          <g class="chevron-flow-group" opacity="0.65">
             <path d="M1120,520 L1145,540 L1120,560 L1132,560 L1157,540 L1132,520 Z" fill="#f59e0b"/>
             <path d="M1145,520 L1170,540 L1145,560 L1157,560 L1182,540 L1157,520 Z" fill="#f59e0b"/>
             <path d="M1170,520 L1195,540 L1170,560 L1182,560 L1207,540 L1182,520 Z" fill="#fde047"/>
@@ -176,167 +196,40 @@
 
           <!-- 4-POINTED RADIANT SPARKLE STARS (Images 1 & 2 Motif) -->
           <g class="star-group-1">
-            <path d="M180 120 Q180 140 200 140 Q180 140 180 160 Q180 140 160 140 Q180 140 180 120 Z" fill="#ffffff" filter="drop-shadow(0 0 6px #fff)"/>
-            <circle cx="180" cy="140" r="9" fill="url(#starGlowGold)"/>
+            <path d="M420 180 Q420 200 440 200 Q420 200 420 220 Q420 200 400 200 Q420 200 420 180 Z" fill="#ffffff" filter="drop-shadow(0 0 6px #fff)"/>
+            <circle cx="420" cy="200" r="9" fill="url(#starGlowGold)"/>
 
-            <path d="M420 220 Q420 236 436 236 Q420 236 420 252 Q420 236 404 236 Q420 236 420 220 Z" fill="#ffffff" filter="drop-shadow(0 0 4px #ffd700)"/>
+            <path d="M680 120 Q680 136 696 136 Q680 136 680 152 Q680 136 664 136 Q680 136 680 120 Z" fill="#ffffff" filter="drop-shadow(0 0 4px #ffd700)"/>
 
-            <path d="M720 90 Q720 106 736 106 Q720 106 720 122 Q720 106 704 106 Q720 106 720 90 Z" fill="#ffffff"/>
-            <circle cx="720" cy="106" r="6" fill="url(#starGlowGold)"/>
+            <path d="M1180 140 Q1180 156 1196 156 Q1180 156 1180 172 Q1180 156 1164 156 Q1180 156 1180 140 Z" fill="#ffffff"/>
+            <circle cx="1180" cy="156" r="6" fill="url(#starGlowGold)"/>
 
-            <path d="M1220 180 Q1220 200 1240 200 Q1220 200 1220 220 Q1220 200 1200 200 Q1220 200 1220 180 Z" fill="#ffffff" filter="drop-shadow(0 0 7px #fde047)"/>
-            <circle cx="1220" cy="200" r="11" fill="url(#starGlowGold)"/>
+            <path d="M1580 180 Q1580 200 1600 200 Q1580 200 1580 220 Q1580 200 1560 200 Q1580 200 1580 180 Z" fill="#ffffff" filter="drop-shadow(0 0 7px #fde047)"/>
+            <circle cx="1580" cy="200" r="10" fill="url(#starGlowGold)"/>
 
-            <path d="M1650 140 Q1650 156 1666 156 Q1650 156 1650 172 Q1650 156 1634 156 Q1650 156 1650 140 Z" fill="#ffffff"/>
+            <path d="M480 440 Q480 455 495 455 Q480 455 480 470 Q480 455 465 455 Q480 455 480 440 Z" fill="#ffffff"/>
 
-            <path d="M1380 380 Q1380 395 1395 395 Q1380 395 1380 410 Q1380 395 1365 395 Q1380 395 1380 380 Z" fill="#ffffff"/>
+            <path d="M1480 460 Q1480 475 1495 475 Q1480 475 1480 490 Q1480 475 1465 475 Q1480 475 1480 460 Z" fill="#ffffff"/>
 
-            <path d="M260 480 Q260 495 275 495 Q260 495 260 510 Q260 495 245 495 Q260 495 260 480 Z" fill="#ffffff"/>
+            <path d="M640 720 Q640 740 660 740 Q640 740 640 760 Q640 740 620 740 Q640 740 640 720 Z" fill="#ffffff" filter="drop-shadow(0 0 6px #fff)"/>
+            <circle cx="640" cy="740" r="8" fill="url(#starGlowGold)"/>
 
-            <path d="M580 620 Q580 640 600 640 Q580 640 580 660 Q580 640 560 640 Q580 640 580 620 Z" fill="#ffffff" filter="drop-shadow(0 0 6px #fff)"/>
-            <circle cx="580" cy="640" r="9" fill="url(#starGlowGold)"/>
-
-            <path d="M1040 580 Q1040 596 1056 596 Q1040 596 1040 612 Q1040 596 1024 596 Q1040 596 1040 580 Z" fill="#ffffff"/>
-
-            <path d="M1540 640 Q1540 660 1560 660 Q1540 660 1540 680 Q1540 660 1520 660 Q1540 660 1540 640 Z" fill="#ffffff" filter="drop-shadow(0 0 7px #ffd700)"/>
-            <circle cx="1540" cy="660" r="10" fill="url(#starGlowGold)"/>
-
-            <path d="M1820 490 Q1820 505 1835 505 Q1820 505 1820 520 Q1820 505 1805 505 Q1820 505 1820 490 Z" fill="#ffffff"/>
+            <path d="M1280 720 Q1280 740 1300 740 Q1280 740 1280 760 Q1280 740 1260 740 Q1280 740 1280 720 Z" fill="#ffffff" filter="drop-shadow(0 0 7px #ffd700)"/>
+            <circle cx="1280" cy="740" r="9" fill="url(#starGlowGold)"/>
           </g>
 
           <!-- FLOATING SOLAR DIAMOND SHARDS & RHOMBUS CRYSTALS (Images 1, 3, 4 Motif) -->
-          <g class="floating-shards-group" opacity="0.65">
-            <polygon points="320,160 329,174 320,188 311,174" fill="#f59e0b" stroke="#fde047" stroke-width="1"/>
-            <polygon points="880,180 892,198 880,216 868,198" fill="#ea580c" stroke="#fcd34d" stroke-width="1"/>
-            <polygon points="1120,380 1129,394 1120,408 1111,394" fill="#f59e0b" stroke="#fde047" stroke-width="1"/>
-            <polygon points="1680,310 1690,326 1680,342 1670,326" fill="#b45309" stroke="#fde047" stroke-width="1"/>
-            <polygon points="480,520 490,536 480,552 470,536" fill="#ea580c" stroke="#fcd34d" stroke-width="1"/>
-            <polygon points="1260,680 1269,694 1260,708 1251,694" fill="#f59e0b" stroke="#fde047" stroke-width="1"/>
-            <polygon points="760,820 772,838 760,856 748,838" fill="#ea580c" stroke="#fde047" stroke-width="1"/>
-            <polygon points="1420,860 1430,876 1420,892 1410,876" fill="#f59e0b" stroke="#fcd34d" stroke-width="1"/>
+          <g class="floating-shards-group" opacity="0.7">
+            <polygon points="560,180 570,196 560,212 550,196" fill="#f59e0b" stroke="#fde047" stroke-width="1"/>
+            <polygon points="820,240 832,258 820,276 808,258" fill="#ea580c" stroke="#fcd34d" stroke-width="1"/>
+            <polygon points="1120,280 1129,294 1120,308 1111,294" fill="#f59e0b" stroke="#fde047" stroke-width="1"/>
+            <polygon points="680,480 690,496 680,512 670,496" fill="#b45309" stroke="#fde047" stroke-width="1"/>
+            <polygon points="1260,520 1270,536 1260,552 1250,536" fill="#ea580c" stroke="#fcd34d" stroke-width="1"/>
+            <polygon points="780,820 790,836 780,852 770,836" fill="#f59e0b" stroke="#fde047" stroke-width="1"/>
+            <polygon points="1160,860 1172,878 1160,896 1148,878" fill="#ea580c" stroke="#fde047" stroke-width="1"/>
           </g>
         </svg>
       </div>
-
-    <div class="bg-solar-nebula-glow"></div>
-    <div class="bg-cosmic-indigo-glow"></div>
-
-    <div class="bg-bokeh bg-bokeh-1"></div>
-    <div class="bg-bokeh bg-bokeh-2"></div>
-    <div class="bg-bokeh bg-bokeh-3"></div>
-
-    <!-- Moving Celestial Constellations & Shifting Star Chart -->
-    <div class="celestial-constellations">
-      <div class="shooting-star ss-1"></div>
-      <div class="shooting-star ss-2"></div>
-      <svg class="constellations-svg" viewBox="0 0 1400 900" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- Constellation Group 1: Corona Borealis (The Royal Crown) -->
-        <g class="constellation-cluster cc-crown">
-          <polyline points="150,180 185,150 240,135 300,145 350,175 390,220" stroke="rgba(253, 224, 71, 0.3)" stroke-width="1.1" stroke-dasharray="3 3"/>
-          <line x1="240" y1="135" x2="240" y2="95" stroke="rgba(253, 224, 71, 0.45)" stroke-width="1.2"/>
-          <line x1="185" y1="150" x2="165" y2="115" stroke="rgba(253, 224, 71, 0.25)" stroke-width="0.8"/>
-          <line x1="300" y1="145" x2="320" y2="115" stroke="rgba(253, 224, 71, 0.25)" stroke-width="0.8"/>
-          <circle cx="150" cy="180" r="2.5" fill="#fde047" class="c-star pulse-s"/>
-          <circle cx="185" cy="150" r="3" fill="#ffffff" class="c-star"/>
-          <circle cx="240" cy="135" r="4.5" fill="#fef08a" class="c-star alpha-star"/>
-          <circle cx="240" cy="95" r="3" fill="#ffffff" class="c-star pulse-s"/>
-          <circle cx="165" cy="115" r="2" fill="#fde047" class="c-star"/>
-          <circle cx="320" cy="115" r="2" fill="#fde047" class="c-star"/>
-          <circle cx="300" cy="145" r="3.2" fill="#ffffff" class="c-star"/>
-          <circle cx="350" cy="175" r="2.8" fill="#fde047" class="c-star"/>
-          <circle cx="390" cy="220" r="2.5" fill="#ffffff" class="c-star pulse-s"/>
-        </g>
-
-        <!-- Constellation Group 2: The Ace of Spades Star Map -->
-        <g class="constellation-cluster cc-spade">
-          <polygon points="1150,120 1200,195 1175,230 1150,215 1125,230 1100,195" stroke="rgba(56, 189, 248, 0.32)" stroke-width="1.1" stroke-dasharray="2 3"/>
-          <line x1="1150" y1="120" x2="1150" y2="245" stroke="rgba(56, 189, 248, 0.45)" stroke-width="1.2"/>
-          <line x1="1135" y1="245" x2="1165" y2="245" stroke="rgba(56, 189, 248, 0.35)" stroke-width="1"/>
-          <circle cx="1150" cy="120" r="4.5" fill="#38bdf8" class="c-star alpha-star"/>
-          <circle cx="1200" cy="195" r="3" fill="#ffffff" class="c-star"/>
-          <circle cx="1175" cy="230" r="2.5" fill="#bae6fd" class="c-star pulse-s"/>
-          <circle cx="1150" cy="215" r="3" fill="#38bdf8" class="c-star"/>
-          <circle cx="1125" cy="230" r="2.5" fill="#bae6fd" class="c-star pulse-s"/>
-          <circle cx="1100" cy="195" r="3" fill="#ffffff" class="c-star"/>
-          <circle cx="1150" cy="245" r="2.5" fill="#38bdf8" class="c-star"/>
-        </g>
-
-        <!-- Constellation Group 3: The Royal Diamond / Lyra -->
-        <g class="constellation-cluster cc-diamond">
-          <polygon points="1220,620 1280,560 1340,620 1280,680" stroke="rgba(253, 224, 71, 0.28)" stroke-width="1"/>
-          <line x1="1220" y1="620" x2="1340" y2="620" stroke="rgba(253, 224, 71, 0.2)" stroke-width="0.8" stroke-dasharray="2 2"/>
-          <line x1="1280" y1="560" x2="1280" y2="680" stroke="rgba(253, 224, 71, 0.2)" stroke-width="0.8" stroke-dasharray="2 2"/>
-          <circle cx="1220" cy="620" r="3" fill="#fde047" class="c-star"/>
-          <circle cx="1280" cy="560" r="4.2" fill="#ffffff" class="c-star alpha-star"/>
-          <circle cx="1340" cy="620" r="3" fill="#fde047" class="c-star"/>
-          <circle cx="1280" cy="680" r="3.5" fill="#fef08a" class="c-star pulse-s"/>
-        </g>
-
-        <!-- Constellation Group 4: The Orion Scepter -->
-        <g class="constellation-cluster cc-scepter">
-          <polyline points="180,680 230,640 290,620 340,650 390,710" stroke="rgba(167, 139, 250, 0.28)" stroke-width="1" stroke-dasharray="3 2"/>
-          <line x1="270" y1="610" x2="310" y2="630" stroke="rgba(253, 224, 71, 0.35)" stroke-width="1.2"/>
-          <circle cx="180" cy="680" r="2.5" fill="#c4b5fd" class="c-star"/>
-          <circle cx="230" cy="640" r="3" fill="#ffffff" class="c-star"/>
-          <circle cx="290" cy="620" r="4.5" fill="#fde047" class="c-star alpha-star"/>
-          <circle cx="340" cy="650" r="3" fill="#ffffff" class="c-star"/>
-          <circle cx="390" cy="710" r="2.8" fill="#c4b5fd" class="c-star pulse-s"/>
-        </g>
-        <!-- Constellation Group 5: Pegasus Wing / Royal High Roller -->
-        <g class="constellation-cluster cc-pegasus">
-          <polygon points="680,100 750,70 820,110 790,180 710,170" stroke="rgba(236, 72, 153, 0.35)" stroke-width="1.2" stroke-dasharray="3 3"/>
-          <line x1="750" y1="70" x2="770" y2="25" stroke="rgba(253, 224, 71, 0.45)" stroke-width="1.2"/>
-          <line x1="820" y1="110" x2="890" y2="130" stroke="rgba(236, 72, 153, 0.3)" stroke-width="1"/>
-          <circle cx="680" cy="100" r="3" fill="#f472b6" class="c-star pulse-s"/>
-          <circle cx="750" cy="70" r="4.2" fill="#ffffff" class="c-star alpha-star"/>
-          <circle cx="770" cy="25" r="3.5" fill="#fde047" class="c-star pulse-s"/>
-          <circle cx="820" cy="110" r="3.8" fill="#ec4899" class="c-star"/>
-          <circle cx="790" cy="180" r="2.8" fill="#ffffff" class="c-star"/>
-          <circle cx="710" cy="170" r="3" fill="#f472b6" class="c-star pulse-s"/>
-          <circle cx="890" cy="130" r="2.5" fill="#fde047" class="c-star"/>
-        </g>
-
-        <!-- Constellation Group 6: Cassiopeia / Celestial Throne -->
-        <g class="constellation-cluster cc-cassiopeia">
-          <polyline points="420,80 470,120 520,75 580,130 630,90" stroke="rgba(56, 189, 248, 0.38)" stroke-width="1.2" stroke-dasharray="2 2"/>
-          <circle cx="420" cy="80" r="3.2" fill="#38bdf8" class="c-star"/>
-          <circle cx="470" cy="120" r="3.5" fill="#ffffff" class="c-star pulse-s"/>
-          <circle cx="520" cy="75" r="4.5" fill="#fef08a" class="c-star alpha-star"/>
-          <circle cx="580" cy="130" r="3.5" fill="#38bdf8" class="c-star"/>
-          <circle cx="630" cy="90" r="3.8" fill="#ffffff" class="c-star pulse-s"/>
-        </g>
-
-        <!-- Constellation Group 7: Cygnus / The Northern Cross -->
-        <g class="constellation-cluster cc-cygnus">
-          <line x1="940" y1="520" x2="1080" y2="680" stroke="rgba(253, 224, 71, 0.32)" stroke-width="1.1"/>
-          <line x1="970" y1="650" x2="1050" y2="550" stroke="rgba(253, 224, 71, 0.32)" stroke-width="1.1"/>
-          <circle cx="940" cy="520" r="3.5" fill="#ffffff" class="c-star"/>
-          <circle cx="1010" cy="600" r="5" fill="#fde047" class="c-star alpha-star"/>
-          <circle cx="1080" cy="680" r="3" fill="#ffffff" class="c-star"/>
-          <circle cx="970" cy="650" r="3" fill="#fef08a" class="c-star pulse-s"/>
-          <circle cx="1050" cy="550" r="3" fill="#fef08a" class="c-star pulse-s"/>
-        </g>
-      </svg>
-    </div>
-
-    <div class="bg-vignette"></div>
-    <!-- Floating Gold Dust & Card Suits -->
-    <div class="floating-suits">
-      <span class="float-suit fs-1">♠</span>
-      <span class="float-suit fs-2">♥</span>
-      <span class="float-suit fs-3">♦</span>
-      <span class="float-suit fs-4">♣</span>
-      <span class="float-suit fs-5">♠</span>
-      <span class="float-suit fs-6">♥</span>
-      <span class="float-suit fs-7">♦</span>
-      <span class="float-suit fs-8">♣</span>
-      <span class="float-sparkle sp-1">✦</span>
-      <span class="float-sparkle sp-2">✦</span>
-      <span class="float-sparkle sp-3">✦</span>
-      <span class="float-sparkle sp-4">✦</span>
-      <span class="float-sparkle sp-5">✦</span>
-    </div>
-  </div>
 
     <div id="app-container">
 
@@ -351,9 +244,9 @@
           <span class="hamburger-bar"></span>
         </button>
         <!-- Top Left Update Log Trigger (v1.01) -->
-        <button id="btn-update-log-trigger" class="update-log-pill-btn" title="View Version 1.01 Release Notes" type="button">
+        <button id="btn-update-log-trigger" class="update-log-pill-btn" title="View Version 1.025 Release Notes" type="button">
           <span class="update-pill-dot"></span>
-          <span class="update-pill-text">v1.01 Solar Overhaul</span>
+          <span class="update-pill-text">Update 1.025</span>
         </button>
         <div class="nav-brand-wrap">
           <svg class="nav-crown-svg" width="22" height="18" viewBox="0 0 72 54" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -441,43 +334,10 @@
     <section id="main-menu" class="main-menu-view">
       <div class="menu-hero">
         <!-- Main Menu Update Banner v1.01 -->
-        <div class="menu-update-banner" id="menu-update-log-trigger" role="button" tabindex="0" title="Click to view v1.01 Release Notes">
-          <span class="update-badge-tag">NEW UPDATE</span>
-          <span class="update-badge-ver">1.01 &bull; Solar Flare Graphics &amp; Visual Overhaul</span>
+        <div class="menu-update-banner" id="menu-update-log-trigger" role="button" tabindex="0" title="Click to view v1.025 Release Notes">
+          <span class="update-badge-tag">UPDATE 1.025</span>
+          <span class="update-badge-ver">Update 1.025 is out, new deco aand casino resort changes, with loifestyle changes.</span>
           <span class="update-badge-arrow">&rarr;</span>
-        </div>
-        <div class="crown-emblem-wrap">
-          <div class="crown-halo"></div>
-          <div class="crown-emblem">
-            <svg class="royal-crown-svg" viewBox="0 0 72 54" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <linearGradient id="crownGold" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#fff9c4"/>
-                  <stop offset="25%" stop-color="#ffd54f"/>
-                  <stop offset="60%" stop-color="#d4af37"/>
-                  <stop offset="100%" stop-color="#8d6e15"/>
-                </linearGradient>
-                <linearGradient id="velvetRed" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stop-color="#b91c1c"/>
-                  <stop offset="100%" stop-color="#450a0a"/>
-                </linearGradient>
-              </defs>
-              <path d="M14 38 Q36 22 58 38 L54 44 Q36 34 18 44 Z" fill="url(#velvetRed)"/>
-              <rect x="10" y="42" width="52" height="8" rx="2" fill="url(#crownGold)" stroke="#fef08a" stroke-width="0.8"/>
-              <circle cx="18" cy="46" r="2.2" fill="#ef4444" stroke="#fef08a" stroke-width="0.6"/>
-              <circle cx="27" cy="46" r="2.4" fill="#38bdf8" stroke="#fef08a" stroke-width="0.6"/>
-              <circle cx="36" cy="46" r="2.8" fill="#10b981" stroke="#fef08a" stroke-width="0.6"/>
-              <circle cx="45" cy="46" r="2.4" fill="#38bdf8" stroke="#fef08a" stroke-width="0.6"/>
-              <circle cx="54" cy="46" r="2.2" fill="#ef4444" stroke="#fef08a" stroke-width="0.6"/>
-              <path d="M12 42 L8 22 L20 30 L36 12 L52 30 L64 22 L60 42 Z" fill="url(#crownGold)" stroke="#fef08a" stroke-width="1.2"/>
-              <circle cx="8" cy="21" r="2.5" fill="#ffffff" stroke="#fcd34d" stroke-width="0.8"/>
-              <circle cx="20" cy="29" r="2" fill="#ffffff" stroke="#fcd34d" stroke-width="0.8"/>
-              <circle cx="36" cy="11" r="3.5" fill="#ffffff" stroke="#fcd34d" stroke-width="1"/>
-              <circle cx="52" cy="29" r="2" fill="#ffffff" stroke="#fcd34d" stroke-width="0.8"/>
-              <circle cx="64" cy="21" r="2.5" fill="#ffffff" stroke="#fcd34d" stroke-width="0.8"/>
-              <path d="M34 6 L38 6 M36 4 L36 9" stroke="#fef08a" stroke-width="1.2" stroke-linecap="round"/>
-            </svg>
-          </div>
         </div>
         <h1 class="menu-title">ROYAL TEXAS HOLD'EM</h1>
         <div class="menu-subtitle-wrap">
@@ -862,7 +722,220 @@
       </div>
 
       <!-- Dual Arena Casino Floor: European Roulette + Multi-Variant Slots -->
-      <div class="casino-floor-grid">
+            <!-- CASINO FLOOR WRAPPER: Interactive Showcase Hub + Dedicated Solo Game Salons -->
+      <div class="casino-floor-wrapper">
+        <!-- MODE 1: Interactive Games Showcase Hub (Uncrowded Lounge Preview) -->
+        <div id="casino-showcase-hub" class="casino-showcase-hub">
+          <div class="showcase-hub-header">
+            <span class="showcase-badge">SOLAR FLARE CASINO RESORT</span>
+            <h2 class="showcase-title">SELECT YOUR VIP GAMING SALON</h2>
+            <p class="showcase-subtitle">Choose an interactive casino arena below. Each dedicated salon features full-focus VIP play, live net profit/loss tracking, and instant cashouts to your Texas Hold'em campaign.</p>
+          </div>
+
+          <div class="showcase-cards-grid">
+            <!-- SHOWCASE CARD 1: EUROPEAN ROULETTE -->
+            <div class="showcase-game-card" id="showcase-card-roulette" role="button" tabindex="0" title="Play European Single-Zero Roulette">
+              <div class="showcase-card-glow"></div>
+              <div class="showcase-card-badge-row">
+                <span class="showcase-game-pill red">SINGLE-ZERO &bull; 37 POCKETS</span>
+                <span class="showcase-payout-pill gold">UP TO 35:1</span>
+              </div>
+              <div class="showcase-preview-frame">
+                <!-- Rich SVG Illustration of European Roulette Wheel & Felt -->
+                <svg class="showcase-preview-svg" viewBox="0 0 360 180" width="100%" height="100%">
+                  <defs>
+                    <radialGradient id="scWheelGrad" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#2d1500"/>
+                      <stop offset="60%" stop-color="#451a03"/>
+                      <stop offset="100%" stop-color="#78350f"/>
+                    </radialGradient>
+                    <radialGradient id="scFeltGrad" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#064e3b"/>
+                      <stop offset="100%" stop-color="#022c22"/>
+                    </radialGradient>
+                  </defs>
+                  <rect x="10" y="10" width="340" height="160" rx="14" fill="url(#scFeltGrad)" stroke="#10b981" stroke-width="1.5"/>
+                  <rect x="25" y="25" width="140" height="130" rx="8" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1" stroke-dasharray="3,3"/>
+                  <text x="95" y="65" fill="#fde047" font-size="12" font-family="sans-serif" font-weight="bold" text-anchor="middle">RED / BLACK</text>
+                  <text x="95" y="95" fill="#ffffff" font-size="11" font-family="sans-serif" text-anchor="middle">EVEN / ODD &bull; 1-18 / 19-36</text>
+                  <text x="95" y="125" fill="#a7f3d0" font-size="10" font-family="sans-serif" text-anchor="middle">DOZENS &bull; 35:1 NUMBERS</text>
+                  <circle cx="260" cy="90" r="62" fill="url(#scWheelGrad)" stroke="#ffd700" stroke-width="3" filter="drop-shadow(0 4px 10px rgba(0,0,0,0.8))"/>
+                  <circle cx="260" cy="90" r="48" fill="#140600" stroke="#f59e0b" stroke-width="1.5"/>
+                  <circle cx="260" cy="90" r="28" fill="#78350f" stroke="#fde047" stroke-width="1"/>
+                  <circle cx="260" cy="90" r="12" fill="#ffd700"/>
+                  <path d="M260,28 L260,152 M198,90 L322,90 M216,46 L304,134 M216,134 L304,46" stroke="#f59e0b" stroke-width="1"/>
+                  <circle cx="276" cy="46" r="4.5" fill="#ffffff" filter="drop-shadow(0 0 4px #fff)"/>
+                  <ellipse cx="65" cy="135" rx="16" ry="6" fill="#f59e0b" stroke="#fde047" stroke-width="1"/>
+                  <ellipse cx="65" cy="131" rx="16" ry="6" fill="#ea580c" stroke="#fde047" stroke-width="1"/>
+                  <ellipse cx="65" cy="127" rx="16" ry="6" fill="#ffd700" stroke="#ffffff" stroke-width="1"/>
+                </svg>
+              </div>
+              <div class="showcase-info-box">
+                <h3 class="showcase-game-name">HELIOS SOLAR ROULETTE</h3>
+                <p class="showcase-desc">Authentic European single-zero wheel with full felt layout, straight-up 35:1 multipliers, color, parity, dozens, and high/low bets.</p>
+                <div class="showcase-specs-row">
+                  <span class="spec-tag">Min Bet: $10</span>
+                  <span class="spec-tag">Max Payout: 35:1</span>
+                  <span class="spec-tag">Zero Commission</span>
+                </div>
+                <button class="btn-enter-showcase-game btn-roulette-enter" type="button">
+                  <span>ENTER ROULETTE SALON</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- SHOWCASE CARD 2: 100X SOLAR CORONA SLOTS -->
+            <div class="showcase-game-card" id="showcase-card-slots" role="button" tabindex="0" title="Play 100x High-Stakes Solar Slots">
+              <div class="showcase-card-glow"></div>
+              <div class="showcase-card-badge-row">
+                <span class="showcase-game-pill orange">3-REEL MECHANICAL</span>
+                <span class="showcase-payout-pill gold">UP TO 100X JACKPOT</span>
+              </div>
+              <div class="showcase-preview-frame">
+                <!-- Rich SVG Illustration of 3-Reel Slots Machine & Lever -->
+                <svg class="showcase-preview-svg" viewBox="0 0 360 180" width="100%" height="100%">
+                  <defs>
+                    <linearGradient id="scSlotBody" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#261005"/>
+                      <stop offset="50%" stop-color="#451a03"/>
+                      <stop offset="100%" stop-color="#180700"/>
+                    </linearGradient>
+                    <linearGradient id="scReelGlass" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#fffbeb"/>
+                      <stop offset="50%" stop-color="#fef3c7"/>
+                      <stop offset="100%" stop-color="#fde68a"/>
+                    </linearGradient>
+                  </defs>
+                  <rect x="40" y="14" width="240" height="152" rx="16" fill="url(#scSlotBody)" stroke="#f59e0b" stroke-width="2.5" filter="drop-shadow(0 6px 14px rgba(0,0,0,0.8))"/>
+                  <rect x="65" y="22" width="190" height="26" rx="6" fill="#78350f" stroke="#ffd700" stroke-width="1.2"/>
+                  <text x="160" y="39" fill="#fde047" font-size="12" font-family="sans-serif" font-weight="900" text-anchor="middle">SOLAR CORONA 100X</text>
+                  <rect x="60" y="58" width="60" height="74" rx="8" fill="url(#scReelGlass)" stroke="#b45309" stroke-width="2"/>
+                  <rect x="130" y="58" width="60" height="74" rx="8" fill="url(#scReelGlass)" stroke="#b45309" stroke-width="2"/>
+                  <rect x="200" y="58" width="60" height="74" rx="8" fill="url(#scReelGlass)" stroke="#b45309" stroke-width="2"/>
+                  <text x="90" y="103" fill="#dc2626" font-size="28" font-family="sans-serif" font-weight="bold" text-anchor="middle">7</text>
+                  <text x="160" y="103" fill="#dc2626" font-size="28" font-family="sans-serif" font-weight="bold" text-anchor="middle">7</text>
+                  <text x="230" y="103" fill="#dc2626" font-size="28" font-family="sans-serif" font-weight="bold" text-anchor="middle">7</text>
+                  <path d="M280,105 L315,65" stroke="#9ca3af" stroke-width="6" stroke-linecap="round"/>
+                  <circle cx="318" cy="62" r="14" fill="#dc2626" stroke="#ffd700" stroke-width="2.5" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.6))"/>
+                  <rect x="80" y="142" width="160" height="16" rx="4" fill="#0f0701" stroke="#f59e0b" stroke-width="1"/>
+                  <circle cx="140" cy="150" r="5" fill="#ffd700"/>
+                  <circle cx="155" cy="150" r="5" fill="#ffd700"/>
+                  <circle cx="170" cy="150" r="5" fill="#ffd700"/>
+                </svg>
+              </div>
+              <div class="showcase-info-box">
+                <h3 class="showcase-game-name">SOLAR CORONA 100X SLOTS</h3>
+                <p class="showcase-desc">High-roller 3-reel slot machine with working pull lever, multiple volatility variants (Classic 40x, Jackpot 100x, Solar Multipliers), and instant spins.</p>
+                <div class="showcase-specs-row">
+                  <span class="spec-tag">Presets: $10 - $1,000</span>
+                  <span class="spec-tag">Jackpot: 100x</span>
+                  <span class="spec-tag">3 Volatility Modes</span>
+                </div>
+                <button class="btn-enter-showcase-game btn-slots-enter" type="button">
+                  <span>ENTER SLOTS SALON</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- SHOWCASE CARD 3: ROYAL SOLAR CRAPS -->
+            <div class="showcase-game-card showcase-craps-card" id="showcase-card-craps" role="button" tabindex="0" title="Play Las Vegas Solar Craps">
+              <div class="showcase-card-glow"></div>
+              <div class="showcase-card-badge-row">
+                <span class="showcase-game-pill emerald craps-new-badge">NEW GAME &bull; VEGAS CRAPS</span>
+                <span class="showcase-payout-pill gold">2X/3X FIELD &bull; 9:1 HARDWAYS</span>
+              </div>
+              <div class="showcase-preview-frame">
+                <!-- Rich SVG Illustration of Craps Table Felt & Tumbling 3D Dice -->
+                <svg class="showcase-preview-svg" viewBox="0 0 360 180" width="100%" height="100%">
+                  <defs>
+                    <radialGradient id="scCrapsFelt" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#065f46"/>
+                      <stop offset="100%" stop-color="#022c22"/>
+                    </radialGradient>
+                  </defs>
+                  <rect x="10" y="10" width="340" height="160" rx="14" fill="url(#scCrapsFelt)" stroke="#10b981" stroke-width="2"/>
+                  <path d="M25,145 L335,145 L320,120 L40,120 Z" fill="rgba(6, 95, 70, 0.6)" stroke="#34d399" stroke-width="1.2"/>
+                  <text x="180" y="137" fill="#fde047" font-size="12" font-family="sans-serif" font-weight="bold" text-anchor="middle">PASS LINE (1:1 &bull; WINS 7/11 ON COME-OUT)</text>
+                  <rect x="40" y="35" width="280" height="35" rx="6" fill="rgba(4, 120, 87, 0.5)" stroke="#6ee7b7" stroke-width="1"/>
+                  <text x="180" y="57" fill="#ffffff" font-size="11" font-family="sans-serif" font-weight="bold" text-anchor="middle">FIELD: 2 (2X) &bull; 3, 4, 9, 10, 11 &bull; 12 (3X)</text>
+                  <circle cx="70" cy="95" r="18" fill="#ffffff" stroke="#000000" stroke-width="2"/>
+                  <text x="70" y="100" fill="#000000" font-size="12" font-family="sans-serif" font-weight="900" text-anchor="middle">ON</text>
+                  <g transform="translate(190, 80) rotate(-15)">
+                    <rect x="0" y="0" width="36" height="36" rx="6" fill="#dc2626" stroke="#fca5a5" stroke-width="1.5" filter="drop-shadow(0 4px 8px rgba(0,0,0,0.6))"/>
+                    <circle cx="9" cy="9" r="3.5" fill="#ffffff"/>
+                    <circle cx="27" cy="9" r="3.5" fill="#ffffff"/>
+                    <circle cx="18" cy="18" r="3.5" fill="#ffffff"/>
+                    <circle cx="9" cy="27" r="3.5" fill="#ffffff"/>
+                    <circle cx="27" cy="27" r="3.5" fill="#ffffff"/>
+                  </g>
+                  <g transform="translate(245, 75) rotate(18)">
+                    <rect x="0" y="0" width="36" height="36" rx="6" fill="#dc2626" stroke="#fca5a5" stroke-width="1.5" filter="drop-shadow(0 4px 8px rgba(0,0,0,0.6))"/>
+                    <circle cx="10" cy="8" r="3.5" fill="#ffffff"/>
+                    <circle cx="10" cy="18" r="3.5" fill="#ffffff"/>
+                    <circle cx="10" cy="28" r="3.5" fill="#ffffff"/>
+                    <circle cx="26" cy="8" r="3.5" fill="#ffffff"/>
+                    <circle cx="26" cy="18" r="3.5" fill="#ffffff"/>
+                    <circle cx="26" cy="28" r="3.5" fill="#ffffff"/>
+                  </g>
+                </svg>
+              </div>
+              <div class="showcase-info-box">
+                <h3 class="showcase-game-name">ROYAL SOLAR CRAPS TABLE</h3>
+                <p class="showcase-desc">Vibrant Las Vegas dice arena featuring Come-Out naturals, active Point phase with ON/OFF puck indicator, high-paying Field bets, and props.</p>
+                <div class="showcase-specs-row">
+                  <span class="spec-tag">3D Dice Physics</span>
+                  <span class="spec-tag">Pass Line &amp; Don't Pass</span>
+                  <span class="spec-tag">Single-Roll Props</span>
+                </div>
+                <button class="btn-enter-showcase-game btn-craps-enter" type="button">
+                  <span>ENTER CRAPS ARENA</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODE 2: Dedicated Solo Game Arena Wrapper (Hidden until a game is selected) -->
+        <div id="casino-solo-arena-wrap" class="casino-solo-arena-wrap hidden">
+          <!-- Top Solo HUD & Session Navigation -->
+          <div class="solo-game-hud-bar" id="solo-game-hud-bar">
+            <div class="solo-hud-left">
+              <button id="btn-solo-back-hub" class="btn-solo-nav" type="button" title="Back to All Casino Games">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 19l-7-7 7-7" stroke="#ffd700" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>Casino Lounge</span>
+              </button>
+              <button id="btn-solo-exit-main" class="btn-solo-nav" type="button" title="Return to Texas Hold'em Main Lobby">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 12l9-9 9 9M9 21V9h6v12" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>Main Lobby</span>
+              </button>
+            </div>
+
+            <div class="solo-hud-center">
+              <div class="solo-arena-tag" id="solo-active-game-title">HELIOS SOLAR ROULETTE</div>
+              <div class="solo-pnl-pill" id="solo-pnl-pill" title="Current Gaming Session Net Profit/Loss">
+                <span class="solo-pnl-lbl">Session P&amp;L:</span>
+                <strong id="solo-session-pnl-val" class="gold">$0 (Even)</strong>
+              </div>
+            </div>
+
+            <div class="solo-hud-right">
+              <div class="solo-wallet-chip">
+                <span class="solo-wallet-lbl">WALLET:</span>
+                <strong id="solo-wallet-display" class="emerald">$1,000</strong>
+              </div>
+              <button id="btn-solo-cashout-poker" class="btn-solo-cashout" type="button" title="Cash Out Casino Winnings Directly to Poker Vault">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M17 9l4 4m0 0l-4 4m4-4H7m6 5v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" stroke="#ffd700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>Cash Out</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Active Arena Card Container -->
+          <div class="solo-arena-body">
+
         <!-- WING 1: European Single-Zero Roulette Arena -->
         <div class="casino-arena-card roulette-arena-card">
           <div class="arena-card-header">
@@ -1276,7 +1349,9 @@
             <span>Come-out: 7/11 natural win, 2/3/12 craps. 4-10 sets Point!</span>
           </div>
         </div>
-      </div>
+          </div><!-- end .solo-arena-body -->
+        </div><!-- end #casino-solo-arena-wrap -->
+      </div><!-- end .casino-floor-wrapper -->
     </section>
 
 
@@ -1693,13 +1768,42 @@
       <div class="modal-card update-log-card">
         <div class="modal-header">
           <div class="update-log-header-left">
-            <span class="update-log-ver-badge">v1.02</span>
-            <h2>1.02 - Slot Machine Fix, Craps Rules &amp; Layer 0 Starfield</h2>
+            <span class="update-log-ver-badge">v1.025</span>
+            <h2>Update 1.025 is out, new deco aand casino resort changes, with loifestyle changes.</h2>
           </div>
           <button id="close-update-log-btn" class="close-btn" type="button">&times;</button>
         </div>
                         <div class="modal-body update-log-body">
-          <!-- ==================== v1.02 LATEST RELEASE ==================== -->
+          <!-- ==================== v1.025 LATEST RELEASE ==================== -->
+          <div class="update-log-section current-release-section">
+            <div class="update-sec-badge-row">
+              <span class="update-log-ver-badge">v1.025 CURRENT</span>
+              <span class="update-sec-date">Latest Release</span>
+            </div>
+            <h3 class="update-sec-title">Interactive Casino Showcase &amp; Dedicated Solo Gaming Salons</h3>
+            <ul class="update-sec-list">
+              <li><strong>VIP Game Selection Showcase:</strong> The Casino Resort entrance is now an uncrowded VIP lounge displaying rich interactive gameplay previews for Roulette, Slots, and Craps.</li>
+              <li><strong>Dedicated Solo Game Salons:</strong> Selecting a game teleports you into an uncrowded, focused salon with full table view and dedicated session financial HUD.</li>
+              <li><strong>Live Session Net P&amp;L Tracker:</strong> Watch your exact session winnings and losings update live in real time on every spin and roll.</li>
+              <li><strong>Zero-Money Auto-Prompt:</strong> Instant notification when casino funds reach $0 with direct options to cash out, return to Texas Hold'em, or claim your 3-hour allowance.</li>
+              <li><strong>One-Click Craps Teleport:</strong> Clicking the NEW GAME Craps button on the main lobby instantly teleports you directly to the Craps arena!</li>
+            </ul>
+          </div>
+
+          <div class="update-log-section current-release-section">
+            <h3 class="update-sec-title">Solar Flare Authentic Architectural Deco (No GD Wave)</h3>
+            <ul class="update-sec-list">
+              <li><strong>Massive Layered Diamond Structures:</strong> Monolithic geometric diamond towers with concentric gold/amber bevels and nested chevron teeth flanking the cosmos.</li>
+              <li><strong>Celestial Blue Nebula Portal:</strong> Center-stage cosmic aperture with delicate constellation lines and sparkling 4-pointed radiant cross stars (Screenshot 2).</li>
+              <li><strong>Rotating Spiky Solar Cogs:</strong> Multi-spoke mechanical sunburst gears with orbital rings and continuous rotation physics.</li>
+              <li><strong>Strictly Deco-Focused:</strong> Removed the GD player wave trail and ship as requested to preserve pure architectural atmosphere.</li>
+            </ul>
+          </div>
+
+          <div class="update-log-archive-divider">
+            <span>PREVIOUS RELEASE ARCHIVE (v1.02 &bull; v1.015 &bull; v1.01)</span>
+          </div>
+          <!-- ==================== v1.02 ARCHIVED RELEASE ==================== -->
           <div class="update-log-section current-release-section">
             <div class="update-sec-badge-row">
               <span class="update-log-ver-badge">v1.02 CURRENT</span>

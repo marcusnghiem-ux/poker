@@ -319,3 +319,37 @@ equirePlayerName() when player was already registered, permanently fixing slot b
 - **Full Verification:**
   - 25 Engine Performance + 25 Graphics/Alerts + 25 Gameplay Simulation runs (75/75 tests passing).
   - 100% SVG vector graphics (0 system emojis in rendered HTML/CSS).
+## 24. RELEASE 1.025: INTERACTIVE CASINO SHOWCASE, SOLO SALONS, LIVE P&L HUD, ZERO-FUNDS ALERTS & ARCHITECTURAL SOLAR FLARE DECO
+
+### Changes Completed in v1.025
+- **Interactive Casino Showcase Hub (`#casino-showcase-hub`):**
+  - Replaced the crowded 3-game stacking with a spacious, VIP gaming lounge gallery.
+  - 3 rich interactive gameplay cards with bespoke vector artwork (100% SVG, 0 emojis):
+    1. **Helios European Roulette:** 37-pocket wheel, green felt, 35:1 straight-up payouts.
+    2. **Solar Corona 100x Slots:** 3-reel mechanical machine, pull lever, jackpot bells, cherries, bars.
+    3. **Royal Solar Craps Table:** Green felt dice arena with 3D tumbling red/gold dice, Pass Line, 2x/3x Field.
+- **Dedicated Solo Gaming Salons (`#casino-solo-arena-wrap`):**
+  - Selecting any game smoothly opens an uncrowded, solo VIP room dedicated exclusively to that table.
+  - Smooth-scrolling auto-center layout for zero-friction focus.
+- **Dedicated Session Financial HUD (`#solo-game-hud-bar`):**
+  - **Live Mini-Game Wallet:** Real-time balance synchronization (`#solo-wallet-display`).
+  - **Session Net P&L Tracker:** Real-time net winnings/losings calculation (`#solo-session-pnl-val`) dynamically color-coded (emerald green for profit, crimson red for loss, gold for even).
+  - **Navigation Controls:** Instant return to "Casino Lounge" (`#btn-solo-back-hub`) or Texas Hold'em "Main Lobby" (`#btn-solo-exit-main`).
+  - **Direct Cashout Action:** One-click cash out to poker savings vault (`#btn-solo-cashout-poker`).
+- **Zero-Money Auto-Prompt (`promptInsufficientCasinoFunds`):**
+  - When a player runs out of chips ($0), an in-game alert offers options to cash out, return to the main lobby, or claim their $1,000 allowance if the 3-hour timer is ready.
+- **One-Click Craps Teleport (`#btn-quick-craps-portal`):**
+  - Main lobby "NEW GAME • VEGAS CRAPS" button teleports directly into the dedicated Craps salon.
+- **Authentic Solar Flare Architectural Deco (Screenshots 1-4, GD Wave Removed):**
+  - Added monumental layered diamond structures (`.left-pillar`, `.right-pillar`) with nested gold/amber bevels, dark obsidian cores, and outer spike brackets.
+  - Symmetrical celestial blue constellation aperture (Screenshot 2) with cyan constellation lines and radiant 4-pointed stars.
+  - Removed the GD wave trail and ship as requested to focus purely on the geometric background deco.
+  - Central solar eclipse core, rotating spiky sun cogs, floating amber rhombus crystals, and sawtooth edge trims.
+- **Updated Version 1.025 Labels Everywhere:**
+  - Top header pill: `Update 1.025`
+  - Home screen news banner: `Update 1.025 is out, new deco aand casino resort changes, with loifestyle changes.`
+  - Update log modal header: `Update 1.025 is out, new deco aand casino resort changes, with loifestyle changes.`
+  - Modal release badge: `v1.025 CURRENT` with comprehensive patch notes.
+- **Full Verification:**
+  - 25 Engine Performance + 25 Graphics/Alerts + 25 Gameplay Simulation runs (75/75 tests passing).
+  - 100% custom SVG graphics (0 system emojis in rendered HTML/CSS).

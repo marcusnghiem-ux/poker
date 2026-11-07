@@ -1394,6 +1394,11 @@ class PokerApp {
     this.selectedCrapsChip = 10;
     this.crapsRolling = false;
 
+    // Dedicated Solo Casino State & Financial Tracking (v1.025)
+    this.casinoSessionNetPnL = 0;
+    this.casinoActiveSoloGame = null;
+    this.casinoPreviousView = 'menu';
+
     // Multiplayer Online State
     this.isOnlineRoom = false;
     this.isHost = false;
@@ -2160,6 +2165,41 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
         this.requirePlayerName(() => this.showCasinoView('craps'));
       });
     }
+
+    // v1.025: Interactive Showcase Card Listeners
+    const cardRoulette = document.getElementById('showcase-card-roulette');
+    const cardSlots = document.getElementById('showcase-card-slots');
+    const cardCraps = document.getElementById('showcase-card-craps');
+
+    if (cardRoulette) {
+      cardRoulette.addEventListener('click', () => {
+        this.requirePlayerName(() => this.showCasinoSoloGame('roulette'));
+      });
+    }
+    if (cardSlots) {
+      cardSlots.addEventListener('click', () => {
+        this.requirePlayerName(() => this.showCasinoSoloGame('slots'));
+      });
+    }
+    if (cardCraps) {
+      cardCraps.addEventListener('click', () => {
+        this.requirePlayerName(() => this.showCasinoSoloGame('craps'));
+      });
+    }
+
+    // v1.025: Solo HUD Nav Buttons
+    const btnSoloBackHub = document.getElementById('btn-solo-back-hub');
+    if (btnSoloBackHub) {
+      btnSoloBackHub.addEventListener('click', () => this.showCasinoShowcaseHub());
+    }
+    const btnSoloExitMain = document.getElementById('btn-solo-exit-main');
+    if (btnSoloExitMain) {
+      btnSoloExitMain.addEventListener('click', () => this.hideCasinoView());
+    }
+    const btnSoloCashoutPoker = document.getElementById('btn-solo-cashout-poker');
+    if (btnSoloCashoutPoker) {
+      btnSoloCashoutPoker.addEventListener('click', () => this.openTransferModal());
+    }
     const legacyCrapsBtn = document.getElementById('btn-open-craps');
     if (legacyCrapsBtn) {
       legacyCrapsBtn.addEventListener('click', () => {
@@ -2218,13 +2258,132 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
       this.drawRouletteWheel(this.rouletteAngle || 0);
     }
 
-    if (focus === 'slots') {
-      const slotCard = document.querySelector('.slots-arena-card');
-      if (slotCard) slotCard.scrollIntoView({ behavior: 'smooth' });
-    } else if (focus === 'roulette') {
-      const rCard = document.querySelector('.roulette-arena-card');
-      if (rCard) rCard.scrollIntoView({ behavior: 'smooth' });
+    if (focus === 'slots' || focus === 'roulette' || focus === 'craps') {
+      this.showCasinoSoloGame(focus);
+    } else {
+      this.showCasinoShowcaseHub();
     }
+  }
+
+  showCasinoShowcaseHub() {
+    this.casinoActiveSoloGame = null;
+    const hub = document.getElementById('casino-showcase-hub');
+    const soloWrap = document.getElementById('casino-solo-arena-wrap');
+    if (hub) hub.classList.remove('hidden');
+    if (soloWrap) soloWrap.classList.add('hidden');
+    this.updateDualWalletUI();
+  }
+
+  showCasinoSoloGame(game = 'roulette') {
+    this.casinoActiveSoloGame = game;
+    const hub = document.getElementById('casino-showcase-hub');
+    const soloWrap = document.getElementById('casino-solo-arena-wrap');
+    if (hub) hub.classList.add('hidden');
+    if (soloWrap) soloWrap.classList.remove('hidden');
+
+    const rouletteCard = document.querySelector('.roulette-arena-card');
+    const slotsCard = document.querySelector('.slots-arena-card');
+    const crapsCard = document.getElementById('craps-arena-card') || document.querySelector('.craps-arena-card');
+
+    if (rouletteCard) {
+      if (game === 'roulette') {
+        rouletteCard.classList.remove('hidden');
+        rouletteCard.style.display = 'block';
+      } else {
+        rouletteCard.classList.add('hidden');
+        rouletteCard.style.display = 'none';
+      }
+    }
+    if (slotsCard) {
+      if (game === 'slots') {
+        slotsCard.classList.remove('hidden');
+        slotsCard.style.display = 'block';
+      } else {
+        slotsCard.classList.add('hidden');
+        slotsCard.style.display = 'none';
+      }
+    }
+    if (crapsCard) {
+      if (game === 'craps') {
+        crapsCard.classList.remove('hidden');
+        crapsCard.style.display = 'block';
+      } else {
+        crapsCard.classList.add('hidden');
+        crapsCard.style.display = 'none';
+      }
+    }
+
+    const titleEl = document.getElementById('solo-active-game-title');
+    if (titleEl) {
+      if (game === 'roulette') titleEl.textContent = 'HELIOS SOLAR ROULETTE';
+      else if (game === 'slots') titleEl.textContent = 'SOLAR CORONA 100X SLOTS';
+      else if (game === 'craps') titleEl.textContent = 'ROYAL SOLAR CRAPS TABLE';
+    }
+
+    this.updateSoloHUD();
+
+    if (game === 'roulette' && this.drawRouletteWheel) {
+      this.drawRouletteWheel(this.rouletteAngle || 0);
+    }
+
+    const soloHud = document.getElementById('solo-game-hud-bar');
+    if (soloHud) soloHud.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  updateSoloHUD() {
+    const wallet = EconomyManager.getMiniGameWallet();
+    const pnlEl = document.getElementById('solo-session-pnl-val');
+    const walletEl = document.getElementById('solo-wallet-display');
+    const cvWallet = document.getElementById('casino-page-wallet-val');
+
+    if (walletEl) walletEl.textContent = `$${wallet.balance.toLocaleString()}`;
+    if (cvWallet) cvWallet.textContent = `$${wallet.balance.toLocaleString()}`;
+
+    if (pnlEl) {
+      const pnl = this.casinoSessionNetPnL || 0;
+      if (pnl > 0) {
+        pnlEl.textContent = `+$${pnl.toLocaleString()} (Profit)`;
+        pnlEl.className = 'emerald';
+      } else if (pnl < 0) {
+        pnlEl.textContent = `-$${Math.abs(pnl).toLocaleString()} (Loss)`;
+        pnlEl.className = 'crimson';
+      } else {
+        pnlEl.textContent = '$0 (Even)';
+        pnlEl.className = 'gold';
+      }
+    }
+  }
+
+  promptInsufficientCasinoFunds(gameName = 'Casino Game') {
+    const wallet = EconomyManager.getMiniGameWallet();
+    this.showInGameConfirm({
+      title: 'OUT OF CASINO FUNDS',
+      message: `Your Casino balance is $${wallet.balance.toLocaleString()}, which is below the minimum bet for ${gameName}.\n\nWould you like to cash out & return to Texas Hold'em, or claim your $1,000 allowance if your 3-hour cooldown is complete?`,
+      confirmText: 'RETURN TO MAIN MENU',
+      cancelText: 'CLAIM $1,000 (3H)',
+      onConfirm: () => this.hideCasinoView(),
+      onCancel: () => {
+        const res = EconomyManager.claimMiniGameDaily();
+        if (res.success) {
+          sounds.playWin();
+          this.updateDualWalletUI();
+          this.updateEconomyDashboard();
+          this.updateSoloHUD();
+          this.updateRouletteUI();
+          this.updateSlotsUI();
+          this.updateCrapsUI();
+          this.setAnnouncement(`[CLAIMED] Claimed $1,000 Mini-Game Allowance! New balance: $${res.balance.toLocaleString()}`);
+        } else {
+          sounds.playCheck();
+          this.setAnnouncement(`[NOTICE] ${res.message}`);
+          this.showInGameAlert({
+            title: 'ALLOWANCE COOLDOWN ACTIVE',
+            message: res.message,
+            type: 'info'
+          });
+        }
+      }
+    });
   }
 
   hideCasinoView() {
@@ -5930,6 +6089,11 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       this.updateEconomyDashboard();
       this.updateCrapsUI();
       this.crapsRolling = false;
+      this.casinoSessionNetPnL = (this.casinoSessionNetPnL || 0) + (totalWon - totalBet);
+      this.updateSoloHUD();
+      if (EconomyManager.getMiniGameWallet().balance <= 0) {
+        setTimeout(() => this.promptInsufficientCasinoFunds('Craps'), 1200);
+      }
     }, 650);
   }
 
@@ -6001,6 +6165,11 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       resultText.textContent = `Result: ${winningNumber} ${colorLabel} (${winningNumber === 0 ? 'Zero' : (isEven ? 'EVEN' : 'ODD')})!`;
     }
 
+    const totalBetRoulette = Object.values(this.rouletteBets || {}).reduce((s, b) => s + (b.amount || 0), 0);
+    const netRoulette = totalPayout - totalBetRoulette;
+    this.casinoSessionNetPnL = (this.casinoSessionNetPnL || 0) + netRoulette;
+    this.updateSoloHUD();
+
     if (totalPayout > 0) {
       sounds.playWin();
       if (statusPill) statusPill.textContent = `WINNER! Paid out $${totalPayout.toLocaleString()}! (${winningDescriptions.join(', ')})`;
@@ -6010,6 +6179,9 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     }
 
     this.updateRouletteUI();
+    if (EconomyManager.getMiniGameWallet().balance <= 0) {
+      setTimeout(() => this.promptInsufficientCasinoFunds('Roulette'), 1200);
+    }
   }
 
   // ==========================================================================
@@ -6390,7 +6562,13 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       this.setAnnouncement(`[SLOTS LOSS] You lost -$${this.slotWager.toLocaleString()} on this spin.`);
     }
 
+    const payout = (multiplier > 0) ? (this.slotWager * multiplier) : 0;
+    this.casinoSessionNetPnL = (this.casinoSessionNetPnL || 0) + (payout - this.slotWager);
+    this.updateSoloHUD();
     this.updateSlotsUI();
+    if (EconomyManager.getMiniGameWallet().balance <= 0) {
+      setTimeout(() => this.promptInsufficientCasinoFunds('Slots'), 1200);
+    }
   }
 
   // ==========================================================================
