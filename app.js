@@ -67,7 +67,9 @@ class SoundManager {
     this.ctx = null;
     this.masterGain = null;
     this.compressor = null;
+    this.boostGain = null;
     this.slotSpinInterval = null;
+    this.rouletteTimers = [];
   }
 
   setVolume(vol) {
@@ -87,16 +89,21 @@ class SoundManager {
         this.masterGain = this.ctx.createGain();
         this.masterGain.gain.setValueAtTime(this.enabled ? this.volume : 0, this.ctx.currentTime);
 
-        // Hardware Dynamics Compressor for punchy, loud, crystal-clear sound without distortion
+        // Hardware Dynamics Compressor to prevent clipping while allowing loud output
         this.compressor = this.ctx.createDynamicsCompressor();
-        this.compressor.threshold.setValueAtTime(-14, this.ctx.currentTime);
-        this.compressor.knee.setValueAtTime(10, this.ctx.currentTime);
-        this.compressor.ratio.setValueAtTime(4.5, this.ctx.currentTime);
-        this.compressor.attack.setValueAtTime(0.003, this.ctx.currentTime);
-        this.compressor.release.setValueAtTime(0.12, this.ctx.currentTime);
+        this.compressor.threshold.setValueAtTime(-20, this.ctx.currentTime);
+        this.compressor.knee.setValueAtTime(8, this.ctx.currentTime);
+        this.compressor.ratio.setValueAtTime(3.5, this.ctx.currentTime);
+        this.compressor.attack.setValueAtTime(0.002, this.ctx.currentTime);
+        this.compressor.release.setValueAtTime(0.08, this.ctx.currentTime);
+
+        // Make-Up Boost Gain Node: Crystal-clear, noticeably louder audio volume (v1.0325 Sound Fix 2.0)
+        this.boostGain = this.ctx.createGain();
+        this.boostGain.gain.setValueAtTime(1.95, this.ctx.currentTime);
 
         this.masterGain.connect(this.compressor);
-        this.compressor.connect(this.ctx.destination);
+        this.compressor.connect(this.boostGain);
+        this.boostGain.connect(this.ctx.destination);
       }
       if (this.ctx && this.ctx.state === 'suspended') {
         this.ctx.resume().catch(() => {});
@@ -125,7 +132,7 @@ class SoundManager {
     }
   }
 
-  // 1. Melodic Audio Activation Chime (Louder & Triumphant)
+  // 1. Melodic Audio Activation Chime
   playToggleChime() {
     if (!this.enabled) return;
     this.init();
@@ -136,27 +143,27 @@ class SoundManager {
       const gain1 = this.ctx.createGain();
       osc1.type = 'triangle';
       osc1.frequency.setValueAtTime(587.33, t); // D5
-      gain1.gain.setValueAtTime(0.35, t);
-      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+      gain1.gain.setValueAtTime(0.65, t);
+      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
       osc1.connect(gain1);
       this._connectOut(gain1);
       osc1.start(t);
-      osc1.stop(t + 0.14);
+      osc1.stop(t + 0.16);
 
       const osc2 = this.ctx.createOscillator();
       const gain2 = this.ctx.createGain();
       osc2.type = 'sine';
       osc2.frequency.setValueAtTime(880, t + 0.08); // A5
-      gain2.gain.setValueAtTime(0.40, t + 0.08);
-      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
+      gain2.gain.setValueAtTime(0.70, t + 0.08);
+      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
       osc2.connect(gain2);
       this._connectOut(gain2);
       osc2.start(t + 0.08);
-      osc2.stop(t + 0.32);
+      osc2.stop(t + 0.35);
     } catch (e) {}
   }
 
-  // 2. Tactile UI Click (Crisp & Punchy)
+  // 2. Tactile UI Click (Crisp, Punchy & Louder)
   playClick() {
     if (!this.enabled) return;
     this.init();
@@ -166,18 +173,18 @@ class SoundManager {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(1200, t);
-      osc.frequency.exponentialRampToValueAtTime(400, t + 0.035);
-      gain.gain.setValueAtTime(0.28, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.035);
+      osc.frequency.setValueAtTime(1400, t);
+      osc.frequency.exponentialRampToValueAtTime(450, t + 0.04);
+      gain.gain.setValueAtTime(0.65, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
       osc.connect(gain);
       this._connectOut(gain);
       osc.start(t);
-      osc.stop(t + 0.035);
+      osc.stop(t + 0.04);
     } catch (e) {}
   }
 
-  // 3. Ceramic Poker Chip Clatter (Dual Clink)
+  // 3. Ceramic Poker Chip Clatter (Dual Clink, Rich Resonance)
   playChip() {
     if (!this.enabled) return;
     this.init();
@@ -187,30 +194,30 @@ class SoundManager {
       const osc1 = this.ctx.createOscillator();
       const gain1 = this.ctx.createGain();
       osc1.type = 'triangle';
-      osc1.frequency.setValueAtTime(2400, t);
-      osc1.frequency.exponentialRampToValueAtTime(850, t + 0.05);
-      gain1.gain.setValueAtTime(0.35, t);
-      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+      osc1.frequency.setValueAtTime(2600, t);
+      osc1.frequency.exponentialRampToValueAtTime(900, t + 0.055);
+      gain1.gain.setValueAtTime(0.72, t);
+      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.055);
       osc1.connect(gain1);
       this._connectOut(gain1);
       osc1.start(t);
-      osc1.stop(t + 0.05);
+      osc1.stop(t + 0.055);
 
       const osc2 = this.ctx.createOscillator();
       const gain2 = this.ctx.createGain();
       osc2.type = 'sine';
-      osc2.frequency.setValueAtTime(1750, t + 0.016);
-      osc2.frequency.exponentialRampToValueAtTime(700, t + 0.06);
-      gain2.gain.setValueAtTime(0.25, t + 0.016);
-      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+      osc2.frequency.setValueAtTime(1900, t + 0.015);
+      osc2.frequency.exponentialRampToValueAtTime(750, t + 0.065);
+      gain2.gain.setValueAtTime(0.55, t + 0.015);
+      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.065);
       osc2.connect(gain2);
       this._connectOut(gain2);
-      osc2.start(t + 0.016);
-      osc2.stop(t + 0.06);
+      osc2.start(t + 0.015);
+      osc2.stop(t + 0.065);
     } catch (e) {}
   }
 
-  // 4. Playing Card Deal & Flick
+  // 4. Playing Card Deal & Flick on Felt Table
   playCard(pitchVariation = 1.0) {
     if (!this.enabled) return;
     this.init();
@@ -220,42 +227,42 @@ class SoundManager {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(540 * pitchVariation, t);
-      osc.frequency.exponentialRampToValueAtTime(140 * pitchVariation, t + 0.09);
-      gain.gain.setValueAtTime(0.32, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+      osc.frequency.setValueAtTime(620 * pitchVariation, t);
+      osc.frequency.exponentialRampToValueAtTime(160 * pitchVariation, t + 0.095);
+      gain.gain.setValueAtTime(0.68, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.095);
       osc.connect(gain);
       this._connectOut(gain);
       osc.start(t);
-      osc.stop(t + 0.09);
+      osc.stop(t + 0.095);
     } catch (e) {}
   }
 
-  // 4B. Deal Hand Cards Sequence (Snap, Snap, Snap...)
-  playCardDealingSequence(count = 2, interval = 70) {
+  // 4B. Deal Hand Cards Sequence (Flick, Flick, Flick...)
+  playCardDealingSequence(count = 2, interval = 75) {
     if (!this.enabled) return;
     for (let i = 0; i < count; i++) {
       setTimeout(() => {
-        const pitch = 0.95 + (i % 5) * 0.04;
+        const pitch = 0.95 + (i % 5) * 0.05;
         this.playCard(pitch);
       }, i * interval);
     }
   }
 
-  // 5. Card Shuffle Riffle
+  // 5. Card Shuffle Riffle (6 Rapid Riffles)
   playShuffle() {
     if (!this.enabled) return;
     this.init();
     if (!this.ctx) return;
     try {
-      for (let i = 0; i < 5; i++) {
-        const time = this.ctx.currentTime + i * 0.035;
+      for (let i = 0; i < 6; i++) {
+        const time = this.ctx.currentTime + i * 0.032;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(380 + Math.random() * 200, time);
-        osc.frequency.exponentialRampToValueAtTime(100, time + 0.035);
-        gain.gain.setValueAtTime(0.24, time);
+        osc.frequency.setValueAtTime(420 + Math.random() * 220, time);
+        osc.frequency.exponentialRampToValueAtTime(120, time + 0.035);
+        gain.gain.setValueAtTime(0.55, time);
         gain.gain.exponentialRampToValueAtTime(0.001, time + 0.035);
         osc.connect(gain);
         this._connectOut(gain);
@@ -265,7 +272,7 @@ class SoundManager {
     } catch (e) {}
   }
 
-  // 6. Poker Table Double Knock (Check / Tap)
+  // 6. Poker Table Double Knock (Check / Tap on Oak Wood)
   playCheck() {
     if (!this.enabled) return;
     this.init();
@@ -276,27 +283,27 @@ class SoundManager {
       const osc1 = this.ctx.createOscillator();
       const gain1 = this.ctx.createGain();
       osc1.type = 'square';
-      osc1.frequency.setValueAtTime(200, t);
-      osc1.frequency.exponentialRampToValueAtTime(80, t + 0.04);
-      gain1.gain.setValueAtTime(0.32, t);
-      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+      osc1.frequency.setValueAtTime(220, t);
+      osc1.frequency.exponentialRampToValueAtTime(80, t + 0.045);
+      gain1.gain.setValueAtTime(0.70, t);
+      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.045);
       osc1.connect(gain1);
       this._connectOut(gain1);
       osc1.start(t);
-      osc1.stop(t + 0.04);
+      osc1.stop(t + 0.045);
 
       // Knock 2 (45ms later)
       const osc2 = this.ctx.createOscillator();
       const gain2 = this.ctx.createGain();
       osc2.type = 'square';
-      osc2.frequency.setValueAtTime(170, t + 0.045);
-      osc2.frequency.exponentialRampToValueAtTime(70, t + 0.085);
-      gain2.gain.setValueAtTime(0.28, t + 0.045);
-      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.085);
+      osc2.frequency.setValueAtTime(180, t + 0.045);
+      osc2.frequency.exponentialRampToValueAtTime(70, t + 0.09);
+      gain2.gain.setValueAtTime(0.65, t + 0.045);
+      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
       osc2.connect(gain2);
       this._connectOut(gain2);
       osc2.start(t + 0.045);
-      osc2.stop(t + 0.085);
+      osc2.stop(t + 0.09);
     } catch (e) {}
   }
 
@@ -310,18 +317,18 @@ class SoundManager {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(260, t);
-      osc.frequency.exponentialRampToValueAtTime(65, t + 0.12);
-      gain.gain.setValueAtTime(0.25, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+      osc.frequency.setValueAtTime(320, t);
+      osc.frequency.exponentialRampToValueAtTime(70, t + 0.14);
+      gain.gain.setValueAtTime(0.60, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
       osc.connect(gain);
       this._connectOut(gain);
       osc.start(t);
-      osc.stop(t + 0.12);
+      osc.stop(t + 0.14);
     } catch (e) {}
   }
 
-  // 8. All-In Dramatic Resonant Chord
+  // 8. All-In Dramatic Resonant Chord & Sub-Bass
   playAllIn() {
     if (!this.enabled) return;
     this.init();
@@ -334,13 +341,13 @@ class SoundManager {
         const gain = this.ctx.createGain();
         osc.type = idx === 0 ? 'sine' : 'triangle';
         osc.frequency.setValueAtTime(f, t);
-        osc.frequency.exponentialRampToValueAtTime(f * 0.7, t + 0.42);
-        gain.gain.setValueAtTime(0.30, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.42);
+        osc.frequency.exponentialRampToValueAtTime(f * 0.7, t + 0.45);
+        gain.gain.setValueAtTime(0.75, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
         osc.connect(gain);
         this._connectOut(gain);
         osc.start(t);
-        osc.stop(t + 0.42);
+        osc.stop(t + 0.45);
       });
     } catch (e) {}
   }
@@ -358,12 +365,35 @@ class SoundManager {
         const gain = this.ctx.createGain();
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(freq, time);
-        gain.gain.setValueAtTime(0.35, time);
-        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.32);
+        gain.gain.setValueAtTime(0.75, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.35);
         osc.connect(gain);
         this._connectOut(gain);
         osc.start(time);
-        osc.stop(time + 0.32);
+        osc.stop(time + 0.35);
+      });
+    } catch (e) {}
+  }
+
+  // 9B. Loss / Fold / Busted Tone (Descending Minor Harmonics)
+  playLose() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const notes = [293.66, 233.08, 196.00]; // D4 -> Bb3 -> G3
+      notes.forEach((freq, idx) => {
+        const time = this.ctx.currentTime + idx * 0.09;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, time);
+        gain.gain.setValueAtTime(0.52, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.28);
+        osc.connect(gain);
+        this._connectOut(gain);
+        osc.start(time);
+        osc.stop(time + 0.28);
       });
     } catch (e) {}
   }
@@ -381,17 +411,17 @@ class SoundManager {
         const gain = this.ctx.createGain();
         osc.type = 'sine';
         osc.frequency.setValueAtTime(freq, time);
-        gain.gain.setValueAtTime(0.38, time);
-        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.38);
+        gain.gain.setValueAtTime(0.80, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.40);
         osc.connect(gain);
         this._connectOut(gain);
         osc.start(time);
-        osc.stop(time + 0.38);
+        osc.stop(time + 0.40);
       });
     } catch (e) {}
   }
 
-  // 11. Slot Machine Lever Pull Clunk
+  // 11. Slot Machine Lever Pull Clunk & Spring
   playSlotPull() {
     if (!this.enabled) return;
     this.init();
@@ -402,41 +432,42 @@ class SoundManager {
       const gain = this.ctx.createGain();
       osc.type = 'sawtooth';
       osc.frequency.setValueAtTime(110, t);
-      osc.frequency.exponentialRampToValueAtTime(280, t + 0.15);
-      gain.gain.setValueAtTime(0.32, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+      osc.frequency.exponentialRampToValueAtTime(320, t + 0.16);
+      gain.gain.setValueAtTime(0.72, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
       osc.connect(gain);
       this._connectOut(gain);
       osc.start(t);
-      osc.stop(t + 0.15);
+      osc.stop(t + 0.16);
     } catch (e) {}
   }
 
-  // 12. Continuous Slot Machine Reel Spinning Whirr
+  // 12. Continuous Slot Machine Reel Spinning Whirr & Ratchet Ticker
   startSlotSpinWhirr() {
     if (!this.enabled) return;
     this.stopSlotSpinWhirr();
     this.init();
     if (!this.ctx) return;
     try {
-      // Rapid stepper click interval while reels spin
+      let tickCount = 0;
       this.slotSpinInterval = setInterval(() => {
         if (!this.enabled || !this.ctx) return;
         try {
           const t = this.ctx.currentTime;
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(580 + Math.random() * 120, t);
-          osc.frequency.exponentialRampToValueAtTime(240, t + 0.035);
-          gain.gain.setValueAtTime(0.20, t);
+          osc.type = (tickCount % 2 === 0) ? 'triangle' : 'square';
+          osc.frequency.setValueAtTime((tickCount % 2 === 0 ? 680 : 520) + Math.random() * 80, t);
+          osc.frequency.exponentialRampToValueAtTime(220, t + 0.035);
+          gain.gain.setValueAtTime(0.42, t);
           gain.gain.exponentialRampToValueAtTime(0.001, t + 0.035);
           osc.connect(gain);
           this._connectOut(gain);
           osc.start(t);
           osc.stop(t + 0.035);
+          tickCount++;
         } catch (e) {}
-      }, 50);
+      }, 42);
     } catch (e) {}
   }
 
@@ -451,40 +482,42 @@ class SoundManager {
     this.startSlotSpinWhirr();
   }
 
-  // 13. Slot Machine Reel Brake Stop (Heavy Metallic Thud)
-  playSlotStop() {
+  // 13. Slot Machine Reel Brake Stop (Deep Heavy Metallic Thud)
+  playSlotStop(reelNum = 1) {
     if (!this.enabled) return;
     this.init();
     if (!this.ctx) return;
     try {
       const t = this.ctx.currentTime;
+      const baseFreq = 1800 - (reelNum - 1) * 350;
+
       const osc1 = this.ctx.createOscillator();
       const gain1 = this.ctx.createGain();
       osc1.type = 'sine';
-      osc1.frequency.setValueAtTime(1600, t);
-      osc1.frequency.exponentialRampToValueAtTime(240, t + 0.05);
-      gain1.gain.setValueAtTime(0.35, t);
-      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+      osc1.frequency.setValueAtTime(baseFreq, t);
+      osc1.frequency.exponentialRampToValueAtTime(200, t + 0.055);
+      gain1.gain.setValueAtTime(0.75, t);
+      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.055);
       osc1.connect(gain1);
       this._connectOut(gain1);
       osc1.start(t);
-      osc1.stop(t + 0.05);
+      osc1.stop(t + 0.055);
 
       const osc2 = this.ctx.createOscillator();
       const gain2 = this.ctx.createGain();
       osc2.type = 'square';
-      osc2.frequency.setValueAtTime(120, t);
-      osc2.frequency.exponentialRampToValueAtTime(50, t + 0.06);
-      gain2.gain.setValueAtTime(0.28, t);
-      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+      osc2.frequency.setValueAtTime(110 - (reelNum * 15), t);
+      osc2.frequency.exponentialRampToValueAtTime(45, t + 0.07);
+      gain2.gain.setValueAtTime(0.65, t);
+      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
       osc2.connect(gain2);
       this._connectOut(gain2);
       osc2.start(t);
-      osc2.stop(t + 0.06);
+      osc2.stop(t + 0.07);
     } catch (e) {}
   }
 
-  // 14. Roulette Ball Whirring On Track
+  // 14. Roulette Ball Whirring On Track (Launch Whoosh)
   playRouletteSpin() {
     if (!this.enabled) return;
     this.init();
@@ -492,20 +525,44 @@ class SoundManager {
     try {
       const t = this.ctx.currentTime;
       for (let i = 0; i < 8; i++) {
-        const time = t + i * 0.055;
+        const time = t + i * 0.05;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(2000 - i * 140, time);
-        osc.frequency.exponentialRampToValueAtTime(800, time + 0.035);
-        gain.gain.setValueAtTime(0.22, time);
-        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.035);
+        osc.frequency.setValueAtTime(2200 - i * 150, time);
+        osc.frequency.exponentialRampToValueAtTime(750, time + 0.04);
+        gain.gain.setValueAtTime(0.55, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.04);
         osc.connect(gain);
         this._connectOut(gain);
         osc.start(time);
-        osc.stop(time + 0.035);
+        osc.stop(time + 0.04);
       }
     } catch (e) {}
+  }
+
+  // 14B. Natural Decelerating Roulette Ball Fret Clicks
+  startRouletteBallDeceleration(durationMs = 3800) {
+    if (!this.enabled) return;
+    this.clearRouletteTimers();
+    // Schedule natural decelerating clicks matching the wheel easing
+    const clickDelays = [
+      80, 160, 240, 320, 410, 500, 600, 710, 830, 960, 1100,
+      1260, 1430, 1620, 1830, 2060, 2310, 2580, 2880, 3200, 3540
+    ];
+    clickDelays.forEach(delay => {
+      if (delay < durationMs) {
+        const timer = setTimeout(() => {
+          this.playRouletteClick();
+        }, delay);
+        this.rouletteTimers.push(timer);
+      }
+    });
+  }
+
+  clearRouletteTimers() {
+    this.rouletteTimers.forEach(t => clearTimeout(t));
+    this.rouletteTimers = [];
   }
 
   // 15. Roulette Ball Pocket Click (Brass Fret)
@@ -519,52 +576,64 @@ class SoundManager {
       const gain = this.ctx.createGain();
       osc.type = 'sine';
       osc.frequency.setValueAtTime(2600, t);
-      osc.frequency.exponentialRampToValueAtTime(900, t + 0.02);
-      gain.gain.setValueAtTime(0.26, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.02);
+      osc.frequency.exponentialRampToValueAtTime(850, t + 0.022);
+      gain.gain.setValueAtTime(0.60, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.022);
       osc.connect(gain);
       this._connectOut(gain);
       osc.start(t);
-      osc.stop(t + 0.02);
+      osc.stop(t + 0.022);
     } catch (e) {}
   }
 
   // 16. Roulette Ball Pocket Landing Drop (Solid Wooden Pocket Thud)
   playRouletteDrop() {
     if (!this.enabled) return;
+    this.clearRouletteTimers();
     this.init();
     if (!this.ctx) return;
     try {
       const t = this.ctx.currentTime;
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(320, t);
-      osc.frequency.exponentialRampToValueAtTime(80, t + 0.08);
-      gain.gain.setValueAtTime(0.35, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
-      osc.connect(gain);
-      this._connectOut(gain);
-      osc.start(t);
-      osc.stop(t + 0.08);
+      const osc1 = this.ctx.createOscillator();
+      const gain1 = this.ctx.createGain();
+      osc1.type = 'triangle';
+      osc1.frequency.setValueAtTime(320, t);
+      osc1.frequency.exponentialRampToValueAtTime(75, t + 0.085);
+      gain1.gain.setValueAtTime(0.75, t);
+      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.085);
+      osc1.connect(gain1);
+      this._connectOut(gain1);
+      osc1.start(t);
+      osc1.stop(t + 0.085);
+
+      const osc2 = this.ctx.createOscillator();
+      const gain2 = this.ctx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(1400, t + 0.02);
+      osc2.frequency.exponentialRampToValueAtTime(500, t + 0.05);
+      gain2.gain.setValueAtTime(0.55, t + 0.02);
+      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+      osc2.connect(gain2);
+      this._connectOut(gain2);
+      osc2.start(t + 0.02);
+      osc2.stop(t + 0.05);
     } catch (e) {}
   }
 
-  // 17. Craps Dice Tumbling Rattle
-  playDiceTumble() {
+  // 17. Craps Wooden Cup Shake (3 Rapid Wooden Shakes)
+  playDiceCupShake() {
     if (!this.enabled) return;
     this.init();
     if (!this.ctx) return;
     try {
-      const t = this.ctx.currentTime;
-      for (let i = 0; i < 5; i++) {
-        const time = t + i * 0.05;
+      for (let i = 0; i < 3; i++) {
+        const time = this.ctx.currentTime + i * 0.07;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'square';
-        osc.frequency.setValueAtTime(850 + Math.random() * 400, time);
-        osc.frequency.exponentialRampToValueAtTime(220, time + 0.04);
-        gain.gain.setValueAtTime(0.26, time);
+        osc.frequency.setValueAtTime(650 + Math.random() * 200, time);
+        osc.frequency.exponentialRampToValueAtTime(240, time + 0.04);
+        gain.gain.setValueAtTime(0.60, time);
         gain.gain.exponentialRampToValueAtTime(0.001, time + 0.04);
         osc.connect(gain);
         this._connectOut(gain);
@@ -574,7 +643,31 @@ class SoundManager {
     } catch (e) {}
   }
 
-  // 17B. Craps Dice Table Landing (Thump & Settle)
+  // 17B. Craps Dice Tumbling Rattle
+  playDiceTumble() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      for (let i = 0; i < 6; i++) {
+        const time = t + i * 0.048;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(900 + Math.random() * 450, time);
+        osc.frequency.exponentialRampToValueAtTime(210, time + 0.04);
+        gain.gain.setValueAtTime(0.65, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.04);
+        osc.connect(gain);
+        this._connectOut(gain);
+        osc.start(time);
+        osc.stop(time + 0.04);
+      }
+    } catch (e) {}
+  }
+
+  // 17C. Craps Dice Table Landing (Thump & Settle)
   playDiceLand() {
     if (!this.enabled) return;
     this.init();
@@ -584,25 +677,25 @@ class SoundManager {
       const osc1 = this.ctx.createOscillator();
       const gain1 = this.ctx.createGain();
       osc1.type = 'triangle';
-      osc1.frequency.setValueAtTime(240, t);
-      osc1.frequency.exponentialRampToValueAtTime(70, t + 0.07);
-      gain1.gain.setValueAtTime(0.35, t);
-      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+      osc1.frequency.setValueAtTime(260, t);
+      osc1.frequency.exponentialRampToValueAtTime(65, t + 0.08);
+      gain1.gain.setValueAtTime(0.75, t);
+      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
       osc1.connect(gain1);
       this._connectOut(gain1);
       osc1.start(t);
-      osc1.stop(t + 0.07);
+      osc1.stop(t + 0.08);
 
       const osc2 = this.ctx.createOscillator();
       const gain2 = this.ctx.createGain();
       osc2.type = 'sine';
-      osc2.frequency.setValueAtTime(1400, t + 0.02);
-      osc2.frequency.exponentialRampToValueAtTime(600, t + 0.06);
-      gain2.gain.setValueAtTime(0.22, t + 0.02);
+      osc2.frequency.setValueAtTime(1500, t + 0.018);
+      osc2.frequency.exponentialRampToValueAtTime(620, t + 0.06);
+      gain2.gain.setValueAtTime(0.55, t + 0.018);
       gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
       osc2.connect(gain2);
       this._connectOut(gain2);
-      osc2.start(t + 0.02);
+      osc2.start(t + 0.018);
       osc2.stop(t + 0.06);
     } catch (e) {}
   }
@@ -611,20 +704,20 @@ class SoundManager {
     this.playDiceTumble();
   }
 
-  // 18. Cashout / Vault Metallic Coin Cascade
+  // 18. Cashout / Vault Metallic Coin Cascade (8 Coins)
   playCashout() {
     if (!this.enabled) return;
     this.init();
     if (!this.ctx) return;
     try {
-      const coinFreqs = [2400, 2900, 3400, 4100, 4800, 5400];
+      const coinFreqs = [2400, 2800, 3200, 3700, 4200, 4700, 5200, 5800];
       coinFreqs.forEach((freq, idx) => {
-        const time = this.ctx.currentTime + idx * 0.05;
+        const time = this.ctx.currentTime + idx * 0.045;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'sine';
         osc.frequency.setValueAtTime(freq, time);
-        gain.gain.setValueAtTime(0.28, time);
+        gain.gain.setValueAtTime(0.70, time);
         gain.gain.exponentialRampToValueAtTime(0.001, time + 0.14);
         osc.connect(gain);
         this._connectOut(gain);
@@ -644,13 +737,13 @@ class SoundManager {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(920, t);
-      gain.gain.setValueAtTime(0.30, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.20);
+      osc.frequency.setValueAtTime(960, t);
+      gain.gain.setValueAtTime(0.65, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
       osc.connect(gain);
       this._connectOut(gain);
       osc.start(t);
-      osc.stop(t + 0.20);
+      osc.stop(t + 0.22);
     } catch (e) {}
   }
 }
@@ -658,6 +751,26 @@ class SoundManager {
 const sounds = new SoundManager();
 window.addEventListener('touchstart', () => sounds.init(), { once: true, passive: true });
 window.addEventListener('pointerdown', () => sounds.init(), { once: true, passive: true });
+
+// Global Tactile Audio Listener: Crisp click/chip sound on every button, chip, tab, and card click
+document.addEventListener('click', (e) => {
+  const target = e.target.closest('button, .menu-btn, .action-btn, .chip-selector-btn, .modal-close, .rules-tab, .save-slot-card, .casino-tab-btn, .craps-bet-spot, .roulette-cell, .craps-preset-btn, .update-pill, .daily-allowance-btn, .allowance-btn, .diff-card, .variant-card, .theme-card, .wager-btn, .gold-cashout-btn, .gold-cashout-pill, .hub-launch-btn');
+  if (target) {
+    sounds.init();
+    if (target.classList.contains('chip-selector-btn') || target.classList.contains('craps-bet-spot') || target.classList.contains('roulette-cell') || target.classList.contains('craps-preset-btn') || target.classList.contains('wager-btn')) {
+      sounds.playChip();
+    } else if (target.id === 'btn-fold') {
+      sounds.playFold();
+    } else if (target.id === 'btn-allin') {
+      sounds.playAllIn();
+    } else if (target.id === 'btn-check') {
+      sounds.playCheck();
+    } else {
+      sounds.playClick();
+    }
+  }
+}, { capture: true, passive: true });
+
 
 // ============================================================================
 // 2. CARDS & DECK
@@ -1204,10 +1317,10 @@ class EconomyManager {
 
     const now = Date.now();
     const elapsed = now - lastClaim;
-    if (elapsed >= EconomyManager.MINIGAME_CYCLE_MS || lastClaim === 0) {
+    if (elapsed >= EconomyManager.POKER_CYCLE_MS || lastClaim === 0) {
       return { canClaim: true, remainingMs: 0, text: 'Ready to Claim!' };
     }
-    const remainingMs = EconomyManager.MINIGAME_CYCLE_MS - elapsed;
+    const remainingMs = EconomyManager.POKER_CYCLE_MS - elapsed;
     const hours = Math.floor(remainingMs / (1000 * 60 * 60));
     const mins = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
     const secs = Math.floor((remainingMs % (1000 * 60)) / 1000);
@@ -1222,7 +1335,7 @@ class EconomyManager {
   static claimGlobalPokerDaily() {
     const status = EconomyManager.getGlobalPokerClaimStatus();
     if (!status.canClaim) {
-      return { success: false, message: `30m cycle active! Next claim in ${status.text}` };
+      return { success: false, message: `3h cycle active! Next claim in ${status.text}` };
     }
     const newSavings = EconomyManager.addCumulativeSavings(5000);
     try {
@@ -1305,10 +1418,10 @@ class EconomyManager {
     const now = Date.now();
     const lastClaim = wallet.lastClaimTimestamp || 0;
     const elapsed = now - lastClaim;
-    if (elapsed >= EconomyManager.CYCLE_MS || lastClaim === 0) {
+    if (elapsed >= EconomyManager.MINIGAME_CYCLE_MS || lastClaim === 0) {
       return { canClaim: true, remainingMs: 0, text: 'Ready to Claim!' };
     }
-    const remainingMs = EconomyManager.CYCLE_MS - elapsed;
+    const remainingMs = EconomyManager.MINIGAME_CYCLE_MS - elapsed;
     const hours = Math.floor(remainingMs / (1000 * 60 * 60));
     const mins = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
     const secs = Math.floor((remainingMs % (1000 * 60)) / 1000);
@@ -1323,7 +1436,7 @@ class EconomyManager {
   static claimMiniGameDaily() {
     const status = EconomyManager.getMiniGameClaimStatus();
     if (!status.canClaim) {
-      return { success: false, message: `3h cycle active! Next claim in ${status.text}` };
+      return { success: false, message: `30m cycle active! Next claim in ${status.text}` };
     }
     const wallet = EconomyManager.getMiniGameWallet();
     wallet.balance += 1000;
@@ -2500,7 +2613,7 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
           this.updateEconomyDashboard();
           this.updateRouletteUI();
           this.updateSlotsUI();
-          this.setAnnouncement(`[CLAIMED] Claimed $1,000 Mini-Game Allowance! (3-Hour Cooldown) New balance: $${res.balance.toLocaleString()}`);
+          this.setAnnouncement(`[CLAIMED] Claimed $1,000 Mini-Game Allowance! (30-Minute Cooldown) New balance: $${res.balance.toLocaleString()}`);
         } else {
           sounds.playCheck();
           this.setAnnouncement(`[NOTICE] ${res.message}`);
@@ -3012,7 +3125,7 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
           sounds.playWin();
           this.updateDualWalletUI();
           this.updateEconomyDashboard();
-          this.setAnnouncement(`[CLAIMED] Claimed $1,000 Mini-Game Allowance! (3-Hour Cooldown) New balance: $${res.balance.toLocaleString()}`);
+          this.setAnnouncement(`[CLAIMED] Claimed $1,000 Mini-Game Allowance! (30-Minute Cooldown) New balance: $${res.balance.toLocaleString()}`);
         } else {
           sounds.playCheck();
           this.setAnnouncement(`[NOTICE] ${res.message}`);
@@ -5525,7 +5638,7 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
       for (let i = 0; i < 3; i++) {
         const c = this.deck.deal();
         this.communityCards.push(c);
-        sounds.playCard();
+        setTimeout(() => sounds.playCard(1.0 + i * 0.05), i * 90);
         document.getElementById(`flop-${i + 1}`).appendChild(this.renderCardDOM(c));
       }
       this.setAnnouncement('Flop dealt! First player acts.');
@@ -6108,6 +6221,7 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
 
     SaveManager.recordRouletteSpin();
     sounds.playRouletteSpin();
+    sounds.startRouletteBallDeceleration(3800);
     this.rouletteSpinning = true;
     const spinBtn = document.getElementById('btn-spin-roulette');
     if (spinBtn) spinBtn.disabled = true;
@@ -6344,7 +6458,8 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     this.updateCrapsUI();
 
     this.crapsRolling = true;
-    sounds.playDiceTumble();
+    sounds.playDiceCupShake();
+    setTimeout(() => sounds.playDiceTumble(), 120);
 
     const d1El = document.getElementById('craps-die-1');
     const d2El = document.getElementById('craps-die-2');
@@ -6505,7 +6620,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
           this.setAnnouncement(`[CRAPS PUSH] Rolled ${total} (${d1}+${d2})! Push/Return $${totalReturn.toLocaleString()}.`);
         }
       } else {
-        sounds.playFold();
+        sounds.playLose();
         this.setAnnouncement(`[CRAPS LOSS] Rolled ${total} (${d1}+${d2}). You LOST -$${totalBet.toLocaleString()} on this roll.`);
       }
 
@@ -6522,6 +6637,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
   }
 
   resolveRouletteSpin(winningNumber) {
+    sounds.playRouletteDrop();
     const isRed = this.redNumbers.has(winningNumber);
     const isBlack = winningNumber > 0 && !isRed;
     const isEven = (winningNumber > 0 && winningNumber % 2 === 0);
@@ -6598,7 +6714,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       sounds.playWin();
       if (statusPill) statusPill.textContent = `WINNER! Paid out $${totalPayout.toLocaleString()}! (${winningDescriptions.join(', ')})`;
     } else {
-      sounds.playFold();
+      sounds.playLose();
       if (statusPill) statusPill.textContent = `No winning bets. Try your luck again!`;
     }
 
@@ -6779,6 +6895,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       leverArm.classList.add('pulled');
       setTimeout(() => leverArm.classList.remove('pulled'), 600);
     }
+    sounds.playSlotPull();
 
     this.slotSpinning = true;
     wallet.balance -= this.slotWager;
@@ -6834,7 +6951,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       if (reel1) {
         reel1.classList.remove('spinning');
         reel1.innerHTML = `<div class="slot-symbol">${renderSlotSymbol(finalReels[0])}</div>`;
-        sounds.playSlotStop();
+        sounds.playSlotStop(1);
       }
     }, 600);
 
@@ -6842,7 +6959,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       if (reel2) {
         reel2.classList.remove('spinning');
         reel2.innerHTML = `<div class="slot-symbol">${renderSlotSymbol(finalReels[1])}</div>`;
-        sounds.playSlotStop();
+        sounds.playSlotStop(2);
       }
     }, 1050);
 
@@ -6850,7 +6967,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       if (reel3) {
         reel3.classList.remove('spinning');
         reel3.innerHTML = `<div class="slot-symbol">${renderSlotSymbol(finalReels[2])}</div>`;
-        sounds.playSlotStop();
+        sounds.playSlotStop(3);
       }
       this.resolveSlotSpin(finalReels);
     }, 1500);
@@ -6858,6 +6975,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
 
   resolveSlotSpin(reels) {
     this.slotSpinning = false;
+    sounds.stopSlotSpinWhirr();
     if (this.btnSpinSlots) this.btnSpinSlots.disabled = false;
 
     const [s1, s2, s3] = reels;
@@ -7141,7 +7259,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
         if (res.success) {
           sounds.playWin();
           this.updateEconomyDashboard();
-          this.setAnnouncement(`[CLAIMED] Claimed $1,000 Mini-Game Allowance! (3-Hour Cooldown) New balance: $${res.balance.toLocaleString()}`);
+          this.setAnnouncement(`[CLAIMED] Claimed $1,000 Mini-Game Allowance! (30-Minute Cooldown) New balance: $${res.balance.toLocaleString()}`);
         } else {
           sounds.playCheck();
           this.setAnnouncement(`[NOTICE] ${res.message}`);

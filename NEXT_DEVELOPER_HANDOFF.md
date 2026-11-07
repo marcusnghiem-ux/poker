@@ -526,3 +526,42 @@ equirePlayerName() when player was already registered, permanently fixing slot b
   - Current section: `v1.0325 CURRENT`
   - Previous releases archived: `v1.03 ARCHIVED`, `v1.0275 ARCHIVED`, `v1.025 ARCHIVED`, `v1.02 ARCHIVED`, `v1.015 ARCHIVED`, `v1.01 ARCHIVED`.
 
+
+---
+
+## 30. Version 1.0325 Refinement: Authentic 360° Living Cosmic Starfield, High-Impact Soundscape 2.0 & Economy Synchronization
+
+### Overview
+In response to direct visual evaluation against Geometry Dash *Solar Flare* gameplay captures and audio volume feedback:
+1. **Authentic 360° Non-Linear Lissajous Starfield Drift:**
+   - Completely eradicated linear back-and-forth oscillation.
+   - Designed 6 unique, continuous 2D harmonic Lissajous orbital trajectories (`celestialDrift1` through `celestialDrift6`) spanning prime periods between **18s and 32s** (19.2s, 20.8s, 21.4s, 22.7s, 23.5s, 24.2s, 25.1s, 26.4s, 27.8s, 28.6s, 29.3s, 31.6s).
+   - Wrapped each mini-star sparkle and background glow circle into unified SVG groups (`<g class="mini-star-unit">`) with `transform-box: fill-box; transform-origin: center;`.
+   - Each star rotates through a full 360° continuous glint with non-linear scale breathing (0.65x to 1.35x), radiant lens flare blooms, and out-of-phase negative delays (-3.2s to -21.3s).
+   - Extended organic drift to the celestial portal void stars (`.star-portal-1`..`3`).
+   - Cleaned up dangling CSS keyframe syntax errors in `style.css`.
+2. **High-Impact Audio Engine 2.0 & Loudness Booster:**
+   - Introduced a dedicated post-compressor Make-Up Boost Gain (`this.boostGain = 1.95x`) with dynamic compression threshold (-20dB) for clean, loud, punchy video-game volume without clipping.
+   - Raised individual oscillator amplitude envelopes across all sound synthesis pipelines to 0.55 - 0.85.
+   - Added global delegated capture click listener on `document` targeting all interactive buttons, tabs, modal controls, and chip selectors for immediate tactile audio feedback (`playClick()` or `playChip()`).
+   - Added continuous mechanical soundscapes:
+     - **Slot Machine:** Real-time rhythmic stepper clicks (`startSlotSpinWhirr()` every 42ms with alternating frequencies) throughout reel spinning, heavy lever pull sound (`playSlotPull()`), and 3 distinct weighted metallic reel stops (`playSlotStop(1..3)`).
+     - **European Roulette:** Ball launch whip sound (`playRouletteSpin()`), natural 22-step decelerating brass fret ticks (`startRouletteBallDeceleration()`), and solid wooden pocket drop thud (`playRouletteDrop()`).
+     - **Craps:** 3-shake wooden cup rattle (`playDiceCupShake()`), rapid dice tumble on felt (`playDiceTumble()`), and dual dice felt impact and settle click (`playDiceLand()`).
+     - **Card Dealing:** Staggered card dealing snaps across all hole cards and 3-card flop sequence (`setTimeout(() => sounds.playCard(pitch), i * 90)`), turn flick, river snap, and fold mucking slide (`playFold()`).
+     - **Loss / Bust Audio:** Introduced soft descending minor harmonic tone (`playLose()`) for losing spins, rolls, and busted hands.
+     - **Allowance & Cashout:** Payout cascade of 8 coins falling into the metallic tray (`playCashout()`).
+3. **Economy Synchronization & Timer Correction:**
+   - Fixed swapped cooldown constants:
+     - `EconomyManager.POKER_CYCLE_MS = 3 * 60 * 60 * 1000` (3 hours) for high-stakes Cumulative Poker Savings ($5,000 allowance).
+     - `EconomyManager.MINIGAME_CYCLE_MS = 30 * 60 * 1000` (30 minutes) for Mini-Games Free Allowance ($1,000 allowance).
+   - Corrected announcement strings and cooldown status messages across the application to reflect the 30-minute mini-game cycle.
+4. **Comprehensive Branding Polish:**
+   - Ensured all instances of "Royal Texas Hold'em" across headers, titles, rules modal, and navigation are fully updated to **Solar Texas Hold'em**.
+
+### Verification
+- `scratch/validate_tags.py`: 0 tag errors.
+- `scratch/find_emojis.py`: 0 system emojis in HTML/CSS.
+- `scratch/check_index_ids.py`: 0 missing IDs.
+- `simulate_performance_25_runs.py`: 25/25 benchmarks passed (0 regressions).
+- Production deployment: `https://solarflare-hub-iota.vercel.app/`.
