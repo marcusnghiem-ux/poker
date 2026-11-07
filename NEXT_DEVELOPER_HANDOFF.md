@@ -231,7 +231,28 @@ try { this.renderMainMenuSlots(); } catch (err) { console.error("renderSlots err
 - Branch: `main`
 - Origin Remote: `https://github.com/marcusnghiem-ux/poker.git` (Powers Vercel)
 - Texas Hold'em Remote: `https://github.com/marcusnghiem-ux/texas-holdem.git`
-- Production URL: `https://myimathss.vercel.app/`
+- Production URL: `https://solarflare-hub-iota.vercel.app/`
+
+### 21. v1.01 Release: Solar Flare Visual Overhaul, Animations & Universal Buy-In ✅ COMPLETED & VERIFIED
+- **Production Deployment Target:** `https://solarflare-hub-iota.vercel.app/`
+- **Update Log Modal (v1.01):**
+  - Added `#btn-update-log-trigger` in top navigation bar (`.site-top-bar`) and `#menu-update-log-trigger` in `.menu-hero`.
+  - Detailed modal `#update-log-modal` titled **"1.01 - Solar Flare Graphics & Visual Overhaul"** detailing geometry dash vector art, card deal/fold physics, flying chip animations, universal save file buy-in prompt, and expanded wagering controls.
+- **Solar Flare Geometric Dash Vector Artwork (Photos 1 & 2):**
+  - **Photo 1 Geometry:** Top and bottom fiery molten sawblades (`.solar-sawblade-svg`), rotating 8-spoke radiant gear medallions (`.gear-sun-medallion`), diagonal glowing laser arrows (`.laser-energy-arrow`), and floating diamond shards.
+  - **Photo 2 Geometry:** Cosmic celestial space portal disc (`.cosmic-portal-disc`) with midnight indigo interior, molten planetary crust framing, zig-zag constellation beams, and radiant 4-pointed orbital starbursts.
+- **Motion & Table Physics Animations:**
+  - **Card Dealing:** Newly dealt cards play 3D rotational flip and glide-in animation (`.card-deal-anim`).
+  - **Card Folding:** Folded hands tilt and gracefully muck into the discard zone (`.card-folded-anim`).
+  - **Betting Chips Flight:** Posting bets triggers flying chip tokens (`.flying-chip-token`) traveling from player seats directly into the table pot.
+  - **Victory Pot Sweep:** Showdown and fold wins trigger `.pot-victory-sweep` pulsing glow and flying chips from pot to winner stack.
+- **Universal Save File Buy-In Selection (Min $1,000):**
+  - Entering ANY save slot (starting a new run or continuing an active run) prompts the player for how much to enter with (minimum $1,000) drawn from their Cumulative Savings Vault. Zero free chip spawns.
+- **Preset & Custom Casino Wagers:**
+  - European Roulette and Slot Machines feature exact preset buttons: `$10`, `$50`, `$100`, `$1,000`, and `Custom`.
+  - Clicking `Custom` opens `#custom-wager-modal` with numeric validation ($\ge \$10$ and $\le$ wallet balance).
+- **Zero Emojis:** Strictly 0 emojis in rendered HTML and CSS.
+- **75 Simulation Runs:** 25 Engine Performance + 25 Graphics/Alerts + 25 Gameplay Simulation runs all passing 100%.
 - Verification Suite:
   - `python verify_syntax.py`
   - `python simulate_10_runs.py`

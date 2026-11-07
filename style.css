@@ -6157,3 +6157,365 @@ body {
   border-color: rgba(249, 115, 22, 0.55) !important;
   box-shadow: 0 14px 40px rgba(0, 0, 0, 0.75), 0 0 40px rgba(245, 158, 11, 0.3) !important;
 }
+
+/* ==========================================================================
+   v1.01 RELEASE: UPDATE LOG BADGE & MODAL
+   ========================================================================== */
+.update-log-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(220, 38, 38, 0.2) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.55);
+  border-radius: 20px;
+  padding: 4px 12px;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+}
+
+.update-log-pill-btn:hover {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.4) 0%, rgba(220, 38, 38, 0.35) 100%);
+  border-color: #ffd700;
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.5);
+  transform: translateY(-1px);
+}
+
+.update-pill-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  animation: pulseGreenDot 1.5s infinite alternate;
+}
+
+@keyframes pulseGreenDot {
+  0% { transform: scale(0.85); opacity: 0.7; }
+  100% { transform: scale(1.2); opacity: 1; filter: drop-shadow(0 0 4px #10b981); }
+}
+
+.update-pill-text {
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ffd700;
+  letter-spacing: 0.05em;
+}
+
+/* Main Menu Update Banner */
+.menu-update-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(90deg, rgba(30, 27, 75, 0.8) 0%, rgba(180, 83, 9, 0.45) 50%, rgba(30, 27, 75, 0.8) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.5);
+  border-radius: 30px;
+  padding: 6px 18px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 20px rgba(245, 158, 11, 0.25);
+  transition: all 0.25s ease;
+}
+
+.menu-update-banner:hover {
+  transform: translateY(-2px);
+  border-color: #ffd700;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.6), 0 0 30px rgba(245, 158, 11, 0.45);
+}
+
+.update-badge-tag {
+  background: #ea580c;
+  color: #ffffff;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 10px;
+  letter-spacing: 0.06em;
+}
+
+.update-badge-ver {
+  font-family: 'Cinzel', serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fef08a;
+  letter-spacing: 0.05em;
+}
+
+.update-badge-arrow {
+  color: #f59e0b;
+  font-weight: 900;
+}
+
+/* Update Log Modal */
+.update-log-card {
+  max-width: 620px !important;
+  background: linear-gradient(145deg, #0f0a1c 0%, #1a102e 50%, #0d0617 100%) !important;
+  border: 1px solid rgba(245, 158, 11, 0.55) !important;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.85), 0 0 35px rgba(245, 158, 11, 0.3) !important;
+  padding: 24px 28px !important;
+}
+
+.update-log-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.update-log-ver-badge {
+  background: linear-gradient(135deg, #ea580c 0%, #f59e0b 100%);
+  color: #0f172a;
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  font-weight: 900;
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+.update-log-body {
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.update-log-section {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 3px solid #f59e0b;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+}
+
+.update-sec-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  color: #fde047;
+  margin: 0 0 8px 0;
+  letter-spacing: 0.05em;
+}
+
+.update-sec-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  line-height: 1.55;
+}
+
+.update-sec-list li {
+  margin-bottom: 5px;
+}
+
+/* Custom Wager Modal */
+.custom-wager-card {
+  max-width: 420px !important;
+  text-align: center;
+  background: linear-gradient(145deg, #090d16 0%, #1e1338 100%) !important;
+  border: 1px solid rgba(245, 158, 11, 0.5) !important;
+}
+
+.custom-wager-desc {
+  font-size: 0.88rem;
+  color: #94a3b8;
+  margin-bottom: 16px;
+}
+
+.custom-wager-input-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.custom-wager-cur {
+  font-family: 'Cinzel', serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #ffd700;
+}
+
+.custom-wager-field {
+  width: 180px;
+  padding: 10px 14px;
+  font-family: 'Courier New', monospace;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #ffd700;
+  background: #020617;
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.custom-wager-err {
+  color: #ef4444;
+  font-size: 0.82rem;
+  margin-bottom: 12px;
+}
+
+/* ==========================================================================
+   SOLAR FLARE GEOMETRIC DASH VECTOR ARTWORK (Inspired by Photos 1 & 2)
+   ========================================================================== */
+.solar-geometry-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.solar-sawblade-svg {
+  position: absolute;
+  width: 100%;
+  height: 60px;
+  pointer-events: none;
+  opacity: 0.65;
+  filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.5));
+}
+
+.solar-sawblade-svg.top-sawblade {
+  top: 0;
+  left: 0;
+}
+
+.solar-sawblade-svg.bottom-sawblade {
+  bottom: 0;
+  left: 0;
+}
+
+/* Glowing Diagonal Laser Wave Arrows */
+.laser-energy-arrow {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0.75;
+  filter: drop-shadow(0 0 15px #f43f5e);
+  animation: laserPulse 4s infinite alternate ease-in-out;
+}
+
+.laser-left {
+  top: 22%;
+  left: 4%;
+  transform: rotate(25deg);
+}
+
+.laser-right {
+  top: 60%;
+  right: 5%;
+  transform: rotate(-25deg);
+  animation-delay: 2s;
+}
+
+@keyframes laserPulse {
+  0% { transform: translateY(0) scale(0.95); opacity: 0.5; }
+  50% { transform: translateY(-8px) scale(1.05); opacity: 0.9; }
+  100% { transform: translateY(0) scale(0.95); opacity: 0.5; }
+}
+
+/* Rotating Gear-Sun Medallions */
+.gear-sun-medallion {
+  position: absolute;
+  pointer-events: none;
+  filter: drop-shadow(0 0 16px rgba(245, 158, 11, 0.65));
+}
+
+.gear-left {
+  top: 15%;
+  right: 8%;
+  animation: gearSpinClockwise 35s linear infinite;
+}
+
+.gear-right {
+  bottom: 15%;
+  left: 6%;
+  animation: gearSpinCounter 40s linear infinite;
+}
+
+@keyframes gearSpinClockwise {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes gearSpinCounter {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
+
+/* Cosmic Celestial Portal Disc */
+.cosmic-portal-disc {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0.55;
+  filter: drop-shadow(0 0 30px rgba(245, 158, 11, 0.4));
+  animation: portalHover 8s ease-in-out infinite alternate;
+  z-index: 0;
+}
+
+@keyframes portalHover {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  100% { transform: translate(-50%, -47%) scale(1.06); filter: drop-shadow(0 0 45px rgba(245, 158, 11, 0.65)); }
+}
+
+/* ==========================================================================
+   CARD & CHIP REAL-TIME TABLE ANIMATIONS
+   ========================================================================== */
+.card-deal-anim {
+  animation: cardDealFlyIn 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes cardDealFlyIn {
+  0% {
+    transform: translateY(-40px) scale(0.55) rotate(-10deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.card-folded-anim {
+  animation: cardFoldMuck 0.4s ease forwards !important;
+}
+
+@keyframes cardFoldMuck {
+  0% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.7) translateY(24px) rotate(14deg);
+    opacity: 0.28;
+    filter: grayscale(1);
+  }
+}
+
+/* Flying Chip Bet Animation Token */
+.flying-chip-token {
+  position: fixed;
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+  z-index: 999;
+  transition: transform 0.42s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.42s ease;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 8px #ffd700);
+}
+
+/* Pot Award Victory Sweep */
+.pot-victory-sweep {
+  animation: potVictoryPulse 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes potVictoryPulse {
+  0% { transform: scale(1); filter: drop-shadow(0 0 10px #ffd700); }
+  100% { transform: scale(1.1); filter: drop-shadow(0 0 22px #ffd700) drop-shadow(0 0 35px #f59e0b); }
+}

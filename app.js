@@ -1427,6 +1427,8 @@ class PokerApp {
     try { this.updateGlobalStatsUI(); } catch (err) { console.error("updateGlobalStatsUI error:", err); }
     try { this.updateDualWalletUI(); } catch (err) { console.error("updateDualWalletUI error:", err); }
     try { this.renderMainMenuSlots(); } catch (err) { console.error("renderSlots error:", err); }
+    try { this.initUpdateLogModal(); } catch (err) { console.error("initUpdateLogModal error:", err); }
+    try { this.initCustomWagerModal(); } catch (err) { console.error("initCustomWagerModal error:", err); }
 
     window.pokerApp = this;
     window.pokerGame = this;
@@ -1437,6 +1439,169 @@ class PokerApp {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('room') === 'join' || urlParams.get('room') === 'private') {
       this.promptOnlineRoomPassword();
+    }
+  }
+
+  // ==========================================================================
+  // v1.01: UPDATE LOG, CUSTOM WAGERING & TABLE MOTION ANIMATIONS
+  // ==========================================================================
+  initUpdateLogModal() {
+    const modal = document.getElementById('update-log-modal');
+    const btnNav = document.getElementById('btn-update-log-trigger');
+    const btnHero = document.getElementById('menu-update-log-trigger');
+    const closeBtn = document.getElementById('close-update-log-btn');
+    const closeBtnBottom = document.getElementById('btn-close-update-log');
+
+    const openModal = () => {
+      if (modal) modal.classList.remove('hidden');
+    };
+    const closeModal = () => {
+      if (modal) modal.classList.add('hidden');
+    };
+
+    if (btnNav) btnNav.addEventListener('click', openModal);
+    if (btnHero) btnHero.addEventListener('click', openModal);
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (closeBtnBottom) closeBtnBottom.addEventListener('click', closeModal);
+  }
+
+  initCustomWagerModal() {
+    this.customWagerTargetGame = null;
+    const modal = document.getElementById('custom-wager-modal');
+    const inputEl = document.getElementById('custom-wager-input');
+    const errEl = document.getElementById('custom-wager-err');
+    const closeBtn = document.getElementById('close-custom-wager-btn');
+    const cancelBtn = document.getElementById('btn-cancel-custom-wager');
+    const confirmBtn = document.getElementById('btn-confirm-custom-wager');
+
+    const closeModal = () => {
+      if (modal) modal.classList.add('hidden');
+      if (errEl) errEl.classList.add('hidden');
+    };
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', () => {
+        const val = Math.floor(Number(inputEl ? inputEl.value : 0));
+        const wallet = EconomyManager.getMiniGameWallet();
+        if (isNaN(val) || val < 10) {
+          if (errEl) { errEl.textContent = 'Minimum wager is $10!'; errEl.classList.remove('hidden'); }
+          return;
+        }
+        if (val > wallet.balance) {
+          if (errEl) { errEl.textContent = `Insufficient Mini-Game Wallet balance! Available: $${wallet.balance.toLocaleString()}.`; errEl.classList.remove('hidden'); }
+          return;
+        }
+
+        if (this.customWagerTargetGame === 'roulette') {
+          this.selectedRouletteChip = val;
+          const customBtn = document.querySelector('.r-preset-btn[data-wager="custom"]');
+          if (customBtn) customBtn.textContent = `$${val.toLocaleString()}`;
+        } else if (this.customWagerTargetGame === 'slots') {
+          this.slotWager = val;
+          const customBtn = document.querySelector('.slots-preset-btn[data-wager="custom"]');
+          if (customBtn) customBtn.textContent = `$${val.toLocaleString()}`;
+          this.updateSlotsUI();
+        }
+
+        sounds.playChip();
+        closeModal();
+      });
+    }
+  }
+
+  openCustomWagerModal(gameType) {
+    this.customWagerTargetGame = gameType;
+    const modal = document.getElementById('custom-wager-modal');
+    const inputEl = document.getElementById('custom-wager-input');
+    const errEl = document.getElementById('custom-wager-err');
+    const titleEl = document.getElementById('custom-wager-modal-title');
+    const descEl = document.getElementById('custom-wager-modal-desc');
+    const wallet = EconomyManager.getMiniGameWallet();
+
+    if (titleEl) titleEl.textContent = gameType === 'roulette' ? 'Custom Roulette Wager' : 'Custom Slot Machine Bet';
+    if (descEl) descEl.textContent = `Set your custom bet amount from your Mini-Game Wallet (Available: $${wallet.balance.toLocaleString()}).`;
+
+    const currentWager = gameType === 'roulette' ? this.selectedRouletteChip : this.slotWager;
+    if (inputEl) {
+      inputEl.value = Math.max(10, currentWager || 50);
+      inputEl.max = wallet.balance;
+    }
+    if (errEl) errEl.classList.add('hidden');
+    if (modal) modal.classList.remove('hidden');
+  }
+
+  animateChipBet(playerIdx) {
+    try {
+      const seatEl = document.getElementById(`seat-${playerIdx}`);
+      const potEl = this.potEl || document.getElementById('pot-total');
+      if (!seatEl || !potEl) return;
+
+      const rectFrom = seatEl.getBoundingClientRect();
+      const rectTo = potEl.getBoundingClientRect();
+      if (!rectFrom.width || !rectTo.width) return;
+
+      const chip = document.createElement('div');
+      chip.className = 'flying-chip-token';
+      chip.innerHTML = `<svg viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="10" fill="#f59e0b" stroke="#ffd700" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="#b45309" stroke="#fde047" stroke-width="1.2"/><text x="12" y="16" font-size="11" font-weight="900" fill="#fff" text-anchor="middle">$</text></svg>`;
+      chip.style.left = `${rectFrom.left + rectFrom.width / 2 - 12}px`;
+      chip.style.top = `${rectFrom.top + rectFrom.height / 2 - 12}px`;
+      document.body.appendChild(chip);
+
+      requestAnimationFrame(() => {
+        const deltaX = (rectTo.left + rectTo.width / 2) - (rectFrom.left + rectFrom.width / 2);
+        const deltaY = (rectTo.top + rectTo.height / 2) - (rectFrom.top + rectFrom.height / 2);
+        chip.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.85) rotate(180deg)`;
+        chip.style.opacity = '0.85';
+      });
+
+      setTimeout(() => {
+        if (chip && chip.parentNode) chip.parentNode.removeChild(chip);
+      }, 450);
+    } catch (e) {
+      // Defensive try/catch
+    }
+  }
+
+  animatePotAward(winnerIdx) {
+    try {
+      const seatEl = document.getElementById(`seat-${winnerIdx}`);
+      const potEl = this.potEl || document.getElementById('pot-total');
+      if (potEl) {
+        potEl.classList.add('pot-victory-sweep');
+        setTimeout(() => potEl.classList.remove('pot-victory-sweep'), 700);
+      }
+      if (!seatEl || !potEl) return;
+
+      const rectFrom = potEl.getBoundingClientRect();
+      const rectTo = seatEl.getBoundingClientRect();
+      if (!rectFrom.width || !rectTo.width) return;
+
+      for (let i = 0; i < 3; i++) {
+        setTimeout(() => {
+          const chip = document.createElement('div');
+          chip.className = 'flying-chip-token';
+          chip.innerHTML = `<svg viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="10" fill="#ffd700" stroke="#fde047" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="#b45309" stroke="#fef08a" stroke-width="1.2"/><text x="12" y="16" font-size="11" font-weight="900" fill="#fff" text-anchor="middle">$</text></svg>`;
+          chip.style.left = `${rectFrom.left + rectFrom.width / 2 - 12}px`;
+          chip.style.top = `${rectFrom.top + rectFrom.height / 2 - 12}px`;
+          document.body.appendChild(chip);
+
+          requestAnimationFrame(() => {
+            const deltaX = (rectTo.left + rectTo.width / 2) - (rectFrom.left + rectFrom.width / 2);
+            const deltaY = (rectTo.top + rectTo.height / 2) - (rectFrom.top + rectFrom.height / 2);
+            chip.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(1.1) rotate(270deg)`;
+            chip.style.opacity = '0.9';
+          });
+
+          setTimeout(() => {
+            if (chip && chip.parentNode) chip.parentNode.removeChild(chip);
+          }, 450);
+        }, i * 90);
+      }
+    } catch (e) {
+      // Defensive try/catch
     }
   }
 
@@ -1813,33 +1978,67 @@ class PokerApp {
     }
   }
 
-  openBuyInModal(slotId, difficulty) {
+  openBuyInModal(slotId, difficulty, isContinuation = false) {
     this.pendingBuyInSlot = slotId;
     this.pendingBuyInDifficulty = difficulty;
+    this.isBuyInContinuation = isContinuation;
 
     const savings = EconomyManager.getCumulativeSavings();
-    if (savings < 1000) {
-      sounds.playCheck();
-      this.showInGameAlert({
-        title: 'INSUFFICIENT SAVINGS VAULT',
-        message: `You currently have $${savings.toLocaleString()} in your Savings Vault. A minimum buy-in of $1,000 is required to launch a Poker Run.
-
-Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!`
-      });
-      return;
-    }
-
     const modal = document.getElementById('buyin-modal');
     const availEl = document.getElementById('buyin-available-savings');
     const inputEl = document.getElementById('buyin-amount-input');
     const errEl = document.getElementById('buyin-err-msg');
+    const modalTitle = modal ? modal.querySelector('h2') : null;
+    const confirmBtn = document.getElementById('btn-confirm-buyin');
 
-    if (availEl) availEl.textContent = `$${savings.toLocaleString()}`;
-    if (inputEl) {
-      inputEl.value = Math.min(1000, savings);
-      inputEl.min = 1000;
-      inputEl.max = savings;
+    if (isContinuation) {
+      const slotData = SaveManager.getSave(slotId) || {};
+      const currentStack = Number(slotData.chips) || 0;
+      this.pendingContinuationCurrentStack = currentStack;
+
+      if (modalTitle) modalTitle.textContent = `Enter Table Stack (Slot ${slotId})`;
+      if (confirmBtn) confirmBtn.textContent = 'Enter Table';
+
+      if (currentStack < 1000 && (savings + currentStack) < 1000) {
+        sounds.playCheck();
+        this.showInGameAlert({
+          title: 'INSUFFICIENT FUNDS FOR TABLE ENTRY',
+          message: `Your current save slot stack ($${currentStack.toLocaleString()}) and Savings Vault ($${savings.toLocaleString()}) cannot reach the minimum table entry of $1,000.
+
+Claim your $5,000 Daily Poker Allowance or transfer Casino funds to continue!`
+        });
+        return;
+      }
+
+      if (availEl) availEl.textContent = `$${savings.toLocaleString()} (Current Stack: $${currentStack.toLocaleString()})`;
+      if (inputEl) {
+        inputEl.value = Math.max(1000, currentStack);
+        inputEl.min = 1000;
+        inputEl.max = currentStack + savings;
+      }
+    } else {
+      if (modalTitle) modalTitle.textContent = 'Fund Poker Run Buy-In';
+      if (confirmBtn) confirmBtn.textContent = 'Launch Run';
+
+      if (savings < 1000) {
+        sounds.playCheck();
+        this.showInGameAlert({
+          title: 'INSUFFICIENT SAVINGS VAULT',
+          message: `You currently have $${savings.toLocaleString()} in your Savings Vault. A minimum buy-in of $1,000 is required to launch a Poker Run.
+
+Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!`
+        });
+        return;
+      }
+
+      if (availEl) availEl.textContent = `$${savings.toLocaleString()}`;
+      if (inputEl) {
+        inputEl.value = Math.min(1000, savings);
+        inputEl.min = 1000;
+        inputEl.max = savings;
+      }
     }
+
     if (errEl) errEl.classList.add('hidden');
     if (modal) modal.classList.remove('hidden');
   }
@@ -1852,23 +2051,53 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
     const savings = EconomyManager.getCumulativeSavings();
 
     if (buyIn < 1000) {
-      if (errEl) { errEl.textContent = 'Minimum Poker Run buy-in is $1,000.'; errEl.classList.remove('hidden'); }
+      if (errEl) { errEl.textContent = 'Minimum Table Buy-In is $1,000.'; errEl.classList.remove('hidden'); }
       return;
     }
-    if (buyIn > savings) {
-      if (errEl) { errEl.textContent = `Insufficient savings! Available balance is only $${savings.toLocaleString()}.`; errEl.classList.remove('hidden'); }
-      return;
-    }
-
-    // Deduct strictly from Cumulative Savings
-    EconomyManager.deductCumulativeSavings(buyIn);
-    this.updateDualWalletUI();
-    this.updateEconomyDashboard();
-    if (modal) modal.classList.add('hidden');
 
     const slotId = this.pendingBuyInSlot || 1;
     const diff = this.pendingBuyInDifficulty || 'medium';
-    this.startNewGame(slotId, diff, buyIn);
+
+    if (this.isBuyInContinuation) {
+      const currentStack = this.pendingContinuationCurrentStack || 0;
+      const neededFromSavings = Math.max(0, buyIn - currentStack);
+
+      if (neededFromSavings > savings) {
+        if (errEl) {
+          errEl.textContent = `Insufficient savings! Need $${neededFromSavings.toLocaleString()} additional funds from Savings Vault to bring stack to $${buyIn.toLocaleString()}.`;
+          errEl.classList.remove('hidden');
+        }
+        return;
+      }
+
+      if (neededFromSavings > 0) {
+        EconomyManager.deductCumulativeSavings(neededFromSavings);
+      } else if (buyIn < currentStack) {
+        const returnToSavings = currentStack - buyIn;
+        EconomyManager.addCumulativeSavings(returnToSavings);
+      }
+
+      const slotData = SaveManager.getSave(slotId) || {};
+      slotData.chips = buyIn;
+      SaveManager.save(slotId, slotData);
+
+      this.updateDualWalletUI();
+      this.updateEconomyDashboard();
+      if (modal) modal.classList.add('hidden');
+      this.loadGame(slotId);
+    } else {
+      if (buyIn > savings) {
+        if (errEl) { errEl.textContent = `Insufficient savings! Available balance is only $${savings.toLocaleString()}.`; errEl.classList.remove('hidden'); }
+        return;
+      }
+
+      EconomyManager.deductCumulativeSavings(buyIn);
+      this.updateDualWalletUI();
+      this.updateEconomyDashboard();
+      if (modal) modal.classList.add('hidden');
+
+      this.startNewGame(slotId, diff, buyIn);
+    }
   }
 
 
@@ -2794,7 +3023,7 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
         const diff = card.dataset.difficulty;
         this.diffModal.classList.add('hidden');
         if (this.pendingSlotTarget !== null) {
-          this.startNewGame(this.pendingSlotTarget, diff);
+          this.openBuyInModal(this.pendingSlotTarget, diff, false);
         }
       });
     });
@@ -3735,10 +3964,12 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
           <div class="slot-corner-bracket bottom-right"></div>
         `;
 
-        cardEl.querySelector('.slot-btn-play').onclick = (e) => {
-          e.stopPropagation();
-          this.requirePlayerName(() => this.loadGame(slotId));
+        const handleContinuationClick = (e) => {
+          if (e) e.stopPropagation();
+          this.requirePlayerName(() => this.openBuyInModal(slotId, slotData.difficulty, true));
         };
+        cardEl.onclick = handleContinuationClick;
+        cardEl.querySelector('.slot-btn-play').onclick = handleContinuationClick;
 
         cardEl.querySelector('.slot-btn-del').onclick = (e) => {
           e.stopPropagation();
@@ -3895,7 +4126,7 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
   renderCardDOM(card, isHidden = false) {
     const cardEl = document.createElement('div');
     if (isHidden || !card) {
-      cardEl.className = 'card back card-hidden';
+      cardEl.className = 'card back card-hidden card-deal-anim';
       cardEl.innerHTML = `
         <svg class="card-back-svg" viewBox="0 0 100 140" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="100" height="140" rx="8" fill="#070e22" stroke="#d4af37" stroke-width="1.8"/>
@@ -3951,7 +4182,7 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
     }
 
     const color = card.suit.color; // 'red' or 'black'
-    cardEl.className = `card ${color} card-${color}`;
+    cardEl.className = `card ${color} card-${color} card-deal-anim`;
     cardEl.innerHTML = `
       <div class="card-top">
         <span class="card-rank">${card.label}</span>
@@ -4030,6 +4261,13 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
       const seatEl = document.getElementById(`seat-${idx}`);
       seatEl.classList.toggle('folded-seat', p.folded);
       seatEl.classList.toggle('knocked-out', !!p.knockedOut);
+      if (p.folded) {
+        seatEl.querySelectorAll('.card').forEach(card => card.classList.add('card-folded-anim'));
+        if (idx === 0) {
+          const heroBox = document.getElementById('hero-cards');
+          if (heroBox) heroBox.querySelectorAll('.card').forEach(card => card.classList.add('card-folded-anim'));
+        }
+      }
 
       // Dealer button indicator
       const dBtn = document.getElementById(`dealer-btn-${idx}`);
@@ -4267,6 +4505,7 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
     player.totalBet += actual;
     if (player.chips === 0) player.allIn = true;
     sounds.playChip();
+    this.animateChipBet(player.id);
     return actual;
   }
 
@@ -4717,6 +4956,7 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
     const pot = this.getTotalPot();
     winner.chips += pot;
     sounds.playWin();
+    this.animatePotAward(winner.id);
 
     const heroWon = (winner.id === 0);
     if (heroWon) this.winRecord.won++;
@@ -4774,6 +5014,7 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
       if (eligible.length === 1) {
         eligible[0].chips += pot.amount;
         if (eligible[0].id === 0) heroWonAny = true;
+        this.animatePotAward(eligible[0].id);
         announcements.push(`${eligible[0].name} takes ${potLabel} ($${pot.amount}).`);
         return;
       }
@@ -5047,7 +5288,9 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
         btn.classList.add('active');
         const wagerType = btn.dataset.wager;
         const wallet = EconomyManager.getMiniGameWallet();
-        if (wagerType === 'max') {
+        if (wagerType === 'custom') {
+          this.openCustomWagerModal('roulette');
+        } else if (wagerType === 'max') {
           this.selectedRouletteChip = Math.max(10, wallet.balance);
         } else {
           this.selectedRouletteChip = Number(wagerType) || 10;
@@ -5487,13 +5730,17 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
         btn.classList.add('active');
         const wagerVal = btn.dataset.wager;
         const wallet = EconomyManager.getMiniGameWallet();
-        if (wagerVal === 'max') {
+        if (wagerVal === 'custom') {
+          this.openCustomWagerModal('slots');
+        } else if (wagerVal === 'max') {
           this.slotWager = Math.max(10, wallet.balance);
+          sounds.playChip();
+          this.updateSlotsUI();
         } else {
           this.slotWager = Number(wagerVal) || 50;
+          sounds.playChip();
+          this.updateSlotsUI();
         }
-        sounds.playChip();
-        this.updateSlotsUI();
       });
     });
   }
