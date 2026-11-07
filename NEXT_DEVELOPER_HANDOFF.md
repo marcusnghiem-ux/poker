@@ -565,3 +565,49 @@ In response to direct visual evaluation against Geometry Dash *Solar Flare* game
 - `scratch/check_index_ids.py`: 0 missing IDs.
 - `simulate_performance_25_runs.py`: 25/25 benchmarks passed (0 regressions).
 - Production deployment: `https://solarflare-hub-iota.vercel.app/`.
+
+---
+
+## 31. Version 1.035 Release: Casino Transit Lounge Teleportation & Main Menu Bank Account Fund Transfer
+
+### Overview
+In response to the v1.035 update request and reference screenshot (`media_1794062762546_dec4a5e6.jpg`):
+1. **Casino Transit Lounge Direct Teleportation:**
+   - Attached click delegation to all `#transit-drawer .drawer-item` elements (resolving previous class name mismatch where items were styled as `.drawer-item` while JS looked for `.transit-item`).
+   - Every destination button instantly closes the drawer, plays click audio, and teleports the player directly into the target game:
+     - **Solar Texas Hold'em** (`#drawer-item-texas`): Teleports to Texas Hold'em table (`teleportToTexasHoldem()`), restoring active slot or initializing Slot 1.
+     - **Exclusive Room** (`#drawer-item-exclusive`): Opens online multiplayer room password prompt (`promptOnlineRoomPassword()`).
+     - **Casino Lounge Hub** (`#drawer-item-lounge`): Teleports to full Casino Showcase Hub (`showCasinoView('all')`).
+     - **Solar Flare Slots** (`#drawer-item-slots`): Teleports directly to Solo Slots arena (`showCasinoView('slots')`).
+     - **European Roulette** (`#drawer-item-roulette`): Teleports directly to Solo Roulette arena (`showCasinoView('roulette')`).
+     - **Solar Craps Table** (`#drawer-item-craps`): Added new dedicated button with custom SVG red dice to teleport directly to Solo Craps arena (`showCasinoView('craps')`).
+   - Quick Vault Summary in transit drawer (`#d-vault-savings` and `#d-vault-minigame`) is dynamically synchronized on every drawer open and balance mutation.
+2. **Streamlined Poker Variant Roster:**
+   - Strictly deleted **Short Deck (6-Plus)** (`#drawer-item-short`) and **Omaha High Poker** (`#drawer-item-omaha`) from the Transit Lounge drawer to keep the UI clean and focused on core Solar Texas Hold'em and the Exclusive Online Room for upcoming dedicated tournament expansions.
+3. **Main Menu Bank Account Fund Transfer (No Save Slot Injections):**
+   - Added a prominent, gold-glowing **Bank Transfer** button (`#btn-menu-bank-transfer`) to `menu-action-bar` on the Main Menu.
+   - Added an integrated **Transfer to Bank** action button (`#btn-hero-transfer`) directly inside `dual-wallet-display-hero` between the Cumulative Savings and Mini-Game Wallet cards.
+   - Overhauled `#transfer-modal` into a dedicated **Bank Account • Fund Transfer** modal:
+     - Real-time balances for both **Mini-Game Wallet** (`#transfer-avail-balance`) and **Bank Account (Cumulative Savings Vault)** (`#transfer-bank-balance`).
+     - Two-way direction selector (`#btn-dir-to-bank` / `#btn-dir-to-minigame`):
+       - *Deposit to Bank (Mini-Games &rarr; Bank)*: Safely stores casino profits into permanent Cumulative Savings Vault.
+       - *Withdraw from Bank (Bank &rarr; Mini-Games)*: Funds casino runs directly from Career Savings without affecting game saves.
+     - One-click transfer amount presets (`+$100`, `+$250`, `+$500`, `+$1,000`, `All Funds`).
+     - Completely removed `#transfer-slot-options` and solo save slot injection logic, strictly fulfilling the user mandate: *"the money should transfer to the bank account, not the slot ok?"*.
+   - Added `EconomyManager.transferFunds(direction, amount)` with atomic validation and storage persistence.
+   - Triggers `showInGameAlert` confirmation on completion, updating all wallet counters across the platform.
+4. **Version 1.035 Changelog & Branding:**
+   - Updated top nav pill to **Update 1.035**.
+   - Updated Main Menu update banner to **UPDATE 1.035 • Transit Teleport & Bank Transfer Update**.
+   - Added **v1.035 CURRENT** section to `#update-notes-modal` and archived v1.0325.
+   - Replaced leftover "Royal Poker" in top navbar with **SOLAR POKER**.
+
+### Verification
+- `verify_syntax.py`: 100% valid JavaScript AST, symbols, and bracket matching.
+- Tag check: 0 errors, unclosed remaining: 0.
+- Emojis check: 0 system emojis in HTML and CSS.
+- `scratch_check_ids.py`: All 287 JS `getElementById` calls correctly resolved in HTML.
+- `simulate_performance_25_runs.py`: 25/25 performance benchmarks passed (0 regressions).
+- `simulate_10_full_games_to_2000.py`: 10/10 complete tournament runs reached >= $2,000 target with $21,198 total cashout.
+- Git & deployment: Pushed to `origin/main` and `texas-holdem/main`.
+

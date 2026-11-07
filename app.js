@@ -1508,39 +1508,50 @@ class EconomyManager {
     return { success: true, slotChips: slot.chips };
   }
 
-  static transferMiniGameToPoker(slotId, amount) {
+  static transferFunds(direction, amount) {
     amount = Math.floor(Number(amount));
     if (isNaN(amount) || amount <= 0) {
       return { success: false, message: 'Please enter a valid transfer amount.' };
     }
     const wallet = EconomyManager.getMiniGameWallet();
-    if (wallet.balance < amount) {
-      return { success: false, message: 'Transfer amount exceeds your available mini-game balance!' };
-    }
+    const bankBalance = EconomyManager.getCumulativeSavings();
 
-    // Deduct from Mini-Game Wallet
-    wallet.balance -= amount;
-    EconomyManager.saveMiniGameWallet(wallet);
-
-    // Strictly one-way injection to Poker Save Slot
-    let slot = SaveManager.getSave(slotId);
-    const customName = localStorage.getItem('royal_poker_username') || 'High Roller';
-    if (slot) {
-      slot.chips = (slot.chips || 0) + amount;
-      SaveManager.saveSlot(slotId, slot);
-    } else {
-      slot = {
-        name: customName,
-        chips: 1000 + amount,
-        stage: 1,
-        difficulty: 'medium',
-        handNumber: 0,
-        winRecord: { won: 0, total: 0 }
+    if (direction === 'bank_to_minigame') {
+      if (amount > bankBalance) {
+        return { success: false, message: `Transfer amount ($${amount.toLocaleString()}) exceeds your Bank Account balance ($${bankBalance.toLocaleString()})!` };
+      }
+      EconomyManager.deductCumulativeSavings(amount);
+      wallet.balance += amount;
+      EconomyManager.saveMiniGameWallet(wallet);
+      return {
+        success: true,
+        direction,
+        amount,
+        newMiniBalance: wallet.balance,
+        newBankBalance: EconomyManager.getCumulativeSavings(),
+        message: `Successfully withdrew $${amount.toLocaleString()} from Bank Account into Mini-Game Wallet!`
       };
-      SaveManager.saveSlot(slotId, slot);
+    } else {
+      // Default: minigame_to_bank (Deposit casino winnings to permanent bank account)
+      if (amount > wallet.balance) {
+        return { success: false, message: `Transfer amount ($${amount.toLocaleString()}) exceeds your Mini-Game Wallet balance ($${wallet.balance.toLocaleString()})!` };
+      }
+      wallet.balance -= amount;
+      EconomyManager.saveMiniGameWallet(wallet);
+      const newBank = EconomyManager.addCumulativeSavings(amount);
+      return {
+        success: true,
+        direction: 'minigame_to_bank',
+        amount,
+        newMiniBalance: wallet.balance,
+        newBankBalance: newBank,
+        message: `Successfully transferred $${amount.toLocaleString()} into your Bank Account!`
+      };
     }
+  }
 
-    return { success: true, newMiniBalance: wallet.balance, newSlotChips: slot.chips };
+  static transferMiniGameToPoker(slotId, amount) {
+    return EconomyManager.transferFunds('minigame_to_bank', amount);
   }
 }
 
@@ -2097,6 +2108,9 @@ class PokerApp {
     const isOpen = open !== undefined ? open : !this.transitDrawer.classList.contains('open');
     this.transitDrawer.classList.toggle('open', isOpen);
     if (this.drawerBackdrop) this.drawerBackdrop.classList.toggle('open', isOpen);
+    if (isOpen) {
+      this.updateDualWalletUI();
+    }
   }
 
   bindTopNavAndModals() {
@@ -2110,13 +2124,14 @@ class PokerApp {
     if (this.drawerBackdrop) this.drawerBackdrop.addEventListener('click', () => this.toggleTransitDrawer(false));
     if (this.btnCloseTransit) this.btnCloseTransit.addEventListener('click', () => this.toggleTransitDrawer(false));
 
-    // Transit links in drawer
-    document.querySelectorAll('.transit-item').forEach(item => {
+    // Transit links in drawer (v1.035: All buttons instant teleport to hosted game)
+    document.querySelectorAll('#transit-drawer .drawer-item, .transit-item').forEach(item => {
       item.addEventListener('click', (e) => {
         e.preventDefault();
-        const dest = item.dataset.transit;
+        const dest = item.dataset.dest || item.dataset.transit || item.dataset.variant;
         this.toggleTransitDrawer(false);
-        this.handleTransitNavigation(dest);
+        sounds.playClick();
+        if (dest) this.handleTransitNavigation(dest);
       });
     });
 
@@ -3397,38 +3412,42 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
 
   handleTransitNavigation(dest) {
     if (dest === 'texas') {
-      this.setGameVariant('texas');
-      this.showGameView();
-      if (!this.handInProgress) this.startNewHand();
-    } else if (dest === 'shortDeck') {
-      if (!FeatureManager.isEnabled('shortDeck')) {
-        this.showInGameAlert({ title: 'VARIANT DISABLED', message: 'Short Deck (6+) variant is disabled in Settings.' });
-        return;
-      }
-      this.setGameVariant('shortDeck');
-      this.showGameView();
-      if (!this.handInProgress) this.startNewHand();
-    } else if (dest === 'omaha') {
-      if (!FeatureManager.isEnabled('omaha')) {
-        this.showInGameAlert({ title: 'VARIANT DISABLED', message: 'Omaha High (4-Card) variant is disabled in Settings.' });
-        return;
-      }
-      this.setGameVariant('omaha');
-      this.showGameView();
-      if (!this.handInProgress) this.startNewHand();
+      this.teleportToTexasHoldem();
     } else if (dest === 'exclusive') {
       this.promptOnlineRoomPassword();
     } else if (dest === 'slots') {
-      this.showCasinoView('slots');
+      this.requirePlayerName(() => this.showCasinoView('slots'));
     } else if (dest === 'roulette') {
-      this.showCasinoView('roulette');
+      this.requirePlayerName(() => this.showCasinoView('roulette'));
+    } else if (dest === 'craps') {
+      this.requirePlayerName(() => this.showCasinoView('craps'));
     } else if (dest === 'casino' || dest === 'lounge') {
-      this.showCasinoView('all');
-    } else if (dest === 'vault') {
-      const trModal = document.getElementById('transfer-modal');
-      if (trModal) trModal.classList.remove('hidden');
-      this.updateTransferModal();
+      this.requirePlayerName(() => this.showCasinoView('all'));
+    } else if (dest === 'vault' || dest === 'transfer') {
+      this.openTransferModal();
     }
+  }
+
+  teleportToTexasHoldem() {
+    this.setGameVariant('texas');
+    const mainMenu = document.getElementById('main-menu');
+    const casinoView = document.getElementById('casino-view');
+    if (casinoView) casinoView.classList.add('hidden');
+    if (mainMenu) mainMenu.classList.add('hidden');
+
+    if (this.activeSlot) {
+      this.showGameView();
+      if (!this.handInProgress) this.startNewHand();
+    } else {
+      const s1 = SaveManager.getSave(1);
+      if (s1 && s1.chips > 0) {
+        this.loadGame(1);
+      } else {
+        this.startNewGame(1, 'medium', 1000);
+      }
+    }
+    sounds.playChip();
+    this.setAnnouncement("[TELEPORT] Teleported to Solar Texas Hold'em Arena!");
   }
 
   setGameVariant(v) {
@@ -7118,20 +7137,32 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
   }
 
   // ==========================================================================
-  // BANKROLL TRANSFER TO POKER CAMPAIGN (Strict One-Way Separation)
+  // BANK ACCOUNT FUND TRANSFER (Mini-Game Wallet <-> Cumulative Savings Vault)
   // ==========================================================================
   initTransfer() {
     this.transferModal = document.getElementById('transfer-modal');
     this.btnOpenTransfer = document.getElementById('btn-open-transfer');
+    this.btnMenuBankTransfer = document.getElementById('btn-menu-bank-transfer');
+    this.btnHeroTransfer = document.getElementById('btn-hero-transfer');
+    this.btnSlotsTransfer = document.getElementById('btn-slots-transfer');
     this.closeTransferBtn = document.getElementById('close-transfer-btn');
     this.btnCancelTransfer = document.getElementById('btn-cancel-transfer');
     this.btnConfirmTransfer = document.getElementById('btn-confirm-transfer');
     this.transferAmtInput = document.getElementById('transfer-amount-input');
     this.transferError = document.getElementById('transfer-error-msg');
-    this.selectedTransferSlot = 1;
+    this.transferDirection = 'minigame_to_bank';
 
     if (this.btnOpenTransfer) {
       this.btnOpenTransfer.addEventListener('click', () => this.openTransferModal());
+    }
+    if (this.btnMenuBankTransfer) {
+      this.btnMenuBankTransfer.addEventListener('click', () => this.openTransferModal());
+    }
+    if (this.btnHeroTransfer) {
+      this.btnHeroTransfer.addEventListener('click', () => this.openTransferModal());
+    }
+    if (this.btnSlotsTransfer) {
+      this.btnSlotsTransfer.addEventListener('click', () => this.openTransferModal());
     }
     if (this.closeTransferBtn && this.transferModal) {
       this.closeTransferBtn.addEventListener('click', () => this.closeTransferModal());
@@ -7143,15 +7174,39 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       this.btnConfirmTransfer.addEventListener('click', () => this.executeTransfer());
     }
 
-    // Preset buttons: +$100, +$250, +$500, All Winnings
+    // Direction Toggle
+    const btnDirToBank = document.getElementById('btn-dir-to-bank');
+    const btnDirToMini = document.getElementById('btn-dir-to-minigame');
+    if (btnDirToBank && btnDirToMini) {
+      btnDirToBank.addEventListener('click', () => {
+        this.transferDirection = 'minigame_to_bank';
+        btnDirToBank.classList.add('active');
+        btnDirToMini.classList.remove('active');
+        this.updateTransferModal();
+        sounds.playClick();
+      });
+      btnDirToMini.addEventListener('click', () => {
+        this.transferDirection = 'bank_to_minigame';
+        btnDirToMini.classList.add('active');
+        btnDirToBank.classList.remove('active');
+        this.updateTransferModal();
+        sounds.playClick();
+      });
+    }
+
+    // Preset buttons: +$100, +$250, +$500, +$1,000, All Funds
     document.querySelectorAll('.t-preset-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const amtType = btn.dataset.amt;
         const wallet = EconomyManager.getMiniGameWallet();
+        const bank = EconomyManager.getCumulativeSavings();
+        const maxAvail = (this.transferDirection === 'bank_to_minigame') ? bank : wallet.balance;
+
         if (amtType === 'all') {
-          if (this.transferAmtInput) this.transferAmtInput.value = wallet.balance;
+          if (this.transferAmtInput) this.transferAmtInput.value = maxAvail;
         } else {
-          if (this.transferAmtInput) this.transferAmtInput.value = Number(amtType) || 100;
+          const val = Number(amtType) || 100;
+          if (this.transferAmtInput) this.transferAmtInput.value = Math.min(val, maxAvail);
         }
         sounds.playChip();
       });
@@ -7160,72 +7215,68 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
 
   openTransferModal() {
     if (!this.transferModal) return;
-    const wallet = EconomyManager.getMiniGameWallet();
-    const balEl = document.getElementById('transfer-avail-balance');
-    if (balEl) balEl.textContent = `$${wallet.balance.toLocaleString()}`;
+    this.updateTransferModal();
     if (this.transferError) this.transferError.classList.add('hidden');
-    if (this.transferAmtInput) this.transferAmtInput.value = Math.min(100, wallet.balance);
-
-    this.renderTransferSlots();
+    const wallet = EconomyManager.getMiniGameWallet();
+    const bank = EconomyManager.getCumulativeSavings();
+    const maxAvail = (this.transferDirection === 'bank_to_minigame') ? bank : wallet.balance;
+    if (this.transferAmtInput) this.transferAmtInput.value = Math.min(100, maxAvail);
     this.transferModal.classList.remove('hidden');
+    sounds.playClick();
+  }
+
+  updateTransferModal() {
+    const wallet = EconomyManager.getMiniGameWallet();
+    const bank = EconomyManager.getCumulativeSavings();
+    const miniEl = document.getElementById('transfer-avail-balance');
+    const bankEl = document.getElementById('transfer-bank-balance');
+    const confirmBtn = document.getElementById('btn-confirm-transfer');
+    const inputLabel = document.getElementById('transfer-amount-label');
+    const boxMini = document.getElementById('t-box-minigame');
+    const boxBank = document.getElementById('t-box-bank');
+
+    if (miniEl) miniEl.textContent = `$${wallet.balance.toLocaleString()}`;
+    if (bankEl) bankEl.textContent = `$${bank.toLocaleString()}`;
+
+    if (this.transferDirection === 'bank_to_minigame') {
+      if (confirmBtn) confirmBtn.textContent = 'Withdraw to Mini-Game Wallet';
+      if (inputLabel) inputLabel.textContent = `Withdraw Amount ($) • Available in Bank: $${bank.toLocaleString()}:`;
+      if (boxBank) boxBank.classList.add('active');
+      if (boxMini) boxMini.classList.remove('active');
+    } else {
+      if (confirmBtn) confirmBtn.textContent = 'Confirm Bank Deposit';
+      if (inputLabel) inputLabel.textContent = `Deposit Amount ($) • Available in Wallet: $${wallet.balance.toLocaleString()}:`;
+      if (boxMini) boxMini.classList.add('active');
+      if (boxBank) boxBank.classList.remove('active');
+    }
   }
 
   closeTransferModal() {
     if (this.transferModal) this.transferModal.classList.add('hidden');
   }
 
-  renderTransferSlots() {
-    const container = document.getElementById('transfer-slot-options');
-    if (!container) return;
-    container.innerHTML = '';
-    const saves = SaveManager.getSaves();
-
-    for (let slotId = 1; slotId <= 3; slotId++) {
-      const slotData = saves[`slot_${slotId}`];
-      const isSelected = (slotId === this.selectedTransferSlot);
-      const card = document.createElement('div');
-      card.className = `transfer-slot-card ${isSelected ? 'selected' : ''}`;
-      card.dataset.slotId = slotId;
-
-      const title = slotData ? `Slot ${slotId}: ${slotData.name || 'Hero'}` : `Slot ${slotId}: New Profile`;
-      const chips = slotData ? `$${(slotData.chips || 0).toLocaleString()} chips` : `$1,000 baseline`;
-      const stage = slotData ? `Stage ${slotData.stage || 1}` : `Fresh Start`;
-
-      card.innerHTML = `
-        <div class="t-slot-title">${title}</div>
-        <div class="t-slot-chips">${chips}</div>
-        <div class="t-slot-stage">${stage}</div>
-      `;
-
-      card.addEventListener('click', () => {
-        this.selectedTransferSlot = slotId;
-        document.querySelectorAll('.transfer-slot-card').forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-        sounds.playChip();
-      });
-
-      container.appendChild(card);
-    }
-  }
-
   executeTransfer() {
     const amt = Number(this.transferAmtInput ? this.transferAmtInput.value : 0);
+    const direction = this.transferDirection || 'minigame_to_bank';
     const wallet = EconomyManager.getMiniGameWallet();
+    const bank = EconomyManager.getCumulativeSavings();
+    const maxAvail = (direction === 'bank_to_minigame') ? bank : wallet.balance;
 
-    if (isNaN(amt) || amt <= 0 || amt > wallet.balance) {
+    if (isNaN(amt) || amt <= 0 || amt > maxAvail) {
       if (this.transferError) {
-        this.transferError.textContent = 'Invalid transfer amount or exceeds available balance!';
+        this.transferError.textContent = (amt > maxAvail)
+          ? `Amount exceeds available ${(direction === 'bank_to_minigame') ? 'Bank Account' : 'Mini-Game'} balance ($${maxAvail.toLocaleString()})!`
+          : 'Please enter a valid positive transfer amount.';
         this.transferError.classList.remove('hidden');
       }
       sounds.playCheck();
       return;
     }
 
-    const slotId = this.selectedTransferSlot || 1;
-    const res = EconomyManager.transferMiniGameToPoker(slotId, amt);
+    const res = EconomyManager.transferFunds(direction, amt);
     if (!res.success) {
       if (this.transferError) {
-        this.transferError.textContent = `${res.message}`;
+        this.transferError.textContent = res.message;
         this.transferError.classList.remove('hidden');
       }
       sounds.playCheck();
@@ -7233,16 +7284,16 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     }
 
     sounds.playWin();
-    this.setAnnouncement(`[TRANSFER] Transferred $${amt.toLocaleString()} casino winnings into Poker Slot ${slotId}!`);
+    this.setAnnouncement(`[BANK TRANSFER] ${res.message}`);
+    this.showInGameAlert({
+      title: 'BANK TRANSFER COMPLETE',
+      message: `${res.message}\nNew Bank Balance: $${res.newBankBalance.toLocaleString()} | Mini-Game Wallet: $${res.newMiniBalance.toLocaleString()}`
+    });
 
-    // If currently playing in this save slot, update hero live chips
-    if (!this.isOnlineRoom && this.activeSlot === slotId && this.players[0]) {
-      this.players[0].chips += amt;
-      this.updateTableUI();
-    }
-
-    this.renderMainMenuSlots();
+    this.updateDualWalletUI();
     this.updateEconomyDashboard();
+    this.updateRouletteUI();
+    this.updateSlotsUI();
     this.closeTransferModal();
   }
 
