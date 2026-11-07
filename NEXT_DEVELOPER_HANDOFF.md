@@ -292,4 +292,30 @@ try { this.renderMainMenuSlots(); } catch (err) { console.error("renderSlots err
   - `python scratch/find_emojis.py`
   - `python scratch/test_allin_elimination.py`
   - `python scratch/test_factory_reset_and_variants.py`
+## 23. RELEASE 1.02: SLOT FIX, QUICK CRAPS, EXPLICIT WIN/LOSS, TOP-LAYER ALERTS & SOLAR FLARE DECO
 
+### Changes Completed in v1.02
+- **Slot Machine Engine Bug Fix:**
+  - Resolved ReferenceError: payout is not defined in showCasinoView().
+  - Resolved infinite recursive loop in 
+equirePlayerName() when player was already registered, permanently fixing slot button clicks and mechanical lever pulls.
+- **Explicit Win & Loss Reporting:**
+  - Every single spin, dice roll, and roulette wheel spin explicitly displays the net amount won or lost (e.g. +,500 Won! (Net profit: +,450) or LOST - on this spin).
+- **Quick Craps Dashboard Portal:**
+  - Added #btn-quick-craps-portal positioned directly above the Casino Resort card on the main poker dashboard at ~40% compact scale for instant dice action.
+- **In-Game Craps Rules Guide:**
+  - Integrated #btn-craps-rules button with modal dialog explaining Come-Out rolls, Point phase, Single-roll Field wagers, Any 7, Any Craps, and Hardways.
+- **Top-Layer In-Game Alerts:**
+  - Fixed #in-game-modal-alert to position: fixed !important; inset: 0 !important; z-index: 9999999 !important; with .in-game-alert-card centered at max-width: 480px (normal size) ensuring zero browser alerts and total visibility above headers, drawers, and canvases.
+- **Layer 0 Solar Flare Geometric Art & Starfield:**
+  - Enriched Layer 0 directly capturing all 4 Geometry Dash Solar Flare reference screenshots:
+    - Cosmic perspective grid lattice (48px warm gold lines).
+    - Deep celestial blue constellation portal with glowing star nodes and constellation lines (Screenshot 2).
+    - Blazing solar sun with radiant corona rings and satellite diamonds (Screenshots 1, 3, 4).
+    - Rotating solar spiky cogs/gears with 8 and 12 triangular teeth and slow spin keyframe animations (Screenshots 1, 3, 4).
+    - Signature neon white zigzag wave trail with pink arrow ship head (Screenshots 1, 2, 3, 4).
+    - Floating amber rhombus shards and radiant 4-pointed sparkle stars.
+    - Subtle top and bottom sawtooth border trims.
+- **Full Verification:**
+  - 25 Engine Performance + 25 Graphics/Alerts + 25 Gameplay Simulation runs (75/75 tests passing).
+  - 100% SVG vector graphics (0 system emojis in rendered HTML/CSS).

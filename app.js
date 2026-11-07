@@ -1897,7 +1897,6 @@ class PokerApp {
   requirePlayerName(onSuccess) {
     const name = this.getPlayerName();
     if (name) {
-      if (onSuccess) onSuccess(name);
       return true;
     }
     this.openPlayerNameModal(onSuccess);
@@ -2155,6 +2154,19 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
       });
     }
 
+    const quickCrapsBtn = document.getElementById('btn-quick-craps-portal');
+    if (quickCrapsBtn) {
+      quickCrapsBtn.addEventListener('click', () => {
+        this.requirePlayerName(() => this.showCasinoView('craps'));
+      });
+    }
+    const legacyCrapsBtn = document.getElementById('btn-open-craps');
+    if (legacyCrapsBtn) {
+      legacyCrapsBtn.addEventListener('click', () => {
+        this.requirePlayerName(() => this.showCasinoView('craps'));
+      });
+    }
+
     // Redirect legacy casino buttons to dedicated view
     const legacyCasinoLounge = document.getElementById('btn-open-casino-lounge');
     if (legacyCasinoLounge) {
@@ -2201,7 +2213,7 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
     this.updateSlotsUI();
     this.updateDualWalletUI();
     const meterWin = document.getElementById('meter-win-val');
-    if (meterWin) meterWin.textContent = `$${payout.toLocaleString()}`;
+    if (meterWin) meterWin.textContent = '$0';
     if (this.drawRouletteWheel) {
       this.drawRouletteWheel(this.rouletteAngle || 0);
     }
@@ -5632,6 +5644,31 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
       });
     });
 
+    // Craps Rules button
+    const rulesBtn = document.getElementById('btn-craps-rules');
+    if (rulesBtn) {
+      rulesBtn.addEventListener('click', () => {
+        this.showInGameAlert({
+          title: 'ROYAL SOLAR CRAPS RULES',
+          message: `COME-OUT ROLL (Point OFF):
+• Bet Pass Line (1:1): Natural 7 or 11 WINS! Craps 2, 3, or 12 LOSES.
+• Bet Don't Pass (1:1): Craps 2 or 3 WINS! (12 pushes). 7 or 11 loses.
+• Rolling 4, 5, 6, 8, 9, 10 sets the POINT! Puck flips ON.
+
+POINT PHASE (Puck ON):
+• Pass Line WINS if Point is hit before a 7!
+• Seven Out: Rolling 7 before Point loses Pass Line, wins Don't Pass.
+
+HIGH-ACTION PROPOSITIONS (Every Roll):
+• FIELD: 2 pays 2:1, 12 pays 3:1, 3/4/9/10/11 pay 1:1. 5/6/7/8 lose.
+• ANY 7: Pays 4:1 if 7 is rolled on the next roll.
+• ANY CRAPS: Pays 7:1 if 2, 3, or 12 is rolled on next roll.
+• HARDWAYS: Hard 6 (3-3) or Hard 8 (4-4) pays 9:1 before 7!`,
+          type: 'info'
+        });
+      });
+    }
+
     // Roll Dice button
     const rollBtn = document.getElementById('btn-craps-roll');
     if (rollBtn) {
@@ -5873,13 +5910,20 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
         }
       }
 
-      // Credit total return to wallet if any wins
+      const netReturn = totalReturn - totalBet;
       if (totalReturn > 0) {
         sounds.playWin();
         const curWallet = EconomyManager.getMiniGameWallet();
         curWallet.balance += totalReturn;
         EconomyManager.saveMiniGameWallet(curWallet);
-        this.setAnnouncement(`[CRAPS WIN] Rolled ${total} (${d1}+${d2})! Won $${totalReturn.toLocaleString()}!`);
+        if (netReturn > 0) {
+          this.setAnnouncement(`[CRAPS WIN] Rolled ${total} (${d1}+${d2})! You WON +$${totalReturn.toLocaleString()}! (Net profit: +$${netReturn.toLocaleString()})`);
+        } else {
+          this.setAnnouncement(`[CRAPS PUSH] Rolled ${total} (${d1}+${d2})! Push/Return $${totalReturn.toLocaleString()}.`);
+        }
+      } else {
+        sounds.playFold();
+        this.setAnnouncement(`[CRAPS LOSS] Rolled ${total} (${d1}+${d2}). You LOST -$${totalBet.toLocaleString()} on this roll.`);
       }
 
       this.updateDualWalletUI();
@@ -6321,15 +6365,17 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
         sounds.playWin();
       }
 
+      const netProfit = payout - this.slotWager;
       if (banner && bannerTitle && bannerDetail) {
         banner.className = 'slots-result-banner win-glow';
         banner.classList.remove('hidden');
         bannerTitle.textContent = title;
-        bannerDetail.textContent = `+ $${payout.toLocaleString()} Added to Mini-Game Wallet!`;
+        bannerDetail.textContent = `+$${payout.toLocaleString()} Won! (Net profit: +$${netProfit.toLocaleString()})`;
       }
       if (winDisplay) {
-        winDisplay.textContent = `Won $${payout.toLocaleString()}! (${multiplier}x)`;
+        winDisplay.textContent = `WIN +$${payout.toLocaleString()}! (Net profit: +$${netProfit.toLocaleString()})`;
       }
+      this.setAnnouncement(`[SLOTS WIN] ${title} Won +$${payout.toLocaleString()}! (Net profit +$${netProfit.toLocaleString()})`);
     } else {
       sounds.playFold();
       if (banner && bannerTitle && bannerDetail) {
@@ -6339,8 +6385,9 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
         bannerDetail.textContent = `-$${this.slotWager.toLocaleString()} • Spin again to win big!`;
       }
       if (winDisplay) {
-        winDisplay.textContent = 'No win on this spin.';
+        winDisplay.textContent = `LOST -$${this.slotWager.toLocaleString()} on this spin.`;
       }
+      this.setAnnouncement(`[SLOTS LOSS] You lost -$${this.slotWager.toLocaleString()} on this spin.`);
     }
 
     this.updateSlotsUI();

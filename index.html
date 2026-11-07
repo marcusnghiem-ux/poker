@@ -18,151 +18,205 @@
 <body>
   <!-- Atmospheric Luxury Casino Background & Overhead Spotlight -->
   <div class="casino-bg-effects">
-    <div class="bg-art-deco-lattice"></div>
-    <div class="bg-light-beams"></div>
-    <div class="bg-spotlight"></div>
-    <!-- Solar Flare Geometry High-Energy Vector Artwork (Geometry Dash Solar Flare Inspired) -->
-    <div class="solar-geometry-layer">
-      <!-- Top Molten Sawblade Teeth Frame -->
-      <svg class="solar-sawblade-svg top-sawblade" viewBox="0 0 1400 50" preserveAspectRatio="none" fill="none">
-        <polygon points="0,0 70,60 140,15 210,75 280,20 350,85 420,20 490,70 560,25 630,90 700,30 770,90 840,25 910,70 980,20 1050,85 1120,20 1190,75 1260,15 1330,60 1400,0" fill="url(#moltenSawbladeGrad)" stroke="#fde047" stroke-width="2"/>
-        <defs>
-          <linearGradient id="moltenSawbladeGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#450a0a"/>
-            <stop offset="40%" stop-color="#b91c1c"/>
-            <stop offset="75%" stop-color="#ea580c"/>
-            <stop offset="100%" stop-color="#f59e0b"/>
-          </linearGradient>
-        </defs>
-      </svg>
-
-      <!-- Bottom Molten Sawblade Teeth Frame -->
-      <svg class="solar-sawblade-svg bottom-sawblade" viewBox="0 0 1400 50" preserveAspectRatio="none" fill="none">
-        <polygon points="0,90 70,30 140,75 210,15 280,70 350,5 420,70 490,20 560,65 630,0 700,60 770,0 840,65 910,20 980,70 1050,5 1120,70 1190,15 1260,75 1330,30 1400,90" fill="url(#moltenSawbladeGradRev)" stroke="#fde047" stroke-width="2"/>
-        <defs>
-          <linearGradient id="moltenSawbladeGradRev" x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0%" stop-color="#450a0a"/>
-            <stop offset="40%" stop-color="#b91c1c"/>
-            <stop offset="75%" stop-color="#ea580c"/>
-            <stop offset="100%" stop-color="#f59e0b"/>
-          </linearGradient>
-        </defs>
-      </svg>
-
-      <!-- Glowing Diagonal Laser Wave Energy Arrows (Photo 1 Motif) -->
-      <div class="laser-energy-arrow laser-left">
-        <svg width="220" height="70" viewBox="0 0 220 70" fill="none">
-          <line x1="0" y1="35" x2="175" y2="35" stroke="#ffffff" stroke-width="10" stroke-linecap="round" filter="drop-shadow(0 0 10px #f43f5e) drop-shadow(0 0 20px #fb7185)"/>
-          <line x1="10" y1="35" x2="170" y2="35" stroke="#ffe4e6" stroke-width="5" stroke-linecap="round"/>
-          <polygon points="165,18 212,35 165,52 180,35" fill="#ffffff" stroke="#f43f5e" stroke-width="3" filter="drop-shadow(0 0 14px #f43f5e)"/>
-          <polygon points="172,25 200,35 172,45" fill="#fda4af"/>
-        </svg>
-      </div>
-
-      <div class="laser-energy-arrow laser-right">
-        <svg width="220" height="70" viewBox="0 0 220 70" fill="none">
-          <line x1="220" y1="35" x2="45" y2="35" stroke="#ffffff" stroke-width="10" stroke-linecap="round" filter="drop-shadow(0 0 10px #f43f5e) drop-shadow(0 0 20px #fb7185)"/>
-          <line x1="210" y1="35" x2="50" y2="35" stroke="#ffe4e6" stroke-width="5" stroke-linecap="round"/>
-          <polygon points="55,18 8,35 55,52 40,35" fill="#ffffff" stroke="#f43f5e" stroke-width="3" filter="drop-shadow(0 0 14px #f43f5e)"/>
-          <polygon points="48,25 20,35 48,45" fill="#fda4af"/>
-        </svg>
-      </div>
-
-      <!-- Rotating Solar Gear-Sun Medallions (Photo 1 & 2 Motif) -->
-      <div class="gear-sun-medallion gear-left">
-        <svg width="130" height="130" viewBox="0 0 100 100" fill="none">
-          <circle cx="50" cy="50" r="42" stroke="#ea580c" stroke-width="4" stroke-dasharray="14 10"/>
-          <circle cx="50" cy="50" r="32" fill="#7c2d12" stroke="#f59e0b" stroke-width="3"/>
-          <circle cx="50" cy="50" r="20" fill="url(#sunCoreGlow)" stroke="#ffd700" stroke-width="2"/>
-          <circle cx="50" cy="50" r="8" fill="#ffffff"/>
+      <!-- LAYER 0: Solar Flare Celestial Grid & Cosmic Motifs (Images 1, 2, 3 & 4) -->
+      <div class="layer0-cosmic-grid"></div>
+      <div class="layer0-starfield-container">
+        <svg class="layer0-starfield-svg" width="100%" height="100%" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <radialGradient id="sunCoreGlow">
+            <radialGradient id="starGlowGold" cx="50%" cy="50%" r="50%">
               <stop offset="0%" stop-color="#ffffff"/>
-              <stop offset="50%" stop-color="#fde047"/>
-              <stop offset="100%" stop-color="#ea580c"/>
+              <stop offset="40%" stop-color="#fde047"/>
+              <stop offset="100%" stop-color="rgba(245, 158, 11, 0)"/>
             </radialGradient>
-          </defs>
-        </svg>
-      </div>
-
-      <div class="gear-sun-medallion gear-right">
-        <svg width="140" height="140" viewBox="0 0 100 100" fill="none">
-          <circle cx="50" cy="50" r="44" stroke="#f59e0b" stroke-width="4" stroke-dasharray="16 8"/>
-          <circle cx="50" cy="50" r="34" fill="#431407" stroke="#fbbf24" stroke-width="3"/>
-          <circle cx="50" cy="50" r="22" fill="url(#sunCoreGlow2)" stroke="#ffd700" stroke-width="2"/>
-          <circle cx="50" cy="50" r="9" fill="#ffffff"/>
-          <defs>
-            <radialGradient id="sunCoreGlow2">
+            <radialGradient id="solarLunarGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#fffbeb"/>
+              <stop offset="25%" stop-color="#fde047"/>
+              <stop offset="65%" stop-color="#ea580c"/>
+              <stop offset="100%" stop-color="rgba(180, 83, 9, 0)"/>
+            </radialGradient>
+            <radialGradient id="celestialBlueGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#1e3a8a" stop-opacity="0.8"/>
+              <stop offset="45%" stop-color="#0c1938" stop-opacity="0.88"/>
+              <stop offset="80%" stop-color="#020617" stop-opacity="0.94"/>
+              <stop offset="100%" stop-color="rgba(2, 6, 23, 0)"/>
+            </radialGradient>
+            <radialGradient id="starGlowCyan" cx="50%" cy="50%" r="50%">
               <stop offset="0%" stop-color="#ffffff"/>
-              <stop offset="50%" stop-color="#fed7aa"/>
-              <stop offset="100%" stop-color="#dc2626"/>
+              <stop offset="40%" stop-color="#38bdf8"/>
+              <stop offset="100%" stop-color="rgba(56, 189, 248, 0)"/>
             </radialGradient>
+            <filter id="neonGlowWhite" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="4" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+            <filter id="goldFlareGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="6" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
           </defs>
-        </svg>
-      </div>
 
-      <!-- Cosmic Portal Disc with 4-Pointed Starbursts & Zig-Zag Trail (Photo 2 Motif) -->
-      <div class="cosmic-portal-disc">
-        <svg width="340" height="340" viewBox="0 0 340 340" fill="none">
-          <polygon points="170,10 205,50 255,20 270,75 325,75 315,130 355,160 325,200 345,255 295,270 280,325 225,310 185,345 145,315 95,335 75,285 25,275 40,225 5,185 40,145 20,95 70,80 85,25 135,40" stroke="#f59e0b" stroke-width="3" fill="rgba(69, 10, 10, 0.45)"/>
-          <circle cx="170" cy="170" r="120" fill="#04061a" stroke="#38bdf8" stroke-width="2.5" filter="drop-shadow(0 0 18px rgba(56, 189, 248, 0.6))"/>
-          
-          <polyline points="70,220 115,150 160,200 205,130 250,170" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" filter="drop-shadow(0 0 8px #38bdf8)"/>
-          <polyline points="70,220 115,150 160,200 205,130 250,170" stroke="#bae6fd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <polygon points="250,170 268,162 258,178" fill="#38bdf8"/>
-
-          <!-- 4-Pointed Radiant Starbursts with Orbit Rings -->
-          <g transform="translate(115, 150)">
-            <circle cx="0" cy="0" r="14" fill="rgba(56, 189, 248, 0.25)" stroke="#38bdf8" stroke-width="1.2"/>
-            <path d="M0 -18 Q0 0 18 0 Q0 0 0 18 Q0 0 -18 0 Q0 0 0 -18 Z" fill="#ffffff" filter="drop-shadow(0 0 6px #fff)"/>
-            <circle cx="0" cy="0" r="4" fill="#38bdf8"/>
+          <!-- TOP & BOTTOM SAWTOOTH BORDERS (Image 4 Motif) -->
+          <g class="sawtooth-border-top" opacity="0.4">
+            <path d="M0,0 L30,22 L60,0 L90,22 L120,0 L150,22 L180,0 L210,22 L240,0 L270,22 L300,0 L330,22 L360,0 L390,22 L420,0 L450,22 L480,0 L510,22 L540,0 L570,22 L600,0 L630,22 L660,0 L690,22 L720,0 L750,22 L780,0 L810,22 L840,0 L870,22 L900,0 L930,22 L960,0 L990,22 L1020,0 L1050,22 L1080,0 L1110,22 L1140,0 L1170,22 L1200,0 L1230,22 L1260,0 L1290,22 L1320,0 L1350,22 L1380,0 L1410,22 L1440,0 L1470,22 L1500,0 L1530,22 L1560,0 L1590,22 L1620,0 L1650,22 L1680,0 L1710,22 L1740,0 L1770,22 L1800,0 L1830,22 L1860,0 L1890,22 L1920,0" fill="none" stroke="#f59e0b" stroke-width="1.8"/>
+          </g>
+          <g class="sawtooth-border-bottom" opacity="0.4">
+            <path d="M0,1080 L30,1058 L60,1080 L90,1058 L120,1080 L150,1058 L180,1080 L210,1058 L240,1080 L270,1058 L300,1080 L330,1058 L360,1080 L390,1058 L420,1080 L450,1058 L480,1080 L510,1058 L540,1080 L570,1058 L600,1080 L630,1058 L660,1080 L690,1058 L720,1080 L750,1058 L780,1080 L810,1058 L840,1080 L870,1058 L900,1080 L930,1058 L960,1080 L990,1058 L1020,1080 L1050,1058 L1080,1080 L1110,1058 L1140,1080 L1170,1058 L1200,1080 L1230,1058 L1260,1080 L1290,1058 L1320,1080 L1350,1058 L1380,1080 L1410,1058 L1440,1080 L1470,1058 L1500,1080 L1530,1058 L1560,1080 L1590,1058 L1620,1080 L1650,1058 L1680,1080 L1710,1058 L1740,1080 L1770,1058 L1800,1080 L1830,1058 L1860,1080 L1890,1058 L1920,1080" fill="none" stroke="#f59e0b" stroke-width="1.8"/>
           </g>
 
-          <g transform="translate(160, 200)">
-            <circle cx="0" cy="0" r="16" fill="rgba(253, 224, 71, 0.25)" stroke="#fde047" stroke-width="1.2"/>
-            <path d="M0 -22 Q0 0 22 0 Q0 0 0 22 Q0 0 -22 0 Q0 0 0 -22 Z" fill="#ffffff" filter="drop-shadow(0 0 8px #fde047)"/>
-            <circle cx="0" cy="0" r="5" fill="#fde047"/>
+          <!-- DEEP CELESTIAL BLUE CONSTELLATION PORTAL (Image 2 Motif) -->
+          <g class="celestial-portal-group" transform="translate(380, 500)">
+            <circle cx="0" cy="0" r="260" fill="url(#celestialBlueGlow)"/>
+            <!-- Surrounding golden diamond teeth border -->
+            <polygon points="0,-275 22,-258 0,-240 -22,-258" fill="#f59e0b" opacity="0.65"/>
+            <polygon points="0,275 22,258 0,240 -22,258" fill="#f59e0b" opacity="0.65"/>
+            <polygon points="-275,0 -258,22 -240,0 -258,-22" fill="#f59e0b" opacity="0.65"/>
+            <polygon points="275,0 258,22 240,0 258,-22" fill="#f59e0b" opacity="0.65"/>
+            <!-- Constellation Lines -->
+            <path d="M-140,-100 L-60,-40 L20,-110 L100,-60 L140,-120 M-60,-40 L-20,60 L80,30 L130,90 M-140,50 L-20,60" stroke="#38bdf8" stroke-width="1.4" stroke-opacity="0.65" stroke-dasharray="4,3" fill="none"/>
+            <!-- Constellation Star Nodes -->
+            <circle cx="-140" cy="-100" r="6" fill="url(#starGlowCyan)"/>
+            <circle cx="-60" cy="-40" r="8" fill="#ffffff" filter="url(#neonGlowWhite)"/>
+            <circle cx="20" cy="-110" r="5" fill="url(#starGlowCyan)"/>
+            <circle cx="100" cy="-60" r="9" fill="#ffffff" filter="url(#neonGlowWhite)"/>
+            <circle cx="140" cy="-120" r="5" fill="url(#starGlowCyan)"/>
+            <circle cx="-20" cy="60" r="10" fill="#ffffff" filter="url(#neonGlowWhite)"/>
+            <circle cx="80" cy="30" r="6" fill="url(#starGlowCyan)"/>
+            <circle cx="130" cy="90" r="8" fill="#ffffff" filter="url(#neonGlowWhite)"/>
+            <circle cx="-140" cy="50" r="5" fill="url(#starGlowCyan)"/>
+            <!-- 4-Pointed Sparkle Stars inside Portal -->
+            <path d="M-60 -55 Q-60 -40 -45 -40 Q-60 -40 -60 -25 Q-60 -40 -75 -40 Q-60 -40 -60 -55 Z" fill="#ffffff"/>
+            <path d="M100 -75 Q100 -60 115 -60 Q100 -60 100 -45 Q100 -60 85 -60 Q100 -60 100 -75 Z" fill="#ffffff"/>
+            <path d="M-20 45 Q-20 60 -5 60 Q-20 60 -20 75 Q-20 60 -35 60 Q-20 60 -20 45 Z" fill="#ffffff"/>
           </g>
 
-          <g transform="translate(205, 130)">
-            <circle cx="0" cy="0" r="15" fill="rgba(56, 189, 248, 0.25)" stroke="#38bdf8" stroke-width="1.2"/>
-            <path d="M0 -20 Q0 0 20 0 Q0 0 0 20 Q0 0 -20 0 Q0 0 0 -20 Z" fill="#ffffff" filter="drop-shadow(0 0 6px #fff)"/>
-            <circle cx="0" cy="0" r="4.5" fill="#38bdf8"/>
+          <!-- BLAZING SOLAR SUN & CORONA RAYS (Images 1, 3, 4 Motif) -->
+          <g class="solar-blazing-core" transform="translate(1480, 260)">
+            <!-- Corona Halo -->
+            <circle cx="0" cy="0" r="130" fill="url(#solarLunarGlow)" class="solar-lunar-orb" opacity="0.85"/>
+            <!-- Outer Flare Rings -->
+            <circle cx="0" cy="0" r="70" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="8,6" opacity="0.7"/>
+            <circle cx="0" cy="0" r="95" fill="none" stroke="#ea580c" stroke-width="1.5" opacity="0.5"/>
+            <!-- Sun Core -->
+            <circle cx="0" cy="0" r="42" fill="#fef08a" stroke="#f59e0b" stroke-width="3" filter="drop-shadow(0 0 16px #f59e0b)"/>
+            <!-- Diamond Flare Satellites -->
+            <polygon points="0,-110 8,-95 0,-80 -8,-95" fill="#fde047"/>
+            <polygon points="0,110 8,95 0,80 -8,95" fill="#fde047"/>
+            <polygon points="-110,0 -95,8 -80,0 -95,-8" fill="#fde047"/>
+            <polygon points="110,0 95,8 80,0 95,-8" fill="#fde047"/>
           </g>
 
-          <circle cx="280" cy="80" r="18" fill="#1c0702" stroke="#ea580c" stroke-width="2.5" stroke-dasharray="6 4"/>
-          <circle cx="280" cy="80" r="6" fill="#f59e0b"/>
-        </svg>
-      </div>
+          <!-- ROTATING SOLAR SUNBURST SPIKY COGS / GEARS (Images 1, 3, 4 Motif) -->
+          <!-- Cog 1 (Bottom Left) -->
+          <g class="solar-spiky-cog cog-spin-cw" transform="translate(220, 880)">
+            <circle cx="0" cy="0" r="75" fill="none" stroke="#d97706" stroke-width="2.5" opacity="0.6"/>
+            <circle cx="0" cy="0" r="48" fill="#78350f" stroke="#f59e0b" stroke-width="2" opacity="0.7"/>
+            <circle cx="0" cy="0" r="16" fill="#fde047" filter="url(#goldFlareGlow)"/>
+            <!-- 8 Spiky Teeth -->
+            <polygon points="0,-88 12,-72 -12,-72" fill="#f59e0b"/>
+            <polygon points="62,-62 68,-44 50,-50" fill="#f59e0b"/>
+            <polygon points="88,0 72,12 72,-12" fill="#f59e0b"/>
+            <polygon points="62,62 50,50 68,44" fill="#f59e0b"/>
+            <polygon points="0,88 12,72 -12,72" fill="#f59e0b"/>
+            <polygon points="-62,62 -68,44 -50,50" fill="#f59e0b"/>
+            <polygon points="-88,0 -72,12 -72,-12" fill="#f59e0b"/>
+            <polygon points="-62,-62 -50,-50 -68,-44" fill="#f59e0b"/>
+          </g>
 
-      <!-- Central Solar Diamond Core (Photo 1 Motif) -->
-      <div class="solar-diamond-core">
-        <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
-          <g transform="translate(50,50) rotate(45)">
-            <rect x="-30" y="-30" width="60" height="60" fill="rgba(69, 10, 10, 0.5)" stroke="#ea580c" stroke-width="2.5" filter="drop-shadow(0 0 10px #f59e0b)"/>
-            <rect x="-22" y="-22" width="44" height="44" fill="#1c0505" stroke="#fde047" stroke-width="1.2"/>
-            <circle cx="-10" cy="-10" r="2.2" fill="#ffd700"/>
-            <circle cx="0" cy="-10" r="2.2" fill="#f59e0b"/>
-            <circle cx="10" cy="-10" r="2.2" fill="#ffd700"/>
-            <circle cx="-10" cy="0" r="2.2" fill="#f59e0b"/>
-            <circle cx="0" cy="0" r="3.2" fill="#ffffff" filter="drop-shadow(0 0 4px #fff)"/>
-            <circle cx="10" cy="0" r="2.2" fill="#f59e0b"/>
-            <circle cx="-10" cy="10" r="2.2" fill="#ffd700"/>
-            <circle cx="0" cy="10" r="2.2" fill="#f59e0b"/>
-            <circle cx="10" cy="10" r="2.2" fill="#ffd700"/>
+          <!-- Cog 2 (Right Center) -->
+          <g class="solar-spiky-cog cog-spin-ccw" transform="translate(1740, 720)">
+            <circle cx="0" cy="0" r="90" fill="none" stroke="#ea580c" stroke-width="2" opacity="0.55"/>
+            <circle cx="0" cy="0" r="60" fill="#451a03" stroke="#fde047" stroke-width="1.8" opacity="0.75"/>
+            <circle cx="0" cy="0" r="22" fill="#f59e0b" filter="url(#goldFlareGlow)"/>
+            <!-- 8 Spikes -->
+            <polygon points="0,-105 14,-88 -14,-88" fill="#ea580c"/>
+            <polygon points="74,-74 80,-54 60,-60" fill="#ea580c"/>
+            <polygon points="105,0 88,14 88,-14" fill="#ea580c"/>
+            <polygon points="74,74 60,60 80,54" fill="#ea580c"/>
+            <polygon points="0,105 14,88 -14,88" fill="#ea580c"/>
+            <polygon points="-74,74 -80,54 -60,60" fill="#ea580c"/>
+            <polygon points="-105,0 -88,14 -88,-14" fill="#ea580c"/>
+            <polygon points="-74,-74 -60,-60 -80,-54" fill="#ea580c"/>
+          </g>
+
+          <!-- Cog 3 (Top Center Subtle Accent) -->
+          <g class="solar-spiky-cog cog-spin-cw" transform="translate(960, 110)" opacity="0.4">
+            <circle cx="0" cy="0" r="52" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+            <circle cx="0" cy="0" r="28" fill="#1c1917" stroke="#fde047" stroke-width="1"/>
+            <polygon points="0,-62 8,-50 -8,-50" fill="#f59e0b"/>
+            <polygon points="62,0 50,8 50,-8" fill="#f59e0b"/>
+            <polygon points="0,62 8,50 -8,50" fill="#f59e0b"/>
+            <polygon points="-62,0 -50,8 -50,-8" fill="#f59e0b"/>
+          </g>
+
+          <!-- SIGNATURE SOLAR FLARE NEON WAVE TRAIL (Images 1, 2, 3, 4 Motif) -->
+          <g class="solar-wave-trail-group" opacity="0.8">
+            <!-- Wave zigzag line slicing through scene -->
+            <polyline points="100,560 220,440 340,560 460,440 580,560 700,440 820,560 940,440" fill="none" stroke="#ffffff" stroke-width="3.5" filter="url(#neonGlowWhite)"/>
+            <polyline points="100,560 220,440 340,560 460,440 580,560 700,440 820,560 940,440" fill="none" stroke="#38bdf8" stroke-width="1.5"/>
+            <!-- Wave Arrow Ship Head (Image 1 Motif) -->
+            <g transform="translate(940, 440) rotate(-45)">
+              <polygon points="0,0 -24,-12 -16,0 -24,12" fill="#ffffff" filter="url(#neonGlowWhite)"/>
+              <polygon points="-4,0 -20,-8 -14,0 -20,8" fill="#f43f5e"/>
+            </g>
+          </g>
+
+          <!-- GLOWING CHEVRON FLOW ARROWS (Images 1, 2, 3 Motif) -->
+          <g class="chevron-flow-group" opacity="0.55">
+            <path d="M1120,520 L1145,540 L1120,560 L1132,560 L1157,540 L1132,520 Z" fill="#f59e0b"/>
+            <path d="M1145,520 L1170,540 L1145,560 L1157,560 L1182,540 L1157,520 Z" fill="#f59e0b"/>
+            <path d="M1170,520 L1195,540 L1170,560 L1182,560 L1207,540 L1182,520 Z" fill="#fde047"/>
+          </g>
+
+          <!-- 4-POINTED RADIANT SPARKLE STARS (Images 1 & 2 Motif) -->
+          <g class="star-group-1">
+            <path d="M180 120 Q180 140 200 140 Q180 140 180 160 Q180 140 160 140 Q180 140 180 120 Z" fill="#ffffff" filter="drop-shadow(0 0 6px #fff)"/>
+            <circle cx="180" cy="140" r="9" fill="url(#starGlowGold)"/>
+
+            <path d="M420 220 Q420 236 436 236 Q420 236 420 252 Q420 236 404 236 Q420 236 420 220 Z" fill="#ffffff" filter="drop-shadow(0 0 4px #ffd700)"/>
+
+            <path d="M720 90 Q720 106 736 106 Q720 106 720 122 Q720 106 704 106 Q720 106 720 90 Z" fill="#ffffff"/>
+            <circle cx="720" cy="106" r="6" fill="url(#starGlowGold)"/>
+
+            <path d="M1220 180 Q1220 200 1240 200 Q1220 200 1220 220 Q1220 200 1200 200 Q1220 200 1220 180 Z" fill="#ffffff" filter="drop-shadow(0 0 7px #fde047)"/>
+            <circle cx="1220" cy="200" r="11" fill="url(#starGlowGold)"/>
+
+            <path d="M1650 140 Q1650 156 1666 156 Q1650 156 1650 172 Q1650 156 1634 156 Q1650 156 1650 140 Z" fill="#ffffff"/>
+
+            <path d="M1380 380 Q1380 395 1395 395 Q1380 395 1380 410 Q1380 395 1365 395 Q1380 395 1380 380 Z" fill="#ffffff"/>
+
+            <path d="M260 480 Q260 495 275 495 Q260 495 260 510 Q260 495 245 495 Q260 495 260 480 Z" fill="#ffffff"/>
+
+            <path d="M580 620 Q580 640 600 640 Q580 640 580 660 Q580 640 560 640 Q580 640 580 620 Z" fill="#ffffff" filter="drop-shadow(0 0 6px #fff)"/>
+            <circle cx="580" cy="640" r="9" fill="url(#starGlowGold)"/>
+
+            <path d="M1040 580 Q1040 596 1056 596 Q1040 596 1040 612 Q1040 596 1024 596 Q1040 596 1040 580 Z" fill="#ffffff"/>
+
+            <path d="M1540 640 Q1540 660 1560 660 Q1540 660 1540 680 Q1540 660 1520 660 Q1540 660 1540 640 Z" fill="#ffffff" filter="drop-shadow(0 0 7px #ffd700)"/>
+            <circle cx="1540" cy="660" r="10" fill="url(#starGlowGold)"/>
+
+            <path d="M1820 490 Q1820 505 1835 505 Q1820 505 1820 520 Q1820 505 1805 505 Q1820 505 1820 490 Z" fill="#ffffff"/>
+          </g>
+
+          <!-- FLOATING SOLAR DIAMOND SHARDS & RHOMBUS CRYSTALS (Images 1, 3, 4 Motif) -->
+          <g class="floating-shards-group" opacity="0.65">
+            <polygon points="320,160 329,174 320,188 311,174" fill="#f59e0b" stroke="#fde047" stroke-width="1"/>
+            <polygon points="880,180 892,198 880,216 868,198" fill="#ea580c" stroke="#fcd34d" stroke-width="1"/>
+            <polygon points="1120,380 1129,394 1120,408 1111,394" fill="#f59e0b" stroke="#fde047" stroke-width="1"/>
+            <polygon points="1680,310 1690,326 1680,342 1670,326" fill="#b45309" stroke="#fde047" stroke-width="1"/>
+            <polygon points="480,520 490,536 480,552 470,536" fill="#ea580c" stroke="#fcd34d" stroke-width="1"/>
+            <polygon points="1260,680 1269,694 1260,708 1251,694" fill="#f59e0b" stroke="#fde047" stroke-width="1"/>
+            <polygon points="760,820 772,838 760,856 748,838" fill="#ea580c" stroke="#fde047" stroke-width="1"/>
+            <polygon points="1420,860 1430,876 1420,892 1410,876" fill="#f59e0b" stroke="#fcd34d" stroke-width="1"/>
           </g>
         </svg>
       </div>
-
-      <!-- Glowing Triple Neon Chevrons (Photo 2 Motif) -->
-      <div class="neon-chevron-trail">
-        <svg width="55" height="45" viewBox="0 0 60 50" fill="none">
-          <polyline points="10,10 25,25 10,40" stroke="#818cf8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" filter="drop-shadow(0 0 5px #6366f1)"/>
-          <polyline points="25,10 40,25 25,40" stroke="#a5b4fc" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" filter="drop-shadow(0 0 7px #818cf8)"/>
-          <polyline points="40,10 55,25 40,40" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" filter="drop-shadow(0 0 9px #c084fc)"/>
-        </svg>
-      </div>
-    </div>
 
     <div class="bg-solar-nebula-glow"></div>
     <div class="bg-cosmic-indigo-glow"></div>
@@ -617,12 +671,40 @@
             <button id="btn-open-casino-lounge" class="menu-pill-btn hidden" style="display:none"></button>
             <button id="btn-open-slots" class="menu-pill-btn hidden" style="display:none"></button>
             <button id="btn-open-roulette" class="menu-pill-btn hidden" style="display:none"></button>
+            <button id="btn-open-craps" class="menu-pill-btn hidden" style="display:none"></button>
             <button id="btn-open-transfer" class="menu-pill-btn hidden" style="display:none"></button>
           </div>
         </div>
 
         <!-- RIGHT COLUMN: Prominent Grand Casino Action Portal -->
-        <div class="dashboard-right-col">
+                <div class="dashboard-right-col">
+          <!-- Quick Launch Solar Craps Button (Above Resort Portal, ~40% size) -->
+          <div class="craps-quick-portal-btn" id="btn-quick-craps-portal" role="button" tabindex="0" title="Play Solar Vegas Craps (Dice Table)">
+            <div class="craps-portal-glow"></div>
+            <div class="craps-portal-content">
+              <div class="craps-portal-icon">
+                <svg width="22" height="22" viewBox="0 0 50 50" class="craps-btn-die-svg">
+                  <rect width="50" height="50" rx="8" fill="#090d16" stroke="#ffd700" stroke-width="2.5"/>
+                  <circle cx="14" cy="14" r="4.5" fill="#ef4444"/>
+                  <circle cx="25" cy="25" r="4.5" fill="#ef4444"/>
+                  <circle cx="36" cy="36" r="4.5" fill="#ef4444"/>
+                </svg>
+                <svg width="22" height="22" viewBox="0 0 50 50" class="craps-btn-die-svg">
+                  <rect width="50" height="50" rx="8" fill="#090d16" stroke="#ffd700" stroke-width="2.5"/>
+                  <circle cx="14" cy="14" r="4.5" fill="#ef4444"/>
+                  <circle cx="36" cy="14" r="4.5" fill="#ef4444"/>
+                  <circle cx="14" cy="36" r="4.5" fill="#ef4444"/>
+                  <circle cx="36" cy="36" r="4.5" fill="#ef4444"/>
+                </svg>
+              </div>
+              <div class="craps-portal-text">
+                <span class="craps-portal-badge">NEW GAME &bull; VEGAS CRAPS</span>
+                <h4 class="craps-portal-title">SOLAR CRAPS TABLE</h4>
+              </div>
+              <div class="craps-portal-arrow">&rarr;</div>
+            </div>
+          </div>
+
           <div class="casino-portal-card" id="btn-enter-casino-portal" role="button" tabindex="0" title="Step Onto The High Roller Casino Floor" onclick="if(window.pokerGame){window.pokerGame.showCasinoView()}">
             <div class="portal-card-glow"></div>
             <div class="portal-badge-row">
@@ -1067,6 +1149,9 @@
               </div>
             </div>
             <div class="craps-header-stats">
+              <button id="btn-craps-rules" class="btn btn-secondary craps-rules-btn" type="button" title="View Craps Table Rules">
+                <span>Craps Rules</span>
+              </button>
               <div class="arena-stat-pill">
                 <span>Point:</span> <strong id="craps-point-display" class="gold">OFF</strong>
               </div>
@@ -1608,12 +1693,48 @@
       <div class="modal-card update-log-card">
         <div class="modal-header">
           <div class="update-log-header-left">
-            <span class="update-log-ver-badge">v1.015</span>
-            <h2>1.015 - Solar Craps, 3-Hour Stipends &amp; Visual Polish</h2>
+            <span class="update-log-ver-badge">v1.02</span>
+            <h2>1.02 - Slot Machine Fix, Craps Rules &amp; Layer 0 Starfield</h2>
           </div>
           <button id="close-update-log-btn" class="close-btn" type="button">&times;</button>
         </div>
-                <div class="modal-body update-log-body">
+                        <div class="modal-body update-log-body">
+          <!-- ==================== v1.02 LATEST RELEASE ==================== -->
+          <div class="update-log-section current-release-section">
+            <div class="update-sec-badge-row">
+              <span class="update-log-ver-badge">v1.02 CURRENT</span>
+              <span class="update-sec-date">Latest Release</span>
+            </div>
+            <h3 class="update-sec-title">Slot Machine Engine Bug Fix</h3>
+            <ul class="update-sec-list">
+              <li><strong>Zero-Lock Spin Execution:</strong> Permanently eradicated the recursive name-verification loop that prevented slot lever pulls and spins.</li>
+              <li><strong>Real-Time Net Payout Alerts:</strong> Every spin and mechanical lever pull explicitly displays net profit or loss (e.g. <code>+$1,500 Won (Net +$1,450)</code> or <code>LOST -$50</code>).</li>
+            </ul>
+          </div>
+
+          <div class="update-log-section current-release-section">
+            <h3 class="update-sec-title">Royal Solar Craps Rules &amp; Quick Launch Portal</h3>
+            <ul class="update-sec-list">
+              <li><strong>Main Dashboard Craps Portal:</strong> Positioned directly above the Casino Resort portal on the main menu (at 40% compact scale) for instant dice action!</li>
+              <li><strong>Win &amp; Loss Tracking on Every Roll:</strong> Dynamic alerts and banners inform you precisely how much you won or lost on every roll, come-out, point phase, and field proposition.</li>
+              <li><strong>Interactive Craps Table Rules Guide:</strong> Access complete table rules covering Pass Line, Don't Pass, Points, and Field bets anytime in-game.</li>
+            </ul>
+          </div>
+
+          <div class="update-log-section current-release-section">
+            <h3 class="update-sec-title">Layer 0 Celestial Starfield &amp; Reference Photo Deco</h3>
+            <ul class="update-sec-list">
+              <li><strong>Layer 0 Cosmic Starfield &amp; Grid:</strong> Deep perspective grid lattice and brilliant 4-pointed radiant sparkle stars inspired by Geometry Dash Solar Flare Images 1 &amp; 2.</li>
+              <li><strong>Golden Solar Orb &amp; Diamond Shards:</strong> Atmospheric floating golden sun sphere and amber rhombus crystals orbiting in deep cosmic background space.</li>
+              <li><strong>Top-Layer Alerts:</strong> All in-game alerts and confirmation dialogs prioritized at the absolute top layer (z-index: 9999999) with full screen coverage and clear, normal dimensions.</li>
+            </ul>
+          </div>
+
+          <!-- ==================== ARCHIVED RELEASES (v1.015 & v1.01) ==================== -->
+          <div class="update-log-archive-divider">
+            <span>PREVIOUS RELEASE ARCHIVE</span>
+          </div>
+
           <!-- ==================== v1.015 LATEST RELEASE ==================== -->
           <div class="update-log-section current-release-section">
             <div class="update-sec-badge-row">
