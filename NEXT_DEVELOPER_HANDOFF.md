@@ -1,0 +1,126 @@
+# 🤖 NEXT DEVELOPER / AI HANDOFF GUIDE & ROADMAP
+
+> **CURRENT STATUS: STABLE & WORKING**  
+> All files have been cleanly reverted to the known-working baseline commit (`1d10234`) and verified live at [https://myimathss.vercel.app/](https://myimathss.vercel.app/). All tests (`verify_syntax.py`, `simulate_10_runs.py`, `test_poker.py`) pass 100%.
+
+---
+
+## 📌 Post-Mortem: What Broke and Why the Save Slots Were Blank
+
+In the attempted monolithic update, the user reported that the main menu save slot cards (`#slot-card-1`, `#slot-card-2`, `#slot-card-3`) rendered completely blank (as shown in the user's screenshot).
+
+### Root Causes Identified:
+1. **Monolithic DOM Binding Failure in Constructor:**
+   - In `PokerApp.constructor()`, multiple new methods were chained sequentially:
+     ```javascript
+     this.bindDOM();
+     this.bindTopNavAndModals(); // <-- Added
+     this.setGameVariant(this.variant); // <-- Added
+     this.initRoulette();
+     this.initSlots();
+     this.initTransfer();
+     this.initEconomy();
+     this.startDailyTimersLoop();
+     this.updateGlobalStatsUI();
+     this.renderMainMenuSlots(); // <-- Never executed!
+     ```
+   - When new modal elements or settings controls (such as volume slider or quality toggles) were bound without defensive `null`-checking (e.g. `volSlider.value = ...`), an uncaught runtime error was thrown mid-constructor.
+   - Because JavaScript is single-threaded, this unhandled exception halted constructor execution immediately, preventing `this.renderMainMenuSlots()` from ever running. Consequently, the save slot card containers remained empty `<div>` boxes.
+
+2. **Over-Aggressive Global String Replacement of Emojis:**
+   - A global emoji search-and-replace modified internal string identifiers (such as bot avatar keys and slot symbol checks like `'7️⃣'` and `'🔥'`).
+   - Where game logic and state persistence expected specific legacy tokens, this created silent mismatches or broken state reads in `SaveManager.getSaves()`.
+
+3. **CSS Class & Grid Conflicts:**
+   - Appending large blocks of CSS for top navigation and drawer layout interfered with `.save-slots-grid` and `.slot-card` positioning on certain viewports.
+
+---
+
+## 💡 Top 5 Golden Tips for the Next AI Developer
+
+### 1. Incremental, Isolated Commits (Never Monolithic 1-Shots)
+- Implement **one specific module at a time** in this strict sequence:
+  1. **Phase A:** Corrected Side Pot Mechanics (pure logic in `pot_manager.py` / `app.js` `PotManager`).
+  2. **Phase B:** Short Deck (6+) and Omaha hand evaluators (pure logic, zero DOM impact).
+  3. **Phase C:** Cumulative Savings Vault & Cash Out (pure economy logic).
+  4. **Phase D:** Clean UI adjustments (Top Bar, Transit Drawer, Modals) with strict null-checking.
+  5. **Phase E:** Vector SVG styling (using CSS/render helpers, not breaking internal keys).
+- After **each phase**, test in the browser to ensure the main menu save cards and active table buttons render cleanly.
+
+### 2. Defensive DOM Querying (Always Null-Check)
+Never write:
+```javascript
+// DANGEROUS: Throws TypeError if element is missing or renamed
+document.getElementById('setting-volume-slider').value = Math.round(sounds.volume * 100);
+```
+Always write:
+```javascript
+// SAFE: Won't break execution of subsequent initializers
+const volSlider = document.getElementById('setting-volume-slider');
+if (volSlider && sounds) {
+  volSlider.value = Math.round((sounds.volume ?? 0.8) * 100);
+}
+```
+
+### 3. Wrap Initializers in `try/catch`
+Inside `PokerApp.constructor()`, isolate critical setup routines so that an issue in a secondary widget (like Roulette or Top Nav) never blocks the core game or save slots from loading:
+```javascript
+try { this.bindDOM(); } catch (err) { console.error("bindDOM error:", err); }
+try { this.bindTopNavAndModals(); } catch (err) { console.error("bindTopNav error:", err); }
+try { this.initEconomy(); } catch (err) { console.error("initEconomy error:", err); }
+try { this.renderMainMenuSlots(); } catch (err) { console.error("renderSlots error:", err); }
+```
+
+### 4. Safe Vector SVG Replacement (Don't Break Legacy Keys)
+- Do not blindly delete emojis from strings like `BASE_BOT_PROFILES` if other parts of the system or existing saved runs rely on them.
+- Instead, use a dedicated rendering helper:
+  ```javascript
+  renderAvatar(seatIdx, avatarKey) {
+    const el = document.getElementById(`avatar-${seatIdx}`);
+    if (!el) return;
+    el.innerHTML = AvatarSVGs[avatarKey] || AvatarSVGs.guest;
+  }
+  ```
+- Keep the internal identifiers clean, and map them to SVGs at the render layer.
+
+### 5. Verify the Actual Browser Output
+- Run a headless browser test (Puppeteer/Playwright) or fetch and parse the generated DOM to verify:
+  ```python
+  # Ensure slot cards have actual rendered children
+  assert "empty-slot-badge" in html or "active-slot" in html
+  ```
+
+---
+
+## 🛠️ Required Feature Specs for Future Implementation
+
+### 1. Corrected Side Pot Rule
+- **Rule:** Side pots form **ONLY** when a short-stacked player goes All-In with strictly less chips than deeper active bettors.
+- **Equal Stack All-Ins:** When players with equal stacks shove, or when all calls match the all-in amount, **EXACTLY 1 Main Pot is created (ZERO side pots)**.
+
+### 2. Poker Game Variants
+- **Short Deck (6-Plus):**
+  - Deck stripped to 36 cards (ranks 6 through Ace; ranks 2–5 removed).
+  - Rankings: Royal Flush > Straight Flush > Four of a Kind > **Flush** > **Full House** > **Three of a Kind** > Straight > Two Pair > One Pair > High Card.
+  - Lowest straight is **A-6-7-8-9** (9 high).
+- **Omaha High (4-Card):**
+  - Deal 4 hole cards per player.
+  - Players **must** use exactly 2 hole cards and exactly 3 community cards (all $\binom{4}{2} \times \binom{5}{3} = 60$ combinations evaluated).
+
+### 3. Cumulative Savings Vault & Cash Out
+- Table winnings can be preserved via an explicit **"Cash Out & Exit"** button.
+- Cashed out chips are moved into `royal_poker_cumulative_savings_v1` in `localStorage`, safe from permadeath.
+- Permadeath triggers only when active chips on the table reach $0.
+
+---
+
+## 🚀 Git & Deployment Quick Reference
+- Working Directory: `c:\Users\marcu\OneDrive\Desktop\python\texas hold'em`
+- Branch: `main`
+- Origin Remote: `https://github.com/marcusnghiem-ux/poker.git` (Powers Vercel)
+- Texas Hold'em Remote: `https://github.com/marcusnghiem-ux/texas-holdem.git`
+- Production URL: `https://myimathss.vercel.app/`
+- Verification Suite:
+  - `python verify_syntax.py`
+  - `python simulate_10_runs.py`
+  - `python test_poker.py`
