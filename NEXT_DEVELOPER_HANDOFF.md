@@ -482,3 +482,47 @@ equirePlayerName() when player was already registered, permanently fixing slot b
   - Current section: `v1.03 CURRENT` detailing audio upgrades and background tuning.
   - Previous releases archived: `v1.0275 ARCHIVED`, `v1.025 ARCHIVED`, `v1.02 ARCHIVED`, `v1.015 ARCHIVED`, `v1.01 ARCHIVED`.
 
+
+## 29. RELEASE 1.0325: SOUND FIX 2.0 & BUG FIXES — SOLAR TEXAS HOLD'EM REBRAND, HIGH-IMPACT AUDIO & 30-MINUTE ALLOWANCE
+
+### Official Rebrand to Solar Texas Hold'em
+1. **Unified Solar Identity:**
+   - Updated website title, description metadata, main landing screen hero header (`h1.menu-title`), poker arena header, and navigation drawer from "Royal Texas Hold'em" to **"Solar Texas Hold'em"**.
+
+### Sound Fix 2.0 & High-Impact Procedural Synthesizer
+1. **Hardware Dynamics Compressor & Loudness Boost:**
+   - Boosted master volume baseline to 1.0 and scaled oscillator amplitude envelopes across all sound synthesis pipelines by ~35-50%.
+   - Chained a dedicated Web Audio dynamics compressor node (`createDynamicsCompressor`) into the master audio pipeline to ensure loud, punchy, crystal-clear sound with zero clipping on mobile or desktop speakers.
+2. **Continuous Reel Spin Whirr Loop (Slot Machine):**
+   - Added `startSlotSpinWhirr()` and `stopSlotSpinWhirr()`: Rhythmic, rapid mechanical stepper clicks play continuously throughout the 2-second reel spin duration.
+   - Each individual reel stop triggers a heavy mechanical brake lock thud (`playSlotStop()`).
+3. **Multi-Stage Craps Dice Soundscape:**
+   - Replaced generic shuffle sound with `playDiceTumble()`: a multi-dice wooden rattle and cup shake while tumbling down the felt table.
+   - Added `playDiceLand()`: solid table thump and settle click when the dice come to rest on their final faces.
+4. **Interactive Roulette Ball Deceleration & Pocket Drop:**
+   - Added `playRouletteDrop()` when the roulette ball drops into its final winning pocket fret after the deceleration spin sequence.
+5. **Card Dealing Sequence (`playCardDealingSequence`):**
+   - Added real-time pitch-varied card deal flicks (`sounds.playCard`) for every hole card dealt to all 5 player seats at the start of each round, and for community Flop, Turn, and River cards.
+
+### Organic Random Starfield Drift Animation
+1. **Elimination of Linear Back-and-Forth Motion:**
+   - Replaced simple 2-keyframe alternating scale glint with 4 unique multi-axis organic flight paths (`starRandomFloat1` through `starRandomFloat4`).
+   - Staggered all 10 radiant sparkle stars with non-linear bezier curves, out-of-phase negative animation delays (-1.2s to -5.3s), varying scales (0.6x to 1.4x), and dynamic rotational drift (-26° to +38°).
+   - Only star animation keyframes were modified, preserving all other background structures intact.
+
+### 30-Minute Mini-Games Allowance Rebalance
+1. **Mini-Game Allowance Shortened to 30 Minutes:**
+   - Added `EconomyManager.MINIGAME_CYCLE_MS = 30 * 60 * 1000` (1,800,000 ms = 30 minutes).
+   - Retained `EconomyManager.POKER_CYCLE_MS = 3 * 60 * 60 * 1000` (10,800,000 ms = 3 hours) for high-stakes Poker Savings.
+   - Updated all mini-game allowance buttons, timers, and tooltips across the lobby, casino page, and lounge to `Every 30m` / `+ $1,000 (30m)`.
+
+### Version 1.0325 UI & Labeling Updates
+- Version: **`1.0325`**
+- Tagline: **`1.0325 - Sound Fix 2.0 & Bug Fixes`**
+- Top-left header pill: `Update 1.0325` (tooltip: "View Version 1.0325 Release Notes")
+- Main menu news banner: `UPDATE 1.0325` &bull; `1.0325 • Sound Fix 2.0 & Bug Fixes • Solar Texas Hold'em • 30m Mini-Game Allowance`
+- Update log modal:
+  - Header: `v1.0325` &bull; `1.0325 - Sound Fix 2.0 & Bug Fixes`
+  - Current section: `v1.0325 CURRENT`
+  - Previous releases archived: `v1.03 ARCHIVED`, `v1.0275 ARCHIVED`, `v1.025 ARCHIVED`, `v1.02 ARCHIVED`, `v1.015 ARCHIVED`, `v1.01 ARCHIVED`.
+

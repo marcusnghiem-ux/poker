@@ -63,9 +63,11 @@ class FeatureManager {
 class SoundManager {
   constructor() {
     this.enabled = localStorage.getItem('royal_poker_sound_muted') !== 'true';
-    this.volume = parseFloat(localStorage.getItem('royal_poker_volume') || '0.8');
+    this.volume = parseFloat(localStorage.getItem('royal_poker_volume') || '1.0');
     this.ctx = null;
     this.masterGain = null;
+    this.compressor = null;
+    this.slotSpinInterval = null;
   }
 
   setVolume(vol) {
@@ -84,7 +86,17 @@ class SoundManager {
         this.ctx = new AudioCtx();
         this.masterGain = this.ctx.createGain();
         this.masterGain.gain.setValueAtTime(this.enabled ? this.volume : 0, this.ctx.currentTime);
-        this.masterGain.connect(this.ctx.destination);
+
+        // Hardware Dynamics Compressor for punchy, loud, crystal-clear sound without distortion
+        this.compressor = this.ctx.createDynamicsCompressor();
+        this.compressor.threshold.setValueAtTime(-14, this.ctx.currentTime);
+        this.compressor.knee.setValueAtTime(10, this.ctx.currentTime);
+        this.compressor.ratio.setValueAtTime(4.5, this.ctx.currentTime);
+        this.compressor.attack.setValueAtTime(0.003, this.ctx.currentTime);
+        this.compressor.release.setValueAtTime(0.12, this.ctx.currentTime);
+
+        this.masterGain.connect(this.compressor);
+        this.compressor.connect(this.ctx.destination);
       }
       if (this.ctx && this.ctx.state === 'suspended') {
         this.ctx.resume().catch(() => {});
@@ -113,40 +125,38 @@ class SoundManager {
     }
   }
 
-  // 1. Audio Toggle Melodic Confirmation Chime
+  // 1. Melodic Audio Activation Chime (Louder & Triumphant)
   playToggleChime() {
     if (!this.enabled) return;
     this.init();
     if (!this.ctx) return;
     try {
       const t = this.ctx.currentTime;
-      // Note 1: D5 (587.33 Hz)
       const osc1 = this.ctx.createOscillator();
       const gain1 = this.ctx.createGain();
       osc1.type = 'triangle';
-      osc1.frequency.setValueAtTime(587.33, t);
-      gain1.gain.setValueAtTime(0.22, t);
-      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+      osc1.frequency.setValueAtTime(587.33, t); // D5
+      gain1.gain.setValueAtTime(0.35, t);
+      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
       osc1.connect(gain1);
       this._connectOut(gain1);
       osc1.start(t);
-      osc1.stop(t + 0.12);
+      osc1.stop(t + 0.14);
 
-      // Note 2: A5 (880 Hz)
       const osc2 = this.ctx.createOscillator();
       const gain2 = this.ctx.createGain();
       osc2.type = 'sine';
-      osc2.frequency.setValueAtTime(880, t + 0.08);
-      gain2.gain.setValueAtTime(0.25, t + 0.08);
-      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+      osc2.frequency.setValueAtTime(880, t + 0.08); // A5
+      gain2.gain.setValueAtTime(0.40, t + 0.08);
+      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
       osc2.connect(gain2);
       this._connectOut(gain2);
       osc2.start(t + 0.08);
-      osc2.stop(t + 0.28);
+      osc2.stop(t + 0.32);
     } catch (e) {}
   }
 
-  // 2. Crisp Tactile UI Button & Card Click
+  // 2. Tactile UI Click (Crisp & Punchy)
   playClick() {
     if (!this.enabled) return;
     this.init();
@@ -156,54 +166,52 @@ class SoundManager {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(1100, t);
-      osc.frequency.exponentialRampToValueAtTime(450, t + 0.025);
-      gain.gain.setValueAtTime(0.16, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.025);
+      osc.frequency.setValueAtTime(1200, t);
+      osc.frequency.exponentialRampToValueAtTime(400, t + 0.035);
+      gain.gain.setValueAtTime(0.28, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.035);
       osc.connect(gain);
       this._connectOut(gain);
       osc.start(t);
-      osc.stop(t + 0.025);
+      osc.stop(t + 0.035);
     } catch (e) {}
   }
 
-  // 3. Ceramic Poker Chip Clatter
+  // 3. Ceramic Poker Chip Clatter (Dual Clink)
   playChip() {
     if (!this.enabled) return;
     this.init();
     if (!this.ctx) return;
     try {
       const t = this.ctx.currentTime;
-      // Primary Chip Impulse
       const osc1 = this.ctx.createOscillator();
       const gain1 = this.ctx.createGain();
       osc1.type = 'triangle';
-      osc1.frequency.setValueAtTime(2200, t);
-      osc1.frequency.exponentialRampToValueAtTime(900, t + 0.045);
-      gain1.gain.setValueAtTime(0.22, t);
-      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.045);
+      osc1.frequency.setValueAtTime(2400, t);
+      osc1.frequency.exponentialRampToValueAtTime(850, t + 0.05);
+      gain1.gain.setValueAtTime(0.35, t);
+      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
       osc1.connect(gain1);
       this._connectOut(gain1);
       osc1.start(t);
-      osc1.stop(t + 0.045);
+      osc1.stop(t + 0.05);
 
-      // Secondary Rebound Clink
       const osc2 = this.ctx.createOscillator();
       const gain2 = this.ctx.createGain();
       osc2.type = 'sine';
-      osc2.frequency.setValueAtTime(1600, t + 0.016);
-      osc2.frequency.exponentialRampToValueAtTime(750, t + 0.055);
-      gain2.gain.setValueAtTime(0.14, t + 0.016);
-      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.055);
+      osc2.frequency.setValueAtTime(1750, t + 0.016);
+      osc2.frequency.exponentialRampToValueAtTime(700, t + 0.06);
+      gain2.gain.setValueAtTime(0.25, t + 0.016);
+      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
       osc2.connect(gain2);
       this._connectOut(gain2);
       osc2.start(t + 0.016);
-      osc2.stop(t + 0.055);
+      osc2.stop(t + 0.06);
     } catch (e) {}
   }
 
-  // 4. Playing Card Deal & Flick Swoosh
-  playCard() {
+  // 4. Playing Card Deal & Flick
+  playCard(pitchVariation = 1.0) {
     if (!this.enabled) return;
     this.init();
     if (!this.ctx) return;
@@ -212,15 +220,26 @@ class SoundManager {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(520, t);
-      osc.frequency.exponentialRampToValueAtTime(130, t + 0.08);
-      gain.gain.setValueAtTime(0.22, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+      osc.frequency.setValueAtTime(540 * pitchVariation, t);
+      osc.frequency.exponentialRampToValueAtTime(140 * pitchVariation, t + 0.09);
+      gain.gain.setValueAtTime(0.32, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
       osc.connect(gain);
       this._connectOut(gain);
       osc.start(t);
-      osc.stop(t + 0.08);
+      osc.stop(t + 0.09);
     } catch (e) {}
+  }
+
+  // 4B. Deal Hand Cards Sequence (Snap, Snap, Snap...)
+  playCardDealingSequence(count = 2, interval = 70) {
+    if (!this.enabled) return;
+    for (let i = 0; i < count; i++) {
+      setTimeout(() => {
+        const pitch = 0.95 + (i % 5) * 0.04;
+        this.playCard(pitch);
+      }, i * interval);
+    }
   }
 
   // 5. Card Shuffle Riffle
@@ -230,18 +249,18 @@ class SoundManager {
     if (!this.ctx) return;
     try {
       for (let i = 0; i < 5; i++) {
-        const time = this.ctx.currentTime + i * 0.032;
+        const time = this.ctx.currentTime + i * 0.035;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(360 + Math.random() * 180, time);
-        osc.frequency.exponentialRampToValueAtTime(110, time + 0.03);
-        gain.gain.setValueAtTime(0.14, time);
-        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.03);
+        osc.frequency.setValueAtTime(380 + Math.random() * 200, time);
+        osc.frequency.exponentialRampToValueAtTime(100, time + 0.035);
+        gain.gain.setValueAtTime(0.24, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.035);
         osc.connect(gain);
         this._connectOut(gain);
         osc.start(time);
-        osc.stop(time + 0.03);
+        osc.stop(time + 0.035);
       }
     } catch (e) {}
   }
@@ -257,27 +276,27 @@ class SoundManager {
       const osc1 = this.ctx.createOscillator();
       const gain1 = this.ctx.createGain();
       osc1.type = 'square';
-      osc1.frequency.setValueAtTime(190, t);
-      osc1.frequency.exponentialRampToValueAtTime(90, t + 0.035);
-      gain1.gain.setValueAtTime(0.20, t);
-      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.035);
+      osc1.frequency.setValueAtTime(200, t);
+      osc1.frequency.exponentialRampToValueAtTime(80, t + 0.04);
+      gain1.gain.setValueAtTime(0.32, t);
+      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
       osc1.connect(gain1);
       this._connectOut(gain1);
       osc1.start(t);
-      osc1.stop(t + 0.035);
+      osc1.stop(t + 0.04);
 
       // Knock 2 (45ms later)
       const osc2 = this.ctx.createOscillator();
       const gain2 = this.ctx.createGain();
       osc2.type = 'square';
-      osc2.frequency.setValueAtTime(160, t + 0.045);
-      osc2.frequency.exponentialRampToValueAtTime(75, t + 0.08);
-      gain2.gain.setValueAtTime(0.18, t + 0.045);
-      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+      osc2.frequency.setValueAtTime(170, t + 0.045);
+      osc2.frequency.exponentialRampToValueAtTime(70, t + 0.085);
+      gain2.gain.setValueAtTime(0.28, t + 0.045);
+      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.085);
       osc2.connect(gain2);
       this._connectOut(gain2);
       osc2.start(t + 0.045);
-      osc2.stop(t + 0.08);
+      osc2.stop(t + 0.085);
     } catch (e) {}
   }
 
@@ -291,14 +310,14 @@ class SoundManager {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(240, t);
-      osc.frequency.exponentialRampToValueAtTime(70, t + 0.11);
-      gain.gain.setValueAtTime(0.16, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
+      osc.frequency.setValueAtTime(260, t);
+      osc.frequency.exponentialRampToValueAtTime(65, t + 0.12);
+      gain.gain.setValueAtTime(0.25, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
       osc.connect(gain);
       this._connectOut(gain);
       osc.start(t);
-      osc.stop(t + 0.11);
+      osc.stop(t + 0.12);
     } catch (e) {}
   }
 
@@ -309,19 +328,19 @@ class SoundManager {
     if (!this.ctx) return;
     try {
       const t = this.ctx.currentTime;
-      const freqs = [75, 150, 225];
+      const freqs = [70, 140, 210, 280];
       freqs.forEach((f, idx) => {
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = idx === 0 ? 'sine' : 'triangle';
         osc.frequency.setValueAtTime(f, t);
-        osc.frequency.exponentialRampToValueAtTime(f * 0.75, t + 0.38);
-        gain.gain.setValueAtTime(0.24, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.38);
+        osc.frequency.exponentialRampToValueAtTime(f * 0.7, t + 0.42);
+        gain.gain.setValueAtTime(0.30, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.42);
         osc.connect(gain);
         this._connectOut(gain);
         osc.start(t);
-        osc.stop(t + 0.38);
+        osc.stop(t + 0.42);
       });
     } catch (e) {}
   }
@@ -339,17 +358,17 @@ class SoundManager {
         const gain = this.ctx.createGain();
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(freq, time);
-        gain.gain.setValueAtTime(0.24, time);
-        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.28);
+        gain.gain.setValueAtTime(0.35, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.32);
         osc.connect(gain);
         this._connectOut(gain);
         osc.start(time);
-        osc.stop(time + 0.28);
+        osc.stop(time + 0.32);
       });
     } catch (e) {}
   }
 
-  // 10. Grand Jackpot Fanfare (C5, E5, G5, C6, E6, G6)
+  // 10. Grand Jackpot Fanfare
   playJackpot() {
     if (!this.enabled) return;
     this.init();
@@ -362,12 +381,12 @@ class SoundManager {
         const gain = this.ctx.createGain();
         osc.type = 'sine';
         osc.frequency.setValueAtTime(freq, time);
-        gain.gain.setValueAtTime(0.28, time);
-        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.35);
+        gain.gain.setValueAtTime(0.38, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.38);
         osc.connect(gain);
         this._connectOut(gain);
         osc.start(time);
-        osc.stop(time + 0.35);
+        osc.stop(time + 0.38);
       });
     } catch (e) {}
   }
@@ -382,56 +401,86 @@ class SoundManager {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(120, t);
-      osc.frequency.exponentialRampToValueAtTime(260, t + 0.14);
-      gain.gain.setValueAtTime(0.22, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+      osc.frequency.setValueAtTime(110, t);
+      osc.frequency.exponentialRampToValueAtTime(280, t + 0.15);
+      gain.gain.setValueAtTime(0.32, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
       osc.connect(gain);
       this._connectOut(gain);
       osc.start(t);
-      osc.stop(t + 0.14);
+      osc.stop(t + 0.15);
     } catch (e) {}
   }
 
-  // 12. Slot Machine Reel Spinning Whirr
-  playSlotSpin() {
+  // 12. Continuous Slot Machine Reel Spinning Whirr
+  startSlotSpinWhirr() {
     if (!this.enabled) return;
+    this.stopSlotSpinWhirr();
     this.init();
     if (!this.ctx) return;
     try {
-      const t = this.ctx.currentTime;
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(460, t);
-      osc.frequency.linearRampToValueAtTime(780, t + 0.12);
-      gain.gain.setValueAtTime(0.14, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
-      osc.connect(gain);
-      this._connectOut(gain);
-      osc.start(t);
-      osc.stop(t + 0.12);
+      // Rapid stepper click interval while reels spin
+      this.slotSpinInterval = setInterval(() => {
+        if (!this.enabled || !this.ctx) return;
+        try {
+          const t = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(580 + Math.random() * 120, t);
+          osc.frequency.exponentialRampToValueAtTime(240, t + 0.035);
+          gain.gain.setValueAtTime(0.20, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.035);
+          osc.connect(gain);
+          this._connectOut(gain);
+          osc.start(t);
+          osc.stop(t + 0.035);
+        } catch (e) {}
+      }, 50);
     } catch (e) {}
   }
 
-  // 13. Slot Machine Reel Stop Thud
+  stopSlotSpinWhirr() {
+    if (this.slotSpinInterval) {
+      clearInterval(this.slotSpinInterval);
+      this.slotSpinInterval = null;
+    }
+  }
+
+  playSlotSpin() {
+    this.startSlotSpinWhirr();
+  }
+
+  // 13. Slot Machine Reel Brake Stop (Heavy Metallic Thud)
   playSlotStop() {
     if (!this.enabled) return;
     this.init();
     if (!this.ctx) return;
     try {
       const t = this.ctx.currentTime;
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(1400, t);
-      osc.frequency.exponentialRampToValueAtTime(280, t + 0.045);
-      gain.gain.setValueAtTime(0.22, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.045);
-      osc.connect(gain);
-      this._connectOut(gain);
-      osc.start(t);
-      osc.stop(t + 0.045);
+      const osc1 = this.ctx.createOscillator();
+      const gain1 = this.ctx.createGain();
+      osc1.type = 'sine';
+      osc1.frequency.setValueAtTime(1600, t);
+      osc1.frequency.exponentialRampToValueAtTime(240, t + 0.05);
+      gain1.gain.setValueAtTime(0.35, t);
+      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+      osc1.connect(gain1);
+      this._connectOut(gain1);
+      osc1.start(t);
+      osc1.stop(t + 0.05);
+
+      const osc2 = this.ctx.createOscillator();
+      const gain2 = this.ctx.createGain();
+      osc2.type = 'square';
+      osc2.frequency.setValueAtTime(120, t);
+      osc2.frequency.exponentialRampToValueAtTime(50, t + 0.06);
+      gain2.gain.setValueAtTime(0.28, t);
+      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+      osc2.connect(gain2);
+      this._connectOut(gain2);
+      osc2.start(t);
+      osc2.stop(t + 0.06);
     } catch (e) {}
   }
 
@@ -442,81 +491,14 @@ class SoundManager {
     if (!this.ctx) return;
     try {
       const t = this.ctx.currentTime;
-      for (let i = 0; i < 6; i++) {
-        const time = t + i * 0.06;
+      for (let i = 0; i < 8; i++) {
+        const time = t + i * 0.055;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(1800 - i * 150, time);
-        osc.frequency.exponentialRampToValueAtTime(900, time + 0.03);
-        gain.gain.setValueAtTime(0.12, time);
-        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.03);
-        osc.connect(gain);
-        this._connectOut(gain);
-        osc.start(time);
-        osc.stop(time + 0.03);
-      }
-    } catch (e) {}
-  }
-
-  // 15. Roulette Ball Pocket Click
-  playRouletteClick() {
-    if (!this.enabled) return;
-    this.init();
-    if (!this.ctx) return;
-    try {
-      const t = this.ctx.currentTime;
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(2400, t);
-      osc.frequency.exponentialRampToValueAtTime(900, t + 0.016);
-      gain.gain.setValueAtTime(0.18, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.016);
-      osc.connect(gain);
-      this._connectOut(gain);
-      osc.start(t);
-      osc.stop(t + 0.016);
-    } catch (e) {}
-  }
-
-  // 16. Roulette Ball Pocket Landing Drop
-  playRouletteDrop() {
-    if (!this.enabled) return;
-    this.init();
-    if (!this.ctx) return;
-    try {
-      const t = this.ctx.currentTime;
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(260, t);
-      osc.frequency.exponentialRampToValueAtTime(90, t + 0.06);
-      gain.gain.setValueAtTime(0.24, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
-      osc.connect(gain);
-      this._connectOut(gain);
-      osc.start(t);
-      osc.stop(t + 0.06);
-    } catch (e) {}
-  }
-
-  // 17. Craps Dice Shake & Table Roll
-  playDiceRoll() {
-    if (!this.enabled) return;
-    this.init();
-    if (!this.ctx) return;
-    try {
-      const t = this.ctx.currentTime;
-      // 3 Rapid dice clicks + soft felt bounce
-      for (let i = 0; i < 3; i++) {
-        const time = t + i * 0.045;
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(700 + Math.random() * 300, time);
-        osc.frequency.exponentialRampToValueAtTime(200, time + 0.035);
-        gain.gain.setValueAtTime(0.16, time);
+        osc.frequency.setValueAtTime(2000 - i * 140, time);
+        osc.frequency.exponentialRampToValueAtTime(800, time + 0.035);
+        gain.gain.setValueAtTime(0.22, time);
         gain.gain.exponentialRampToValueAtTime(0.001, time + 0.035);
         osc.connect(gain);
         this._connectOut(gain);
@@ -526,25 +508,128 @@ class SoundManager {
     } catch (e) {}
   }
 
-  // 18. Cashout / Vault Coin Cascade
+  // 15. Roulette Ball Pocket Click (Brass Fret)
+  playRouletteClick() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(2600, t);
+      osc.frequency.exponentialRampToValueAtTime(900, t + 0.02);
+      gain.gain.setValueAtTime(0.26, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.02);
+      osc.connect(gain);
+      this._connectOut(gain);
+      osc.start(t);
+      osc.stop(t + 0.02);
+    } catch (e) {}
+  }
+
+  // 16. Roulette Ball Pocket Landing Drop (Solid Wooden Pocket Thud)
+  playRouletteDrop() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(320, t);
+      osc.frequency.exponentialRampToValueAtTime(80, t + 0.08);
+      gain.gain.setValueAtTime(0.35, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+      osc.connect(gain);
+      this._connectOut(gain);
+      osc.start(t);
+      osc.stop(t + 0.08);
+    } catch (e) {}
+  }
+
+  // 17. Craps Dice Tumbling Rattle
+  playDiceTumble() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      for (let i = 0; i < 5; i++) {
+        const time = t + i * 0.05;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(850 + Math.random() * 400, time);
+        osc.frequency.exponentialRampToValueAtTime(220, time + 0.04);
+        gain.gain.setValueAtTime(0.26, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.04);
+        osc.connect(gain);
+        this._connectOut(gain);
+        osc.start(time);
+        osc.stop(time + 0.04);
+      }
+    } catch (e) {}
+  }
+
+  // 17B. Craps Dice Table Landing (Thump & Settle)
+  playDiceLand() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc1 = this.ctx.createOscillator();
+      const gain1 = this.ctx.createGain();
+      osc1.type = 'triangle';
+      osc1.frequency.setValueAtTime(240, t);
+      osc1.frequency.exponentialRampToValueAtTime(70, t + 0.07);
+      gain1.gain.setValueAtTime(0.35, t);
+      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+      osc1.connect(gain1);
+      this._connectOut(gain1);
+      osc1.start(t);
+      osc1.stop(t + 0.07);
+
+      const osc2 = this.ctx.createOscillator();
+      const gain2 = this.ctx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(1400, t + 0.02);
+      osc2.frequency.exponentialRampToValueAtTime(600, t + 0.06);
+      gain2.gain.setValueAtTime(0.22, t + 0.02);
+      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+      osc2.connect(gain2);
+      this._connectOut(gain2);
+      osc2.start(t + 0.02);
+      osc2.stop(t + 0.06);
+    } catch (e) {}
+  }
+
+  playDiceRoll() {
+    this.playDiceTumble();
+  }
+
+  // 18. Cashout / Vault Metallic Coin Cascade
   playCashout() {
     if (!this.enabled) return;
     this.init();
     if (!this.ctx) return;
     try {
-      const coinFreqs = [2400, 2900, 3400, 4100, 4800];
+      const coinFreqs = [2400, 2900, 3400, 4100, 4800, 5400];
       coinFreqs.forEach((freq, idx) => {
-        const time = this.ctx.currentTime + idx * 0.055;
+        const time = this.ctx.currentTime + idx * 0.05;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'sine';
         osc.frequency.setValueAtTime(freq, time);
-        gain.gain.setValueAtTime(0.18, time);
-        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
+        gain.gain.setValueAtTime(0.28, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.14);
         osc.connect(gain);
         this._connectOut(gain);
         osc.start(time);
-        osc.stop(time + 0.12);
+        osc.stop(time + 0.14);
       });
     } catch (e) {}
   }
@@ -559,13 +644,13 @@ class SoundManager {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(880, t);
-      gain.gain.setValueAtTime(0.20, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+      osc.frequency.setValueAtTime(920, t);
+      gain.gain.setValueAtTime(0.30, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.20);
       osc.connect(gain);
       this._connectOut(gain);
       osc.start(t);
-      osc.stop(t + 0.18);
+      osc.stop(t + 0.20);
     } catch (e) {}
   }
 }
@@ -1106,7 +1191,9 @@ class EconomyManager {
   static POKER_ALLOWANCE_KEY = 'royal_poker_daily_allowance_v2';
   static CUMULATIVE_SAVINGS_KEY = 'royal_poker_cumulative_savings_v1';
   static GLOBAL_POKER_CLAIM_KEY = 'royal_poker_global_poker_claim_v1';
-  static CYCLE_MS = 3 * 60 * 60 * 1000; // 3-hour allowance cycle
+  static POKER_CYCLE_MS = 3 * 60 * 60 * 1000; // 3-hour Poker Savings allowance cycle
+  static MINIGAME_CYCLE_MS = 30 * 60 * 1000;   // 30-minute Mini-Games Free Dollars cycle (v1.0325)
+  static CYCLE_MS = 3 * 60 * 60 * 1000;        // Backward-compat alias for Poker
 
   static getGlobalPokerClaimStatus() {
     let lastClaim = 0;
@@ -1117,10 +1204,10 @@ class EconomyManager {
 
     const now = Date.now();
     const elapsed = now - lastClaim;
-    if (elapsed >= EconomyManager.CYCLE_MS || lastClaim === 0) {
+    if (elapsed >= EconomyManager.MINIGAME_CYCLE_MS || lastClaim === 0) {
       return { canClaim: true, remainingMs: 0, text: 'Ready to Claim!' };
     }
-    const remainingMs = EconomyManager.CYCLE_MS - elapsed;
+    const remainingMs = EconomyManager.MINIGAME_CYCLE_MS - elapsed;
     const hours = Math.floor(remainingMs / (1000 * 60 * 60));
     const mins = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
     const secs = Math.floor((remainingMs % (1000 * 60)) / 1000);
@@ -1135,7 +1222,7 @@ class EconomyManager {
   static claimGlobalPokerDaily() {
     const status = EconomyManager.getGlobalPokerClaimStatus();
     if (!status.canClaim) {
-      return { success: false, message: `3h cycle active! Next claim in ${status.text}` };
+      return { success: false, message: `30m cycle active! Next claim in ${status.text}` };
     }
     const newSavings = EconomyManager.addCumulativeSavings(5000);
     try {
@@ -4938,6 +5025,7 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
 
     // Deal hole cards (4 cards for Omaha, 2 cards for Texas/Short Deck)
     const holeCount = (this.variant === 'omaha') ? 4 : 2;
+    let cardDealDelay = 0;
     for (let c = 0; c < holeCount; c++) {
       this.players.forEach((p, idx) => {
         if (!p.knockedOut && !p.folded) {
@@ -4946,6 +5034,8 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
           const isHidden = (idx !== 0);
           const el = this.renderCardDOM(card, isHidden);
           document.getElementById(`cards-${idx}`).appendChild(el);
+          setTimeout(() => sounds.playCard(1.0 + (idx * 0.04)), cardDealDelay);
+          cardDealDelay += 65;
         }
       });
     }
@@ -6254,7 +6344,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     this.updateCrapsUI();
 
     this.crapsRolling = true;
-    sounds.playShuffle();
+    sounds.playDiceTumble();
 
     const d1El = document.getElementById('craps-die-1');
     const d2El = document.getElementById('craps-die-2');
@@ -6272,6 +6362,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       const d2 = Math.floor(Math.random() * 6) + 1;
       const total = d1 + d2;
 
+      sounds.playDiceLand();
       if (d1El) d1El.innerHTML = this.renderCrapsDieSVG(d1);
       if (d2El) d2El.innerHTML = this.renderCrapsDieSVG(d2);
 
@@ -6695,7 +6786,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     this.updateSlotsUI();
 
     if (this.btnSpinSlots) this.btnSpinSlots.disabled = true;
-    sounds.playSlotSpin();
+    sounds.startSlotSpinWhirr();
 
     const banner = document.getElementById('slots-result-banner');
     if (banner) banner.classList.add('hidden');
