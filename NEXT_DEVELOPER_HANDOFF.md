@@ -433,3 +433,52 @@ equirePlayerName() when player was already registered, permanently fixing slot b
   - New current release section: `v1.0275 CURRENT` detailing the background overhaul.
   - Previous releases cleanly archived: `v1.025 ARCHIVED`, `v1.02 ARCHIVED`, `v1.015 ARCHIVED`, `v1.01 ARCHIVED`.
 
+
+## 28. RELEASE 1.03: SOUND FIX & DECO UPDATE — INTERACTIVE AUDIO ENGINE & SOLAR FLARE BACKGROUND TUNING
+
+### Audio Synthesizer Activation & Sound Bug Resolution
+1. **AudioContext Suspension Fix:**
+   - Browsers require an explicit `resume()` call within a user interaction. Previously, if `AudioContext` was initialized before first tap, it became permanently suspended, causing all sound toggle buttons to appear dead.
+   - Fixed `SoundManager.init()` and all trigger paths to immediately call `this.ctx.resume().catch(() => {})`.
+2. **Master Gain & Real Volume Attenuation:**
+   - Connected all synthesized audio pipelines through a single `masterGain` node tied to `this.volume` and `this.enabled`, ensuring the master volume slider in Settings actively controls audio loudness.
+3. **Instant Auditory Toggle Confirmation:**
+   - Added `playToggleChime()`: a melodic 2-tone chime (D5 $\rightarrow$ A5, 587Hz $\rightarrow$ 880Hz) that plays immediately when unmuting sound, giving immediate confirmation that audio is active.
+4. **Rich Suite of Procedural Synthesizer Effects:**
+   - `playClick()`: Universal tactile interaction sound for buttons, tabs, modal close controls, and cards.
+   - `playChip()`: Dual-impulse ceramic poker chip clatter (2200Hz + 1600Hz).
+   - `playCard()`: Crisp card dealing flick/swoosh.
+   - `playShuffle()`: 5-burst card riffle flutter.
+   - `playCheck()`: Authentic table double knock (190Hz then 160Hz).
+   - `playFold()`: Soft felt card slide.
+   - `playAllIn()`: Resonant low-end casino dramatic boom (75Hz + 150Hz + 225Hz).
+   - `playWin()`: 4-note ascending victory arpeggio (C5, E5, G5, C6).
+   - `playJackpot()`: Shimmering 6-note grand jackpot bell fanfare.
+   - `playSlotPull()`, `playSlotSpin()`, `playSlotStop()`: Mechanical slot ratchet, spin ticks, and reel brake thuds.
+   - `playRouletteSpin()`, `playRouletteClick()`, `playRouletteDrop()`: Realistic ivory ball track spin, pocket clicks, and drop thud.
+   - `playDiceRoll()`: Craps dice cup shake and green felt roll.
+   - `playCashout()`: Metallic coin cascade on daily bonus and bankroll transfers.
+5. **Unified Audio Controls UI Synchronization:**
+   - Synchronized all 4 audio controls (`#btn-quick-sound`, `#menu-sound-btn`, `#sound-toggle-btn`, `#setting-sound-toggle`).
+   - Added `.audio-muted` CSS styling with red diagonal slash SVGs and muted pill indicators.
+
+### Background Deco Tuning & Constellation Expansion
+1. **10% Ambient Brightness Reduction:**
+   - Adjusted `.bg-solar-flare-plasma` gradients and `.layer0-cosmic-grid` opacities down by ~10% for improved visual comfort, eliminating glare and making table cards pop.
+2. **Northern Solar Phoenix Constellation Network:**
+   - Added a sprawling 12-star constellation network in the upper-right quadrant with glowing cyan lines and an Alpha Star radiant starburst.
+3. **Southern Cosmic River Constellation Network:**
+   - Added an 8-star celestial stream sweeping across the lower-left cosmos.
+4. **Asymmetrical Mechanical Observatory Bastion:**
+   - Broken strict mirror symmetry: redesigned right pillar into an asymmetrical mechanical bastion featuring an offset gear ring aperture, radiant cyan power conduits, and drifting golden crystal shard clusters.
+
+### Version 1.03 UI & Labeling Updates
+- Version: **`1.03`**
+- Tagline: **`1.03 - Sound Fix & Deco Update`**
+- Top-left header pill: `Update 1.03` (tooltip: "View Version 1.03 Release Notes")
+- Main menu news banner: `UPDATE 1.03` &bull; `1.03 • Sound Fix & Deco Update • Interactive Web Audio Engine & Background Tuning`
+- Update log modal:
+  - Header: `v1.03` &bull; `1.03 - Sound Fix & Deco Update`
+  - Current section: `v1.03 CURRENT` detailing audio upgrades and background tuning.
+  - Previous releases archived: `v1.0275 ARCHIVED`, `v1.025 ARCHIVED`, `v1.02 ARCHIVED`, `v1.015 ARCHIVED`, `v1.01 ARCHIVED`.
+

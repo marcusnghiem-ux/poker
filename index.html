@@ -108,6 +108,11 @@
                 <feMergeNode in="SourceGraphic"/>
               </feMerge>
             </filter>
+                      <radialGradient id="starGlowViolet" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="45%" stop-color="#a78bfa"/>
+              <stop offset="100%" stop-color="rgba(167, 139, 250, 0)"/>
+            </radialGradient>
           </defs>
 
           <!-- TOP & BOTTOM SAWTOOTH BORDERS (Screenshots 3 & 4 Motif) -->
@@ -187,28 +192,27 @@
           </g>
 
           <!-- =================================================================
-               RIGHT MONUMENTAL DIAMOND TEMPLE TOWER (Screenshots 1, 3, 4 Motif)
+               RIGHT ASYMMETRICAL MECHANICAL OBSERVATORY BASTION (v1.03 Asymmetry)
                ================================================================= -->
-          <g class="solar-diamond-structure right-pillar" transform="translate(1790, 540)">
-            <!-- Outer Colossal Obsidian Shell -->
-            <polygon points="0,-390 235,0 0,390 -235,0" fill="url(#darkObsidianGrad)" stroke="url(#goldBevelGrad)" stroke-width="4.5"/>
-            <!-- Tier 2 Gold-Amber Bevel -->
-            <polygon points="0,-330 190,0 0,330 -190,0" fill="#200b02" stroke="url(#amberBevelGrad)" stroke-width="3.2"/>
-            <!-- Tier 3 Chevron Teeth Rim -->
-            <polygon points="0,-260 145,0 0,260 -145,0" fill="#120500" stroke="#f59e0b" stroke-width="2.5"/>
-            <!-- Tier 4 Dark Core Diamond -->
-            <polygon points="0,-180 96,0 0,180 -96,0" fill="#090200" stroke="#ea580c" stroke-width="2.2"/>
+          <g class="solar-diamond-structure right-pillar asym-bastion" transform="translate(1790, 540)">
+            <!-- Outer Stepped Diamond Shield -->
+            <polygon points="0,-410 240,0 0,390 -220,0" fill="url(#darkObsidianGrad)" stroke="url(#goldBevelGrad)" stroke-width="4.5"/>
+            <!-- Tier 2 Amber Bevel -->
+            <polygon points="0,-340 195,0 0,320 -180,0" fill="#200b02" stroke="url(#amberBevelGrad)" stroke-width="3"/>
+            <!-- Asymmetrical Mechanical Gear Ring Aperture -->
+            <circle cx="0" cy="0" r="145" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="14,8" opacity="0.8"/>
+            <circle cx="0" cy="0" r="110" fill="#120500" stroke="#ea580c" stroke-width="2"/>
             <!-- Glowing Sun-Diamond Matrix Center -->
-            <polygon points="0,-85 48,0 0,85 -48,0" fill="#fde047" filter="url(#goldFlareGlow)"/>
-            <polygon points="0,-50 28,0 0,50 -28,0" fill="#ffffff"/>
-            <!-- Internal Chevron Arrow Teeth -->
-            <polygon points="0,-230 24,-206 -24,-206" fill="#f59e0b"/>
-            <polygon points="0,-150 18,-132 -18,-132" fill="#fde047"/>
-            <polygon points="0,230 24,206 -24,206" fill="#f59e0b"/>
-            <polygon points="0,150 18,132 -18,132" fill="#fde047"/>
-            <!-- Flanking Outer Spike Brackets -->
-            <path d="M-245,-90 L-295,0 L-245,90 L-260,90 L-310,0 L-260,-90 Z" fill="#ea580c" stroke="#fde047" stroke-width="1.5"/>
-            <path d="M245,-90 L295,0 L245,90 L260,90 L310,0 L260,-90 Z" fill="#ea580c" stroke="#fde047" stroke-width="1.5"/>
+            <polygon points="0,-75 42,0 0,75 -42,0" fill="#fde047" filter="url(#goldFlareGlow)"/>
+            <polygon points="0,-42 24,0 0,42 -24,0" fill="#ffffff"/>
+            <!-- Asymmetrical Glowing Cyan Power Conduit Flank -->
+            <path class="asym-conduit-glow" d="M-60,-240 L-10,-140 L-60,-40 L-10,60 L-60,160 L-10,240" stroke="#38bdf8" stroke-width="2.5" stroke-dasharray="8,5" fill="none"/>
+            <!-- Golden Angular Beacon Spikes (Offset Asymmetry) -->
+            <polygon points="-160,-200 -120,-170 -140,-150" fill="#f59e0b"/>
+            <polygon points="-180,-10 -220,0 -180,10" fill="#fde047" filter="url(#goldFlareGlow)"/>
+            <polygon points="-160,200 -120,170 -140,150" fill="#ea580c"/>
+            <!-- Right Flank Spike Brackets -->
+            <path d="M-220,-80 L-265,0 L-220,80 L-235,80 L-280,0 L-235,-80 Z" fill="#ea580c" stroke="#fde047" stroke-width="1.5"/>
           </g>
 
           <!-- =================================================================
@@ -272,6 +276,56 @@
             <path d="M265,-25 L292,0 L265,25 L278,25 L305,0 L278,-25 Z" fill="#38bdf8" filter="url(#cyanGlow)"/>
             <path d="M292,-25 L319,0 L292,25 L305,25 L332,0 L305,-25 Z" fill="#38bdf8"/>
             <path d="M319,-25 L346,0 L319,25 L332,25 L359,0 L332,-25 Z" fill="#7dd3fc"/>
+          </g>
+
+          <!-- =================================================================
+               NORTHERN SOLAR PHOENIX CONSTELLATION NETWORK (v1.03 Motif)
+               ================================================================= -->
+          <g class="constellation-phoenix" opacity="0.82">
+            <!-- Constellation Connector Lines -->
+            <path d="M1260,160 L1340,115 L1450,80 L1480,165 L1420,240 L1340,115 M1480,165 L1580,130 L1680,210 L1620,310 L1530,275 L1480,165 M1530,275 L1480,360 L1360,320 L1420,240" stroke="#38bdf8" stroke-width="1.8" stroke-dasharray="5,4" fill="none" filter="url(#cyanGlow)"/>
+            <path d="M1450,80 L1480,165 L1530,275" stroke="#a78bfa" stroke-width="1.4" stroke-dasharray="3,3" fill="none"/>
+
+            <!-- Constellation Star Nodes -->
+            <circle cx="1260" cy="160" r="6" fill="url(#starGlowCyan)"/>
+            <circle cx="1260" cy="160" r="2.5" fill="#ffffff"/>
+
+            <circle cx="1340" cy="115" r="7" fill="url(#starGlowCyan)"/>
+            <circle cx="1340" cy="115" r="3" fill="#ffffff"/>
+
+            <circle cx="1450" cy="80" r="8" fill="#ffffff" filter="url(#neonGlowWhite)"/>
+            <circle cx="1450" cy="80" r="14" fill="none" stroke="#38bdf8" stroke-width="1.2" stroke-dasharray="3,2"/>
+
+            <!-- ALPHA STAR: Heart of the Phoenix -->
+            <circle cx="1480" cy="165" r="12" fill="#ffffff" filter="url(#neonGlowWhite)"/>
+            <circle cx="1480" cy="165" r="22" fill="none" stroke="#fde047" stroke-width="1.5" stroke-dasharray="4,3"/>
+            <path d="M1480,145 Q1480,165 1500,165 Q1480,165 1480,185 Q1480,165 1460,165 Q1480,165 1480,145 Z" fill="#ffffff" filter="drop-shadow(0 0 6px #fff)"/>
+
+            <circle cx="1420" cy="240" r="6" fill="url(#starGlowViolet)"/>
+            <circle cx="1420" cy="240" r="2.5" fill="#ffffff"/>
+
+            <circle cx="1580" cy="130" r="8" fill="#ffffff" filter="url(#neonGlowWhite)"/>
+            <circle cx="1680" cy="210" r="7" fill="url(#starGlowCyan)"/>
+            <circle cx="1680" cy="210" r="3" fill="#ffffff"/>
+
+            <circle cx="1620" cy="310" r="8" fill="#ffffff" filter="url(#neonGlowWhite)"/>
+            <circle cx="1530" cy="275" r="7" fill="url(#starGlowCyan)"/>
+            <circle cx="1480" cy="360" r="6" fill="url(#starGlowViolet)"/>
+            <circle cx="1360" cy="320" r="6.5" fill="url(#starGlowCyan)"/>
+          </g>
+
+          <!-- =================================================================
+               SOUTHERN COSMIC RIVER CONSTELLATION NETWORK (v1.03 Motif)
+               ================================================================= -->
+          <g class="constellation-river" opacity="0.75">
+            <path d="M240,780 L320,830 L410,790 L510,890 L600,850 L680,930 L760,870" stroke="#60a5fa" stroke-width="1.6" stroke-dasharray="4,3" fill="none"/>
+            <circle cx="240" cy="780" r="6" fill="url(#starGlowCyan)"/>
+            <circle cx="320" cy="830" r="7" fill="#ffffff" filter="url(#neonGlowWhite)"/>
+            <circle cx="410" cy="790" r="6" fill="url(#starGlowCyan)"/>
+            <circle cx="510" cy="890" r="8" fill="#ffffff" filter="url(#neonGlowWhite)"/>
+            <circle cx="600" cy="850" r="6.5" fill="url(#starGlowCyan)"/>
+            <circle cx="680" cy="930" r="7.5" fill="#ffffff" filter="url(#neonGlowWhite)"/>
+            <circle cx="760" cy="870" r="6" fill="url(#starGlowCyan)"/>
           </g>
 
           <!-- =================================================================
@@ -499,9 +553,9 @@
           <span class="hamburger-bar"></span>
         </button>
         <!-- Top Left Update Log Trigger (v1.01) -->
-        <button id="btn-update-log-trigger" class="update-log-pill-btn" title="View Version 1.0275 Release Notes" type="button">
+        <button id="btn-update-log-trigger" class="update-log-pill-btn" title="View Version 1.03 Release Notes" type="button">
           <span class="update-pill-dot"></span>
-          <span class="update-pill-text">Update 1.0275</span>
+          <span class="update-pill-text">Update 1.03</span>
         </button>
         <div class="nav-brand-wrap">
           <svg class="nav-crown-svg" width="22" height="18" viewBox="0 0 72 54" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -589,9 +643,9 @@
     <section id="main-menu" class="main-menu-view">
       <div class="menu-hero">
         <!-- Main Menu Update Banner v1.01 -->
-        <div class="menu-update-banner" id="menu-update-log-trigger" role="button" tabindex="0" title="Click to view v1.0275 Release Notes">
-          <span class="update-badge-tag">UPDATE 1.0275</span>
-          <span class="update-badge-ver">1.0275 &bull; graphics improve &bull; Solar Flare Deep Obsidian &amp; Magma Background Overhaul</span>
+        <div class="menu-update-banner" id="menu-update-log-trigger" role="button" tabindex="0" title="Click to view v1.03 Release Notes">
+          <span class="update-badge-tag">UPDATE 1.03</span>
+          <span class="update-badge-ver">1.03 &bull; Sound Fix &amp; Deco Update &bull; Interactive Web Audio Engine &amp; Background Tuning</span>
           <span class="update-badge-arrow">&rarr;</span>
         </div>
         <h1 class="menu-title">ROYAL TEXAS HOLD'EM</h1>
@@ -2023,17 +2077,45 @@
       <div class="modal-card update-log-card">
         <div class="modal-header">
           <div class="update-log-header-left">
-            <span class="update-log-ver-badge">v1.0275</span>
-            <h2>1.0275 - graphics improve</h2>
+            <span class="update-log-ver-badge">v1.03</span>
+            <h2>1.03 - Sound Fix &amp; Deco Update</h2>
           </div>
           <button id="close-update-log-btn" class="close-btn" type="button">&times;</button>
         </div>
                         <div class="modal-body update-log-body">
-          <!-- ==================== v1.0275 CURRENT RELEASE ==================== -->
+          <!-- ==================== v1.03 CURRENT RELEASE ==================== -->
           <div class="update-log-section current-release-section">
             <div class="update-sec-badge-row">
-              <span class="update-log-ver-badge">v1.0275 CURRENT</span>
+              <span class="update-log-ver-badge">v1.03 CURRENT</span>
               <span class="update-sec-date">Latest Release</span>
+            </div>
+            <h3 class="update-sec-title">High-Definition Web Audio Synthesizer &amp; Sound Engine Fix</h3>
+            <ul class="update-sec-list">
+              <li><strong>Reliable Audio Toggle &amp; Instant Feedback:</strong> Resolved the browser AudioContext suspension lock. Toggling Sound ON/OFF now instantly unlocks the audio pipeline, plays a pleasant melodic confirmation chime, and synchronizes all top-bar, menu, table, and settings controls.</li>
+              <li><strong>Interactive Sound Effects Everywhere:</strong> Full suite of procedural Web Audio synthesizer effects across all interactions: tactile button clicks, ceramic chip wagers, card deal flicks, double table knocks, fold slides, roulette ball whirring/pocket drops, slot machine lever pulls/reels/jackpot bells, craps dice cup rattling, all-in resonant chords, and metallic vault coin cascades!</li>
+              <li><strong>Master Gain &amp; Volume Slider Integration:</strong> Connected master attenuation gain node so the Settings master volume slider dynamically controls the output level of all procedural sound frequencies.</li>
+            </ul>
+          </div>
+
+          <div class="update-log-section current-release-section">
+            <h3 class="update-sec-title">Solar Flare Background Visual Comfort &amp; Dynamic Constellations</h3>
+            <ul class="update-sec-list">
+              <li><strong>10% Ambient Brightness Reduction:</strong> Softened radiant background plasma gradients and perspective grid lines by ~10% for improved visual comfort, reduced eye fatigue, and optimal card legibility.</li>
+              <li><strong>Northern Solar Phoenix Constellation:</strong> Added a sprawling 12-star constellation network with brilliant Alpha Star starburst across the upper-right cosmic quadrant.</li>
+              <li><strong>Southern Cosmic River Constellation:</strong> Added an 8-star celestial stream sweeping gracefully across the lower-left cosmos.</li>
+              <li><strong>Dynamic Asymmetrical Architecture:</strong> Broken strict mirror symmetry by redesigning the right pillar into an Asymmetrical Mechanical Observatory Bastion featuring offset gear apertures, radiant cyan power conduits, and drifting crystal shard clusters.</li>
+            </ul>
+          </div>
+
+          <div class="update-log-archive-divider">
+            <span>PREVIOUS RELEASE ARCHIVE (v1.0275 &bull; v1.025 &bull; v1.02 &bull; v1.015 &bull; v1.01)</span>
+          </div>
+
+          <!-- ==================== v1.0275 ARCHIVED RELEASE ==================== -->
+          <div class="update-log-section current-release-section">
+            <div class="update-sec-badge-row">
+              <span class="update-log-ver-badge">v1.0275 ARCHIVED</span>
+              <span class="update-sec-date">Previous Release</span>
             </div>
             <h3 class="update-sec-title">Solar Flare Authentic Magma &amp; Obsidian Background Overhaul</h3>
             <ul class="update-sec-list">

@@ -65,147 +65,268 @@ class SoundManager {
     this.enabled = localStorage.getItem('royal_poker_sound_muted') !== 'true';
     this.volume = parseFloat(localStorage.getItem('royal_poker_volume') || '0.8');
     this.ctx = null;
+    this.masterGain = null;
   }
 
   setVolume(vol) {
     this.volume = Math.max(0, Math.min(1, vol));
     localStorage.setItem('royal_poker_volume', this.volume.toString());
-  }
-
-  init() {
-    if (!this.ctx) {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (AudioCtx) {
-        this.ctx = new AudioCtx();
-        if (this.ctx.state === 'suspended') {
-          this.ctx.resume();
-        }
-      }
+    if (this.masterGain && this.ctx) {
+      this.masterGain.gain.setValueAtTime(this.enabled ? this.volume : 0, this.ctx.currentTime);
     }
   }
 
+  init() {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      if (!this.ctx) {
+        this.ctx = new AudioCtx();
+        this.masterGain = this.ctx.createGain();
+        this.masterGain.gain.setValueAtTime(this.enabled ? this.volume : 0, this.ctx.currentTime);
+        this.masterGain.connect(this.ctx.destination);
+      }
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume().catch(() => {});
+      }
+    } catch (e) {}
+  }
+
   toggle() {
+    this.init();
     this.enabled = !this.enabled;
     localStorage.setItem('royal_poker_sound_muted', (!this.enabled).toString());
+    if (this.masterGain && this.ctx) {
+      this.masterGain.gain.setValueAtTime(this.enabled ? this.volume : 0, this.ctx.currentTime);
+    }
+    if (this.enabled) {
+      this.playToggleChime();
+    }
     return this.enabled;
   }
 
+  _connectOut(node) {
+    if (this.masterGain) {
+      node.connect(this.masterGain);
+    } else if (this.ctx) {
+      node.connect(this.ctx.destination);
+    }
+  }
+
+  // 1. Audio Toggle Melodic Confirmation Chime
+  playToggleChime() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      // Note 1: D5 (587.33 Hz)
+      const osc1 = this.ctx.createOscillator();
+      const gain1 = this.ctx.createGain();
+      osc1.type = 'triangle';
+      osc1.frequency.setValueAtTime(587.33, t);
+      gain1.gain.setValueAtTime(0.22, t);
+      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+      osc1.connect(gain1);
+      this._connectOut(gain1);
+      osc1.start(t);
+      osc1.stop(t + 0.12);
+
+      // Note 2: A5 (880 Hz)
+      const osc2 = this.ctx.createOscillator();
+      const gain2 = this.ctx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(880, t + 0.08);
+      gain2.gain.setValueAtTime(0.25, t + 0.08);
+      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+      osc2.connect(gain2);
+      this._connectOut(gain2);
+      osc2.start(t + 0.08);
+      osc2.stop(t + 0.28);
+    } catch (e) {}
+  }
+
+  // 2. Crisp Tactile UI Button & Card Click
+  playClick() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(1100, t);
+      osc.frequency.exponentialRampToValueAtTime(450, t + 0.025);
+      gain.gain.setValueAtTime(0.16, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.025);
+      osc.connect(gain);
+      this._connectOut(gain);
+      osc.start(t);
+      osc.stop(t + 0.025);
+    } catch (e) {}
+  }
+
+  // 3. Ceramic Poker Chip Clatter
   playChip() {
     if (!this.enabled) return;
     this.init();
     if (!this.ctx) return;
     try {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(1800, this.ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.05);
-      gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      osc.start();
-      osc.stop(this.ctx.currentTime + 0.05);
+      const t = this.ctx.currentTime;
+      // Primary Chip Impulse
+      const osc1 = this.ctx.createOscillator();
+      const gain1 = this.ctx.createGain();
+      osc1.type = 'triangle';
+      osc1.frequency.setValueAtTime(2200, t);
+      osc1.frequency.exponentialRampToValueAtTime(900, t + 0.045);
+      gain1.gain.setValueAtTime(0.22, t);
+      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.045);
+      osc1.connect(gain1);
+      this._connectOut(gain1);
+      osc1.start(t);
+      osc1.stop(t + 0.045);
+
+      // Secondary Rebound Clink
+      const osc2 = this.ctx.createOscillator();
+      const gain2 = this.ctx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(1600, t + 0.016);
+      osc2.frequency.exponentialRampToValueAtTime(750, t + 0.055);
+      gain2.gain.setValueAtTime(0.14, t + 0.016);
+      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.055);
+      osc2.connect(gain2);
+      this._connectOut(gain2);
+      osc2.start(t + 0.016);
+      osc2.stop(t + 0.055);
     } catch (e) {}
   }
 
+  // 4. Playing Card Deal & Flick Swoosh
   playCard() {
     if (!this.enabled) return;
     this.init();
     if (!this.ctx) return;
     try {
+      const t = this.ctx.currentTime;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(450, this.ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(120, this.ctx.currentTime + 0.09);
-      gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.09);
+      osc.frequency.setValueAtTime(520, t);
+      osc.frequency.exponentialRampToValueAtTime(130, t + 0.08);
+      gain.gain.setValueAtTime(0.22, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
       osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      osc.start();
-      osc.stop(this.ctx.currentTime + 0.09);
+      this._connectOut(gain);
+      osc.start(t);
+      osc.stop(t + 0.08);
     } catch (e) {}
   }
 
+  // 5. Card Shuffle Riffle
   playShuffle() {
     if (!this.enabled) return;
     this.init();
     if (!this.ctx) return;
     try {
-      for (let i = 0; i < 4; i++) {
-        const time = this.ctx.currentTime + i * 0.04;
+      for (let i = 0; i < 5; i++) {
+        const time = this.ctx.currentTime + i * 0.032;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(320 + Math.random() * 150, time);
-        osc.frequency.exponentialRampToValueAtTime(100, time + 0.035);
-        gain.gain.setValueAtTime(0.12, time);
-        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.035);
+        osc.frequency.setValueAtTime(360 + Math.random() * 180, time);
+        osc.frequency.exponentialRampToValueAtTime(110, time + 0.03);
+        gain.gain.setValueAtTime(0.14, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.03);
         osc.connect(gain);
-        gain.connect(this.ctx.destination);
+        this._connectOut(gain);
         osc.start(time);
-        osc.stop(time + 0.035);
+        osc.stop(time + 0.03);
       }
     } catch (e) {}
   }
 
+  // 6. Poker Table Double Knock (Check / Tap)
   playCheck() {
     if (!this.enabled) return;
     this.init();
     if (!this.ctx) return;
     try {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(150, this.ctx.currentTime);
-      gain.gain.setValueAtTime(0.18, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.04);
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      osc.start();
-      osc.stop(this.ctx.currentTime + 0.04);
+      const t = this.ctx.currentTime;
+      // Knock 1
+      const osc1 = this.ctx.createOscillator();
+      const gain1 = this.ctx.createGain();
+      osc1.type = 'square';
+      osc1.frequency.setValueAtTime(190, t);
+      osc1.frequency.exponentialRampToValueAtTime(90, t + 0.035);
+      gain1.gain.setValueAtTime(0.20, t);
+      gain1.gain.exponentialRampToValueAtTime(0.001, t + 0.035);
+      osc1.connect(gain1);
+      this._connectOut(gain1);
+      osc1.start(t);
+      osc1.stop(t + 0.035);
+
+      // Knock 2 (45ms later)
+      const osc2 = this.ctx.createOscillator();
+      const gain2 = this.ctx.createGain();
+      osc2.type = 'square';
+      osc2.frequency.setValueAtTime(160, t + 0.045);
+      osc2.frequency.exponentialRampToValueAtTime(75, t + 0.08);
+      gain2.gain.setValueAtTime(0.18, t + 0.045);
+      gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+      osc2.connect(gain2);
+      this._connectOut(gain2);
+      osc2.start(t + 0.045);
+      osc2.stop(t + 0.08);
     } catch (e) {}
   }
 
+  // 7. Fold (Soft Card Slide Off Felt)
   playFold() {
     if (!this.enabled) return;
     this.init();
     if (!this.ctx) return;
     try {
+      const t = this.ctx.currentTime;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(220, this.ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.12);
-      gain.gain.setValueAtTime(0.14, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.12);
+      osc.frequency.setValueAtTime(240, t);
+      osc.frequency.exponentialRampToValueAtTime(70, t + 0.11);
+      gain.gain.setValueAtTime(0.16, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
       osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      osc.start();
-      osc.stop(this.ctx.currentTime + 0.12);
+      this._connectOut(gain);
+      osc.start(t);
+      osc.stop(t + 0.11);
     } catch (e) {}
   }
 
-  playRouletteClick() {
+  // 8. All-In Dramatic Resonant Chord
+  playAllIn() {
     if (!this.enabled) return;
     this.init();
     if (!this.ctx) return;
     try {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(2200, this.ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(900, this.ctx.currentTime + 0.015);
-      gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.015);
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      osc.start();
-      osc.stop(this.ctx.currentTime + 0.015);
+      const t = this.ctx.currentTime;
+      const freqs = [75, 150, 225];
+      freqs.forEach((f, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = idx === 0 ? 'sine' : 'triangle';
+        osc.frequency.setValueAtTime(f, t);
+        osc.frequency.exponentialRampToValueAtTime(f * 0.75, t + 0.38);
+        gain.gain.setValueAtTime(0.24, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.38);
+        osc.connect(gain);
+        this._connectOut(gain);
+        osc.start(t);
+        osc.stop(t + 0.38);
+      });
     } catch (e) {}
   }
 
+  // 9. Hand Win / Showdown Victory Arpeggio (C5, E5, G5, C6)
   playWin() {
     if (!this.enabled) return;
     this.init();
@@ -213,77 +334,22 @@ class SoundManager {
     try {
       const notes = [523.25, 659.25, 783.99, 1046.50];
       notes.forEach((freq, idx) => {
+        const time = this.ctx.currentTime + idx * 0.085;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.09);
-        gain.gain.setValueAtTime(0.22, this.ctx.currentTime + idx * 0.09);
-        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.09 + 0.25);
+        osc.frequency.setValueAtTime(freq, time);
+        gain.gain.setValueAtTime(0.24, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.28);
         osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(this.ctx.currentTime + idx * 0.09);
-        osc.stop(this.ctx.currentTime + idx * 0.09 + 0.25);
+        this._connectOut(gain);
+        osc.start(time);
+        osc.stop(time + 0.28);
       });
     } catch (e) {}
   }
 
-  playFire() {
-    if (!this.enabled) return;
-    this.init();
-    if (!this.ctx) return;
-    try {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(180, this.ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(360, this.ctx.currentTime + 0.2);
-      gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.2);
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      osc.start();
-      osc.stop(this.ctx.currentTime + 0.2);
-    } catch (e) {}
-  }
-
-  playSlotSpin() {
-    if (!this.enabled) return;
-    this.init();
-    if (!this.ctx) return;
-    try {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(420, this.ctx.currentTime);
-      osc.frequency.linearRampToValueAtTime(740, this.ctx.currentTime + 0.12);
-      gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.12);
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      osc.start();
-      osc.stop(this.ctx.currentTime + 0.12);
-    } catch (e) {}
-  }
-
-  playSlotStop() {
-    if (!this.enabled) return;
-    this.init();
-    if (!this.ctx) return;
-    try {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(1400, this.ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(300, this.ctx.currentTime + 0.04);
-      gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.04);
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      osc.start();
-      osc.stop(this.ctx.currentTime + 0.04);
-    } catch (e) {}
-  }
-
+  // 10. Grand Jackpot Fanfare (C5, E5, G5, C6, E6, G6)
   playJackpot() {
     if (!this.enabled) return;
     this.init();
@@ -291,17 +357,215 @@ class SoundManager {
     try {
       const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
       notes.forEach((freq, idx) => {
+        const time = this.ctx.currentTime + idx * 0.075;
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.08);
-        gain.gain.setValueAtTime(0.25, this.ctx.currentTime + idx * 0.08);
-        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.08 + 0.35);
+        osc.frequency.setValueAtTime(freq, time);
+        gain.gain.setValueAtTime(0.28, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.35);
         osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start(this.ctx.currentTime + idx * 0.08);
-        osc.stop(this.ctx.currentTime + idx * 0.08 + 0.35);
+        this._connectOut(gain);
+        osc.start(time);
+        osc.stop(time + 0.35);
       });
+    } catch (e) {}
+  }
+
+  // 11. Slot Machine Lever Pull Clunk
+  playSlotPull() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(120, t);
+      osc.frequency.exponentialRampToValueAtTime(260, t + 0.14);
+      gain.gain.setValueAtTime(0.22, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+      osc.connect(gain);
+      this._connectOut(gain);
+      osc.start(t);
+      osc.stop(t + 0.14);
+    } catch (e) {}
+  }
+
+  // 12. Slot Machine Reel Spinning Whirr
+  playSlotSpin() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(460, t);
+      osc.frequency.linearRampToValueAtTime(780, t + 0.12);
+      gain.gain.setValueAtTime(0.14, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+      osc.connect(gain);
+      this._connectOut(gain);
+      osc.start(t);
+      osc.stop(t + 0.12);
+    } catch (e) {}
+  }
+
+  // 13. Slot Machine Reel Stop Thud
+  playSlotStop() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1400, t);
+      osc.frequency.exponentialRampToValueAtTime(280, t + 0.045);
+      gain.gain.setValueAtTime(0.22, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.045);
+      osc.connect(gain);
+      this._connectOut(gain);
+      osc.start(t);
+      osc.stop(t + 0.045);
+    } catch (e) {}
+  }
+
+  // 14. Roulette Ball Whirring On Track
+  playRouletteSpin() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      for (let i = 0; i < 6; i++) {
+        const time = t + i * 0.06;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(1800 - i * 150, time);
+        osc.frequency.exponentialRampToValueAtTime(900, time + 0.03);
+        gain.gain.setValueAtTime(0.12, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.03);
+        osc.connect(gain);
+        this._connectOut(gain);
+        osc.start(time);
+        osc.stop(time + 0.03);
+      }
+    } catch (e) {}
+  }
+
+  // 15. Roulette Ball Pocket Click
+  playRouletteClick() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(2400, t);
+      osc.frequency.exponentialRampToValueAtTime(900, t + 0.016);
+      gain.gain.setValueAtTime(0.18, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.016);
+      osc.connect(gain);
+      this._connectOut(gain);
+      osc.start(t);
+      osc.stop(t + 0.016);
+    } catch (e) {}
+  }
+
+  // 16. Roulette Ball Pocket Landing Drop
+  playRouletteDrop() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(260, t);
+      osc.frequency.exponentialRampToValueAtTime(90, t + 0.06);
+      gain.gain.setValueAtTime(0.24, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+      osc.connect(gain);
+      this._connectOut(gain);
+      osc.start(t);
+      osc.stop(t + 0.06);
+    } catch (e) {}
+  }
+
+  // 17. Craps Dice Shake & Table Roll
+  playDiceRoll() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      // 3 Rapid dice clicks + soft felt bounce
+      for (let i = 0; i < 3; i++) {
+        const time = t + i * 0.045;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(700 + Math.random() * 300, time);
+        osc.frequency.exponentialRampToValueAtTime(200, time + 0.035);
+        gain.gain.setValueAtTime(0.16, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.035);
+        osc.connect(gain);
+        this._connectOut(gain);
+        osc.start(time);
+        osc.stop(time + 0.035);
+      }
+    } catch (e) {}
+  }
+
+  // 18. Cashout / Vault Coin Cascade
+  playCashout() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const coinFreqs = [2400, 2900, 3400, 4100, 4800];
+      coinFreqs.forEach((freq, idx) => {
+        const time = this.ctx.currentTime + idx * 0.055;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, time);
+        gain.gain.setValueAtTime(0.18, time);
+        gain.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
+        osc.connect(gain);
+        this._connectOut(gain);
+        osc.start(time);
+        osc.stop(time + 0.12);
+      });
+    } catch (e) {}
+  }
+
+  // 19. Alert / Notification Ding
+  playAlert() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, t);
+      gain.gain.setValueAtTime(0.20, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+      osc.connect(gain);
+      this._connectOut(gain);
+      osc.start(t);
+      osc.stop(t + 0.18);
     } catch (e) {}
   }
 }
@@ -2881,16 +3145,50 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
 
 
   updateAudioControlsUI() {
+    const isMuted = !sounds.enabled;
+
+    // 1. Menu sound pill button
     if (this.menuSoundBtn) {
-      this.menuSoundBtn.innerHTML = `<span class="btn-icon"></span> Sound: ${sounds.enabled ? 'ON' : 'OFF'}`;
+      this.menuSoundBtn.classList.toggle('audio-muted', isMuted);
+      this.menuSoundBtn.title = isMuted ? 'Unmute Sound Effects' : 'Mute Sound Effects';
+      this.menuSoundBtn.innerHTML = `
+        <span class="btn-icon">
+          <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M11 5L6 9H2v6h4l5 4V5z" fill="${isMuted ? 'rgba(239,68,68,0.2)' : 'rgba(253,224,71,0.2)'}" stroke="${isMuted ? '#ef4444' : '#fde047'}" stroke-width="2"/>
+            ${isMuted 
+              ? '<path d="M22 9l-6 6M16 9l6 6" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>' 
+              : '<path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a9 9 0 0 1 0 14" stroke="#fde047" stroke-width="1.8" stroke-linecap="round"/>'}
+          </svg>
+        </span> Sound: ${isMuted ? 'MUTED' : 'ON'}`;
     }
+
+    // 2. Table header sound button
     if (this.soundToggleBtn) {
-      this.soundToggleBtn.textContent = sounds.enabled ? 'Sound ON' : 'Sound OFF';
+      this.soundToggleBtn.classList.toggle('audio-muted', isMuted);
+      this.soundToggleBtn.title = isMuted ? 'Unmute Sound Effects' : 'Mute Sound Effects';
+      this.soundToggleBtn.innerHTML = `
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:3px">
+          <path d="M11 5L6 9H2v6h4l5 4V5z" stroke="${isMuted ? '#ef4444' : '#fde047'}" stroke-width="2"/>
+          ${isMuted 
+            ? '<path d="M22 9l-6 6M16 9l6 6" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>' 
+            : '<path d="M15.5 8.5a5 5 0 0 1 0 7" stroke="#fde047" stroke-width="1.8" stroke-linecap="round"/>'}
+        </svg> ${isMuted ? 'Muted' : 'Sound'}`;
     }
+
+    // 3. Top-bar persistent quick sound toggle
     if (this.btnQuickSound) {
-      this.btnQuickSound.title = sounds.enabled ? 'Mute Audio' : 'Unmute Audio';
-      this.btnQuickSound.classList.toggle('audio-muted', !sounds.enabled);
+      this.btnQuickSound.title = isMuted ? 'Unmute Audio Synthesizer' : 'Mute Audio Synthesizer';
+      this.btnQuickSound.classList.toggle('audio-muted', isMuted);
+      this.btnQuickSound.innerHTML = `
+        <svg id="top-sound-svg" class="btn-svg-icon" width="15" height="15" viewBox="0 0 24 24" fill="none">
+          <path d="M11 5L6 9H2v6h4l5 4V5z" stroke="${isMuted ? '#ef4444' : '#fde047'}" stroke-width="2"/>
+          ${isMuted 
+            ? '<path d="M22 9l-6 6M16 9l6 6" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>' 
+            : '<path d="M15.5 8.5a5 5 0 0 1 0 7" stroke="#fde047" stroke-width="1.8" stroke-linecap="round"/>'}
+        </svg>`;
     }
+
+    // 4. Settings modal toggle
     const settingSoundToggle = document.getElementById('setting-sound-toggle');
     if (settingSoundToggle) {
       settingSoundToggle.checked = sounds.enabled;
@@ -3197,14 +3495,21 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
       });
     });
 
-    // Sound toggle
-    const toggleAudio = () => {
-      sounds.enabled = !sounds.enabled;
-      this.menuSoundBtn.innerHTML = `<span class="btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M11 5L6 9H2v6h4l5 4V5z" stroke="currentColor" stroke-width="2"/><path d="M15.5 8.5a5 5 0 0 1 0 7" stroke="currentColor" stroke-width="1.8"/></svg></span> Sound: ${sounds.enabled ? 'ON' : 'MUTED'}`;
-      this.soundToggleBtn.textContent = sounds.enabled ? 'Sound: ON' : 'Sound: MUTED';
+    // Unified Sound toggle handler for all buttons
+    const handleAudioToggle = () => {
+      sounds.toggle();
+      this.updateAudioControlsUI();
     };
-    if (this.menuSoundBtn) this.menuSoundBtn.addEventListener('click', toggleAudio);
-    if (this.soundToggleBtn) this.soundToggleBtn.addEventListener('click', toggleAudio);
+    if (this.menuSoundBtn) this.menuSoundBtn.addEventListener('click', handleAudioToggle);
+    if (this.soundToggleBtn) this.soundToggleBtn.addEventListener('click', handleAudioToggle);
+
+    // Global Delegating Tactile Click Sound for Interactive UI Controls
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('button, .nav-icon-btn, .menu-pill-btn, .modal-tab-btn, .rules-tab-btn, .save-slot-card, .showcase-card, .diff-card, .craps-quick-portal-btn, .transit-drawer-link');
+      if (btn && !btn.classList.contains('sound-toggle') && btn.id !== 'btn-quick-sound' && btn.id !== 'menu-sound-btn' && btn.id !== 'sound-toggle-btn') {
+        sounds.playClick();
+      }
+    });
 
     // Online Room Auth
     if (this.btnOpenOnlineRoom) this.btnOpenOnlineRoom.addEventListener('click', () => this.promptOnlineRoomPassword());
@@ -5712,6 +6017,7 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
     }
 
     SaveManager.recordRouletteSpin();
+    sounds.playRouletteSpin();
     this.rouletteSpinning = true;
     const spinBtn = document.getElementById('btn-spin-roulette');
     if (spinBtn) spinBtn.disabled = true;
