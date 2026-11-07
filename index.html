@@ -206,20 +206,26 @@
           <span class="stat-icon">
             <svg class="stat-svg pulse-dot" width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#2ec4b6" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="#2ec4b6"/></svg>
           </span>
-          <span class="stat-label">Private Room:</span>
+          <span class="stat-label">Exclusive Room:</span>
           <span class="stat-val" id="stat-room-status">Joinable</span>
         </div>
       </div>
 
       <!-- Action Navigation Buttons with Hand-Crafted SVGs -->
       <div class="menu-action-bar">
-        <button id="btn-open-online-room" class="menu-pill-btn gold-glow-btn" title="Enter Private Room with Friends">
+        <button id="btn-open-online-room" class="menu-pill-btn gold-glow-btn" title="Enter Exclusive Room with Online Players">
           <span class="btn-icon">
             <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="11" rx="2.5" fill="rgba(253,224,71,0.2)" stroke="#fde047" stroke-width="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3" stroke="#fde047" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="15" r="1.5" fill="#fde047"/><path d="M12 16.5v2" stroke="#fde047" stroke-width="1.5"/></svg>
-          </span> Private Friends Room
+          </span> Exclusive Room
+        </button>
+        <button id="btn-open-slots" class="menu-pill-btn ember-glow-btn" title="Play Solar Flare 3-Reel Slots Mini-Game">
+          <span class="btn-icon">🎰</span> Solar Slots
         </button>
         <button id="btn-open-roulette" class="menu-pill-btn ruby-glow-btn" title="Play European Single-Zero Roulette Mini-Game">
-          <span class="btn-icon">🎰</span> European Roulette
+          <span class="btn-icon">🎡</span> European Roulette
+        </button>
+        <button id="btn-open-transfer" class="menu-pill-btn emerald-glow-btn" title="Transfer Mini-Game Casino Winnings to Your Poker Campaign">
+          <span class="btn-icon">💸</span> Transfer to Poker
         </button>
         <button id="menu-rules-btn" class="menu-pill-btn" title="View Comprehensive Poker Rules & Flow">
           <span class="btn-icon">
@@ -240,6 +246,49 @@
           <label for="player-username-input" class="profile-label">Player Name:</label>
           <input type="text" id="player-username-input" class="username-input" placeholder="Enter Your Name" maxlength="14" value="High Roller">
           <button id="btn-save-username" class="btn-save-name" title="Save Username">✔</button>
+        </div>
+      </div>
+
+      <!-- DAILY BANKROLL ALLOWANCES & ECONOMY DASHBOARD -->
+      <div class="economy-dashboard-bar">
+        <!-- Mini-Game Dedicated Wallet & Daily Claim -->
+        <div class="economy-card minigame-wallet-card">
+          <div class="eco-header">
+            <span class="eco-badge emerald-badge">MINI-GAME WALLET</span>
+            <span class="eco-daily-timer" id="minigame-claim-timer">Checking cycle...</span>
+          </div>
+          <div class="eco-balance-row">
+            <div class="eco-bal-wrap">
+              <span class="eco-bal-lbl">Balance:</span>
+              <span class="eco-val" id="minigame-wallet-balance">$1,000</span>
+            </div>
+            <button id="btn-claim-minigame-daily" class="mini-claim-btn" title="Claim $500 Daily Mini-Game Allowance">
+              🎁 Claim $500 Daily
+            </button>
+          </div>
+          <div class="eco-footer">
+            <span>Dedicated mini-game funds &bull; Winnings can transfer to Poker save files</span>
+          </div>
+        </div>
+
+        <!-- 24-Hour Poker Run Allowance ($5,000 / Day per slot) -->
+        <div class="economy-card poker-allowance-card">
+          <div class="eco-header">
+            <span class="eco-badge gold-badge">POKER RUN STIPEND</span>
+            <span class="eco-daily-timer" id="poker-claim-timer">24h Cycle Active</span>
+          </div>
+          <div class="eco-balance-row">
+            <div class="eco-bal-wrap">
+              <span class="eco-bal-lbl">Allowance:</span>
+              <span class="eco-val">$5,000 / Day</span>
+            </div>
+            <button id="btn-claim-poker-daily" class="mini-claim-btn gold-claim-btn" title="Claim $5,000 Daily Allowance for Current Save Slot">
+              💎 Claim $5,000 to Slot
+            </button>
+          </div>
+          <div class="eco-footer">
+            <span>Each of your 3 save slots receives $5,000 every 24 hours</span>
+          </div>
         </div>
       </div>
 
@@ -278,9 +327,9 @@
             <h1>ROYAL TEXAS HOLD'EM</h1>
             <span class="suit-icon red">♥</span>
           </div>
-          <!-- Room Indicator badge when playing in online private room -->
+          <!-- Room Indicator badge when playing in online exclusive room -->
           <div id="online-room-badge" class="badge online-room-badge hidden">
-            <span>🔒 Friends Room:</span> <strong id="online-room-status-text">Connected</strong>
+            <span>🔒 Exclusive Room:</span> <strong id="online-room-status-text">Connected</strong>
             <button id="btn-copy-invite" class="mini-btn" title="Copy Invite Link">📋 Share Link</button>
           </div>
         </div>
@@ -518,21 +567,21 @@
     </div>
 
     <!-- ======================================================================
-         3. PRIVATE ONLINE ROOM PASSWORD & JOIN MODAL (No Password Leaked!)
+         3. EXCLUSIVE ROOM PASSWORD & JOIN MODAL (No Password Leaked!)
          ====================================================================== -->
     <div id="online-auth-modal" class="modal-overlay hidden">
       <div class="modal-card auth-modal-card">
         <div class="modal-header">
-          <h2>🔒 Private Friends Room</h2>
+          <h2>🔒 Exclusive Room Access</h2>
           <button id="close-auth-modal-btn" class="close-btn">&times;</button>
         </div>
         <div class="modal-body auth-modal-body">
           <div class="auth-icon-wrap">🌐</div>
-          <p class="auth-desc">Enter the private room password to play with friends. Everyone joins with a fresh <strong>$1,000</strong> chip stack.</p>
+          <p class="auth-desc">Enter the exclusive room password to play with online players. Everyone joins with a fresh <strong>$1,000</strong> chip stack.</p>
           
           <div class="input-group">
             <label for="room-password-input">Room Password:</label>
-            <input type="password" id="room-password-input" class="modal-text-input" placeholder="Enter private password" autocomplete="off">
+            <input type="password" id="room-password-input" class="modal-text-input" placeholder="Enter exclusive room password" autocomplete="off">
             <span id="auth-error-msg" class="auth-error hidden">❌ Incorrect password. Access denied!</span>
           </div>
 
@@ -543,7 +592,7 @@
 
           <div class="modal-actions-row">
             <button id="btn-cancel-auth" class="btn btn-secondary">Cancel</button>
-            <button id="btn-submit-auth" class="btn btn-primary">Enter Room ($1,000)</button>
+            <button id="btn-submit-auth" class="btn btn-primary">Enter Exclusive Room ($1,000)</button>
           </div>
         </div>
       </div>
@@ -576,10 +625,10 @@
               <div class="diff-title">Hard / Aggressive</div>
               <div class="diff-desc">Hyper-aggressive sharks! Frequent pre-flop 3-bets, ruthless multi-street bluffs, and relentless pressure.</div>
             </div>
-            <div class="diff-card diff-nightmare" data-difficulty="nightmare">
-              <div class="diff-icon">💀</div>
-              <div class="diff-title">Nightmare</div>
-              <div class="diff-desc">Devastating AI advantage! Bots receive favored card deals (~55–60% equity edge), calculate precision pot odds, and execute brutal high-pressure bluffs.</div>
+            <div class="diff-card diff-championship" data-difficulty="nightmare">
+              <div class="diff-icon">💎</div>
+              <div class="diff-title">Championship High Roller</div>
+              <div class="diff-desc">Premier elite tournament tier. World-class opponents calculate precision pot odds, exploit subtle timing tells, and execute relentless championship pressure.</div>
             </div>
           </div>
         </div>
@@ -766,14 +815,14 @@
           <!-- TAB 4: AI & Online Room -->
           <div class="rules-tab-pane" id="tab-ai">
             <div class="guide-block">
-              <h3>🌐 Private Friends Room (5-Second Joining Window)</h3>
+              <h3>🌐 Exclusive Room (5-Second Joining Window & Dynamic Bot Takeover)</h3>
               <p>Play with real friends over peer-to-peer WebRTC connections:</p>
               <ul class="bullet-list">
-                <li>Click <strong>Private Friends Room</strong> on the Main Menu and enter the secret room password.</li>
+                <li>Click <strong>Exclusive Room</strong> on the Main Menu and enter the room password.</li>
                 <li>Share the link with friends to sit at the exact same table!</li>
                 <li>Each player joins with <strong>$1,000</strong>.</li>
-                <li><strong>5-Second Joining Window:</strong> Between hands, an animated 5-second countdown timer runs where friends can join and take an open seat immediately.</li>
-                <li><strong>Loading Screen:</strong> If a friend connects while a hand is actively in progress, they see a loading screen waiting for the round to end, and get automatically dealt in on the next hand!</li>
+                <li><strong>Dynamic Bot Replacement:</strong> During the 5-second window between hands, joining friends dynamically replace an active AI bot at the table and take over its seat and chips immediately!</li>
+                <li><strong>Loading Screen:</strong> If a friend connects while a hand is actively in progress, they see a loading screen waiting for the round to end, and get automatically dealt into the table on the next hand!</li>
               </ul>
             </div>
             
@@ -814,18 +863,18 @@
     </div>
 
     <!-- ======================================================================
-         7. EUROPEAN ROULETTE MINI-GAME MODAL
+         7. EUROPEAN ROULETTE MINI-GAME MODAL (Streamlined Controls)
          ====================================================================== -->
     <div id="roulette-modal" class="modal-overlay hidden">
       <div class="modal-card roulette-modal-card">
         <div class="modal-header">
-          <h2>🎰 European Single-Zero Roulette</h2>
+          <h2>🎡 European Single-Zero Roulette</h2>
           <button id="close-roulette-btn" class="close-btn">&times;</button>
         </div>
         <div class="modal-body roulette-modal-body">
           <div class="roulette-top-bar">
             <div class="roulette-stat-pill">
-              <span>Bankroll:</span> <strong id="roulette-bankroll">$1,000</strong>
+              <span>Mini-Game Wallet:</span> <strong id="roulette-bankroll">$1,000</strong>
             </div>
             <div id="roulette-status-pill" class="roulette-stat-pill status-pill">
               Place your bets and click Spin!
@@ -846,13 +895,21 @@
             <span id="roulette-result-text">Ball landed on 0 Green!</span>
           </div>
 
-          <!-- Chip Denomination Selector -->
-          <div class="roulette-chip-selector">
-            <span class="chip-sel-label">Select Chip:</span>
-            <button class="r-chip-btn active" data-chip="10"><span class="chip-circle c10">$10</span></button>
-            <button class="r-chip-btn" data-chip="25"><span class="chip-circle c25">$25</span></button>
-            <button class="r-chip-btn" data-chip="50"><span class="chip-circle c50">$50</span></button>
-            <button class="r-chip-btn" data-chip="100"><span class="chip-circle c100">$100</span></button>
+          <!-- Preset Wager & Chip Denomination Selector (Single-Click Controls) -->
+          <div class="roulette-preset-bar">
+            <span class="chip-sel-label">Quick Wager:</span>
+            <div class="preset-buttons-row">
+              <button class="r-preset-btn active" data-wager="10">$10</button>
+              <button class="r-preset-btn" data-wager="50">$50</button>
+              <button class="r-preset-btn" data-wager="100">$100</button>
+              <button class="r-preset-btn max-btn" data-wager="max">MAX</button>
+            </div>
+            <div class="roulette-chip-selector">
+              <button class="r-chip-btn active" data-chip="10"><span class="chip-circle c10">$10</span></button>
+              <button class="r-chip-btn" data-chip="25"><span class="chip-circle c25">$25</span></button>
+              <button class="r-chip-btn" data-chip="50"><span class="chip-circle c50">$50</span></button>
+              <button class="r-chip-btn" data-chip="100"><span class="chip-circle c100">$100</span></button>
+            </div>
           </div>
 
           <!-- European Roulette Betting Table -->
@@ -883,8 +940,142 @@
           </div>
 
           <div class="roulette-actions-row">
+            <button id="btn-roulette-transfer" class="btn btn-secondary transfer-shortcut-btn" title="Transfer Mini-Game Winnings to Poker Run">
+              💸 Transfer Winnings to Poker
+            </button>
             <button id="btn-clear-roulette" class="btn btn-secondary">Clear Bets</button>
             <button id="btn-spin-roulette" class="btn btn-primary r-spin-btn">🎡 SPIN WHEEL</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         7B. SOLAR FLARE 3-REEL SLOT MACHINE MINI-GAME
+         ====================================================================== -->
+    <div id="slots-modal" class="modal-overlay hidden">
+      <div class="modal-card slots-modal-card">
+        <div class="modal-header">
+          <h2>🎰 Solar Flare 3-Reel Slots</h2>
+          <button id="close-slots-btn" class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body slots-modal-body">
+          <div class="slots-top-bar">
+            <div class="slots-stat-pill">
+              <span>Mini-Game Wallet:</span> <strong id="slots-wallet-balance">$1,000</strong>
+            </div>
+            <div id="slots-win-display" class="slots-stat-pill slots-win-pill">
+              Ready to Spin!
+            </div>
+            <div class="slots-stat-pill">
+              <span>Current Wager:</span> <strong id="slots-current-wager">$50</strong>
+            </div>
+          </div>
+
+          <!-- 3-Reel Slot Cabinet -->
+          <div class="slots-cabinet">
+            <div class="slots-payline-indicator left">▶</div>
+            <div class="slots-reels-stage">
+              <div class="slot-reel-wrap" id="reel-wrap-1">
+                <div class="slot-reel" id="slot-reel-1">
+                  <div class="slot-symbol">7️⃣</div>
+                </div>
+              </div>
+              <div class="slot-reel-wrap" id="reel-wrap-2">
+                <div class="slot-reel" id="slot-reel-2">
+                  <div class="slot-symbol">🔥</div>
+                </div>
+              </div>
+              <div class="slot-reel-wrap" id="reel-wrap-3">
+                <div class="slot-reel" id="slot-reel-3">
+                  <div class="slot-symbol">⭐</div>
+                </div>
+              </div>
+            </div>
+            <div class="slots-payline-indicator right">◀</div>
+          </div>
+
+          <div id="slots-result-banner" class="slots-result-banner hidden">
+            <span id="slots-result-title">JACKPOT WIN!</span>
+            <span id="slots-result-detail">+ $1,500</span>
+          </div>
+
+          <!-- Quick Preset Wager Controls -->
+          <div class="slots-wager-controls">
+            <span class="wager-label">Select Wager:</span>
+            <div class="preset-buttons-row">
+              <button class="slots-preset-btn" data-wager="10">$10</button>
+              <button class="slots-preset-btn active" data-wager="50">$50</button>
+              <button class="slots-preset-btn" data-wager="100">$100</button>
+              <button class="slots-preset-btn max-btn" data-wager="max">MAX</button>
+            </div>
+            <button id="btn-spin-slots" class="btn btn-primary slots-spin-btn">
+              ⚡ PULL LEVER / SPIN ⚡
+            </button>
+          </div>
+
+          <!-- Paytable Multipliers Drawer -->
+          <div class="slots-paytable">
+            <div class="pt-item"><span class="pt-sym">7️⃣ 7️⃣ 7️⃣</span> <span class="pt-mult gold">50x Multiplier</span></div>
+            <div class="pt-item"><span class="pt-sym">🔥 🔥 🔥</span> <span class="pt-mult orange">30x Wild Flare</span></div>
+            <div class="pt-item"><span class="pt-sym">⭐ ⭐ ⭐</span> <span class="pt-mult yellow">20x Stars</span></div>
+            <div class="pt-item"><span class="pt-sym">♠️/♥️/♦️/♣️ x3</span> <span class="pt-mult blue">10x Royal Suits</span></div>
+            <div class="pt-item"><span class="pt-sym">Pair + 🔥 Wild</span> <span class="pt-mult green">5x Wild Boost</span></div>
+            <div class="pt-item"><span class="pt-sym">Any Pair</span> <span class="pt-mult cyan">2x Payout</span></div>
+            <div class="pt-item"><span class="pt-sym">Any 7️⃣ or ⭐</span> <span class="pt-mult gray">1x Push</span></div>
+          </div>
+
+          <div class="slots-footer-actions">
+            <button id="btn-slots-transfer" class="btn btn-secondary transfer-shortcut-btn">
+              💸 Transfer Winnings to Poker Run
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         7C. BANKROLL TRANSFER MODAL (One-Way: Mini-Games -> Poker Campaign)
+         ====================================================================== -->
+    <div id="transfer-modal" class="modal-overlay hidden">
+      <div class="modal-card transfer-modal-card">
+        <div class="modal-header">
+          <h2>💸 Bankroll Transfer to Poker Campaign</h2>
+          <button id="close-transfer-btn" class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body transfer-modal-body">
+          <div class="transfer-source-box">
+            <div class="transfer-avail-row">
+              <span>Available Mini-Game Winnings:</span>
+              <strong id="transfer-avail-balance">$1,000</strong>
+            </div>
+            <p class="transfer-rule-alert">
+              <strong>⚡ Strict One-Way Separation:</strong> Winnings from Solar Slots and Roulette can be injected into any active poker save file. However, main poker save funds can <em>never</em> be transferred or spent in mini-games!
+            </p>
+          </div>
+
+          <div class="input-group">
+            <label>Select Destination Poker Save Slot:</label>
+            <div class="transfer-slot-options" id="transfer-slot-options">
+              <!-- Dynamically populated with Slot 1, 2, 3 metadata -->
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>Transfer Amount ($):</label>
+            <div class="transfer-presets-row">
+              <button class="t-preset-btn" data-amt="100">+$100</button>
+              <button class="t-preset-btn" data-amt="250">+$250</button>
+              <button class="t-preset-btn" data-amt="500">+$500</button>
+              <button class="t-preset-btn" data-amt="all">All Winnings</button>
+            </div>
+            <input type="number" id="transfer-amount-input" class="modal-text-input" min="10" placeholder="Enter amount to inject" value="100">
+            <span id="transfer-error-msg" class="auth-error hidden">❌ Amount exceeds available mini-game balance!</span>
+          </div>
+
+          <div class="modal-actions-row">
+            <button id="btn-cancel-transfer" class="btn btn-secondary">Cancel</button>
+            <button id="btn-confirm-transfer" class="btn btn-primary gold-action-btn">Confirm Transfer 💸</button>
           </div>
         </div>
       </div>

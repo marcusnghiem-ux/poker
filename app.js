@@ -193,6 +193,65 @@ class SoundManager {
       osc.stop(this.ctx.currentTime + 0.2);
     } catch (e) {}
   }
+
+  playSlotSpin() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(420, this.ctx.currentTime);
+      osc.frequency.linearRampToValueAtTime(740, this.ctx.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.12);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.12);
+    } catch (e) {}
+  }
+
+  playSlotStop() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1400, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(300, this.ctx.currentTime + 0.04);
+      gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.04);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.04);
+    } catch (e) {}
+  }
+
+  playJackpot() {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    try {
+      const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
+      notes.forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.08);
+        gain.gain.setValueAtTime(0.25, this.ctx.currentTime + idx * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.08 + 0.35);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(this.ctx.currentTime + idx * 0.08);
+        osc.stop(this.ctx.currentTime + idx * 0.08 + 0.35);
+      });
+    } catch (e) {}
+  }
 }
 
 const sounds = new SoundManager();
@@ -561,6 +620,166 @@ class SaveManager {
 }
 
 // ============================================================================
+// 5B. DAILY BANKROLL ALLOWANCE & MINI-GAME ECONOMY MANAGER
+// ============================================================================
+class EconomyManager {
+  static MINIGAME_STORAGE_KEY = 'royal_poker_minigame_wallet_v2';
+  static POKER_ALLOWANCE_KEY = 'royal_poker_daily_allowance_v2';
+  static CYCLE_MS = 24 * 60 * 60 * 1000; // Persistent 24-hour cycle
+
+  static getMiniGameWallet() {
+    try {
+      const data = localStorage.getItem(EconomyManager.MINIGAME_STORAGE_KEY);
+      if (data) {
+        const parsed = JSON.parse(data);
+        if (typeof parsed.balance === 'number') {
+          return parsed;
+        }
+      }
+    } catch (e) {}
+    // Starting baseline of $1,000 dedicated strictly to mini-game play
+    const initial = { balance: 1000, lastClaimTimestamp: 0 };
+    EconomyManager.saveMiniGameWallet(initial);
+    return initial;
+  }
+
+  static saveMiniGameWallet(wallet) {
+    try {
+      localStorage.setItem(EconomyManager.MINIGAME_STORAGE_KEY, JSON.stringify(wallet));
+    } catch (e) {}
+  }
+
+  static getMiniGameClaimStatus() {
+    const wallet = EconomyManager.getMiniGameWallet();
+    const now = Date.now();
+    const lastClaim = wallet.lastClaimTimestamp || 0;
+    const elapsed = now - lastClaim;
+    if (elapsed >= EconomyManager.CYCLE_MS || lastClaim === 0) {
+      return { canClaim: true, remainingMs: 0, text: 'Ready to Claim!' };
+    }
+    const remainingMs = EconomyManager.CYCLE_MS - elapsed;
+    const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+    const mins = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+    const secs = Math.floor((remainingMs % (1000 * 60)) / 1000);
+    const pad = (n) => n.toString().padStart(2, '0');
+    return {
+      canClaim: false,
+      remainingMs,
+      text: `${pad(hours)}:${pad(mins)}:${pad(secs)}`
+    };
+  }
+
+  static claimMiniGameDaily() {
+    const status = EconomyManager.getMiniGameClaimStatus();
+    if (!status.canClaim) {
+      return { success: false, message: `24h cycle active! Next claim in ${status.text}` };
+    }
+    const wallet = EconomyManager.getMiniGameWallet();
+    wallet.balance += 500;
+    wallet.lastClaimTimestamp = Date.now();
+    EconomyManager.saveMiniGameWallet(wallet);
+    return { success: true, balance: wallet.balance };
+  }
+
+  static getPokerAllowances() {
+    try {
+      const data = localStorage.getItem(EconomyManager.POKER_ALLOWANCE_KEY);
+      if (data) return JSON.parse(data);
+    } catch (e) {}
+    return { slot_1: 0, slot_2: 0, slot_3: 0 };
+  }
+
+  static savePokerAllowances(allowances) {
+    try {
+      localStorage.setItem(EconomyManager.POKER_ALLOWANCE_KEY, JSON.stringify(allowances));
+    } catch (e) {}
+  }
+
+  static getSlotPokerClaimStatus(slotId) {
+    const allowances = EconomyManager.getPokerAllowances();
+    const lastClaim = allowances[`slot_${slotId}`] || 0;
+    const now = Date.now();
+    const elapsed = now - lastClaim;
+    if (elapsed >= EconomyManager.CYCLE_MS || lastClaim === 0) {
+      return { canClaim: true, remainingMs: 0, text: 'Ready to Claim!' };
+    }
+    const remainingMs = EconomyManager.CYCLE_MS - elapsed;
+    const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+    const mins = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+    const secs = Math.floor((remainingMs % (1000 * 60)) / 1000);
+    const pad = (n) => n.toString().padStart(2, '0');
+    return {
+      canClaim: false,
+      remainingMs,
+      text: `${pad(hours)}:${pad(mins)}:${pad(secs)}`
+    };
+  }
+
+  static claimPokerDailyForSlot(slotId) {
+    const status = EconomyManager.getSlotPokerClaimStatus(slotId);
+    if (!status.canClaim) {
+      return { success: false, message: `Slot ${slotId} on cooldown! Next claim in ${status.text}` };
+    }
+    let slot = SaveManager.getSave(slotId);
+    const customName = localStorage.getItem('royal_poker_username') || 'High Roller';
+    if (slot) {
+      slot.chips = (slot.chips || 0) + 5000;
+      SaveManager.saveSlot(slotId, slot);
+    } else {
+      slot = {
+        name: customName,
+        chips: 5000,
+        stage: 1,
+        difficulty: 'medium',
+        handNumber: 0,
+        winRecord: { won: 0, total: 0 }
+      };
+      SaveManager.saveSlot(slotId, slot);
+    }
+
+    const allowances = EconomyManager.getPokerAllowances();
+    allowances[`slot_${slotId}`] = Date.now();
+    EconomyManager.savePokerAllowances(allowances);
+    return { success: true, slotChips: slot.chips };
+  }
+
+  static transferMiniGameToPoker(slotId, amount) {
+    amount = Math.floor(Number(amount));
+    if (isNaN(amount) || amount <= 0) {
+      return { success: false, message: 'Please enter a valid transfer amount.' };
+    }
+    const wallet = EconomyManager.getMiniGameWallet();
+    if (wallet.balance < amount) {
+      return { success: false, message: 'Transfer amount exceeds your available mini-game balance!' };
+    }
+
+    // Deduct from Mini-Game Wallet
+    wallet.balance -= amount;
+    EconomyManager.saveMiniGameWallet(wallet);
+
+    // Strictly one-way injection to Poker Save Slot
+    let slot = SaveManager.getSave(slotId);
+    const customName = localStorage.getItem('royal_poker_username') || 'High Roller';
+    if (slot) {
+      slot.chips = (slot.chips || 0) + amount;
+      SaveManager.saveSlot(slotId, slot);
+    } else {
+      slot = {
+        name: customName,
+        chips: 1000 + amount,
+        stage: 1,
+        difficulty: 'medium',
+        handNumber: 0,
+        winRecord: { won: 0, total: 0 }
+      };
+      SaveManager.saveSlot(slotId, slot);
+    }
+
+    return { success: true, newMiniBalance: wallet.balance, newSlotChips: slot.chips };
+  }
+}
+
+// ============================================================================
 // 6. BOT PROFILES & DIFFICULTY
 // ============================================================================
 const BASE_BOT_PROFILES = {
@@ -632,6 +851,10 @@ class PokerApp {
 
     this.bindDOM();
     this.initRoulette();
+    this.initSlots();
+    this.initTransfer();
+    this.initEconomy();
+    this.startDailyTimersLoop();
     this.updateGlobalStatsUI();
     this.renderMainMenuSlots();
 
@@ -1016,7 +1239,7 @@ class PokerApp {
 
   startTurnTimer(player) {
     this.clearTurnTimer();
-    if (!this.isOnlineRoom) return; // 15-SECOND LIMIT ONLY IN THE PRIVATE ROOM!
+    if (!this.isOnlineRoom) return; // 15-SECOND LIMIT ONLY IN EXCLUSIVE ROOM!
 
     if (!this.turnTimerBar) return;
     this.turnTimerBar.classList.remove('hidden', 'urgent');
@@ -1114,7 +1337,7 @@ class PokerApp {
   }
 
   // ==========================================================================
-  // ONLINE PRIVATE ROOM (No Password Leaked, P2P Peer Coordination)
+  // EXCLUSIVE ROOM (No Password Leaked, P2P Peer Coordination)
   // ==========================================================================
   promptOnlineRoomPassword() {
     this.roomPassInput.value = '';
@@ -1300,10 +1523,14 @@ class PokerApp {
   }
 
   seatGuestPlayer(conn, name, seatIdx) {
+    const targetBot = this.players[seatIdx];
+    // Friend dynamically replaces active bot and takes over its seat and stack!
+    const inheritedChips = (targetBot && targetBot.chips > 0) ? targetBot.chips : 1000;
+
     this.players[seatIdx].name = name;
     this.players[seatIdx].style = 'Friend (Online)';
     this.players[seatIdx].avatar = '👤';
-    this.players[seatIdx].chips = 1000;
+    this.players[seatIdx].chips = inheritedChips;
     this.players[seatIdx].isBot = false;
     this.players[seatIdx].isRemote = true;
     this.players[seatIdx].peerConn = conn;
@@ -1311,19 +1538,19 @@ class PokerApp {
     document.getElementById(`name-${seatIdx}`).textContent = name;
     document.getElementById(`style-${seatIdx}`).textContent = 'Friend (Online)';
     document.getElementById(`avatar-${seatIdx}`).textContent = '👤';
-    document.getElementById(`chips-${seatIdx}`).textContent = '1000';
+    document.getElementById(`chips-${seatIdx}`).textContent = inheritedChips.toString();
 
-    this.guestConnections.push({ conn, name, seatIdx, chips: 1000, waiting: false });
+    this.guestConnections.push({ conn, name, seatIdx, chips: inheritedChips, waiting: false });
 
     conn.send({
       type: 'seated',
       seat: seatIdx,
       name: name,
-      chips: 1000,
+      chips: inheritedChips,
       tableState: this.serializeTableStateFor(seatIdx)
     });
 
-    this.setAnnouncement(`👋 ${name} sat down at Seat ${seatIdx}!`);
+    this.setAnnouncement(`👋 ${name} joined Exclusive Room & took over Seat ${seatIdx} ($${inheritedChips})!`);
     this.broadcastTableState();
   }
 
@@ -1684,6 +1911,8 @@ class PokerApp {
           : 0;
         const slotUser = slotData.username || localStorage.getItem('royal_poker_username') || 'Hero';
         const slotStage = slotData.stage || 1;
+        const diffBadgeClass = slotData.difficulty === 'nightmare' ? 'diff-championship' : `diff-${slotData.difficulty}`;
+        const diffBadgeLabel = slotData.difficulty === 'nightmare' ? '💎 CHAMPIONSHIP' : slotData.difficulty.toUpperCase();
 
         cardEl.innerHTML = `
           <div class="slot-corner-bracket top-left"></div>
@@ -1695,7 +1924,7 @@ class PokerApp {
               </span>
               <span class="slot-badge">SLOT ${slotId} &bull; ${slotUser}</span>
             </div>
-            <span class="slot-diff diff-${slotData.difficulty}">${slotData.difficulty.toUpperCase()}</span>
+            <span class="slot-diff ${diffBadgeClass}">${diffBadgeLabel}</span>
           </div>
           <div class="slot-bankroll-wrap">
             <span class="slot-bankroll-label">BANKROLL &bull; STAGE ${slotStage}</span>
@@ -1788,7 +2017,7 @@ class PokerApp {
     }
 
     if (this.stageIndicator) this.stageIndicator.textContent = `Stage ${this.stage}`;
-    document.getElementById('difficulty-indicator').textContent = this.difficulty.toUpperCase();
+    document.getElementById('difficulty-indicator').textContent = this.difficulty === 'nightmare' ? 'CHAMPIONSHIP' : this.difficulty.toUpperCase();
     this.saveCurrentGame();
     this.showGameView();
     this.startNewHand();
@@ -1848,7 +2077,7 @@ class PokerApp {
     }
 
     if (this.stageIndicator) this.stageIndicator.textContent = `Stage ${this.stage}`;
-    document.getElementById('difficulty-indicator').textContent = this.difficulty.toUpperCase();
+    document.getElementById('difficulty-indicator').textContent = this.difficulty === 'nightmare' ? 'CHAMPIONSHIP' : this.difficulty.toUpperCase();
     this.showGameView();
     this.startNewHand();
   }
@@ -2881,27 +3110,31 @@ class PokerApp {
         if (g.waiting) {
           g.waiting = false;
           const s = g.seatIdx;
+          const targetBot = this.players[s];
+          const inheritedChips = (targetBot && targetBot.chips > 0) ? targetBot.chips : 1000;
+
           this.players[s].name = g.name;
           this.players[s].style = 'Friend (Online)';
           this.players[s].avatar = '👤';
-          this.players[s].chips = 1000;
+          this.players[s].chips = inheritedChips;
           this.players[s].isBot = false;
           this.players[s].isRemote = true;
           this.players[s].peerConn = g.conn;
+          g.chips = inheritedChips;
 
           document.getElementById(`name-${s}`).textContent = g.name;
           document.getElementById(`style-${s}`).textContent = 'Friend (Online)';
           document.getElementById(`avatar-${s}`).textContent = '👤';
-          document.getElementById(`chips-${s}`).textContent = '1000';
+          document.getElementById(`chips-${s}`).textContent = inheritedChips.toString();
 
           g.conn.send({
             type: 'seated',
             seat: s,
             name: g.name,
-            chips: 1000,
+            chips: inheritedChips,
             tableState: this.serializeTableStateFor(s)
           });
-          this.setAnnouncement(`👋 ${g.name} joined the table for the next hand!`);
+          this.setAnnouncement(`👋 ${g.name} replaced bot at Seat ${s} with $${inheritedChips} for next round!`);
         }
       });
 
@@ -2969,6 +3202,22 @@ class PokerApp {
       }
     }
 
+    // Quick Preset Wager buttons ($10, $50, $100, MAX)
+    document.querySelectorAll('.r-preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.r-preset-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const wagerType = btn.dataset.wager;
+        const wallet = EconomyManager.getMiniGameWallet();
+        if (wagerType === 'max') {
+          this.selectedRouletteChip = Math.max(10, wallet.balance);
+        } else {
+          this.selectedRouletteChip = Number(wagerType) || 10;
+        }
+        sounds.playChip();
+      });
+    });
+
     // Chip selectors
     document.querySelectorAll('.r-chip-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -2985,6 +3234,15 @@ class PokerApp {
         this.placeRouletteBet(spot.dataset.betType, spot.dataset.betVal, spot);
       });
     });
+
+    // Shortcut button to Bankroll Transfer
+    const transferBtn = document.getElementById('btn-roulette-transfer');
+    if (transferBtn) {
+      transferBtn.addEventListener('click', () => {
+        if (this.rouletteModal) this.rouletteModal.classList.add('hidden');
+        this.openTransferModal();
+      });
+    }
   }
 
   openRouletteModal() {
@@ -2995,21 +3253,23 @@ class PokerApp {
   }
 
   updateRouletteUI() {
-    const currentChips = this.players[0].chips;
+    const wallet = EconomyManager.getMiniGameWallet();
     const rBankroll = document.getElementById('roulette-bankroll');
     const rBetTotal = document.getElementById('roulette-total-bet');
-    if (rBankroll) rBankroll.textContent = `$${currentChips.toLocaleString()}`;
+    if (rBankroll) rBankroll.textContent = `$${wallet.balance.toLocaleString()}`;
     const totalBet = Object.values(this.rouletteBets).reduce((sum, b) => sum + b.amount, 0);
     if (rBetTotal) rBetTotal.textContent = `$${totalBet.toLocaleString()}`;
+    this.updateEconomyDashboard();
   }
 
   placeRouletteBet(type, val, targetEl) {
     if (this.rouletteSpinning) return;
     const chipAmt = this.selectedRouletteChip || 10;
-    if (this.players[0].chips < chipAmt) {
+    const wallet = EconomyManager.getMiniGameWallet();
+    if (wallet.balance < chipAmt) {
       sounds.playCheck();
       const pill = document.getElementById('roulette-status-pill');
-      if (pill) pill.textContent = '❌ Insufficient bankroll chips!';
+      if (pill) pill.textContent = '❌ Insufficient mini-game wallet funds!';
       return;
     }
 
@@ -3018,7 +3278,8 @@ class PokerApp {
       this.rouletteBets[key] = { type, val, amount: 0, el: targetEl };
     }
     this.rouletteBets[key].amount += chipAmt;
-    this.players[0].chips -= chipAmt;
+    wallet.balance -= chipAmt;
+    EconomyManager.saveMiniGameWallet(wallet);
     sounds.playChip();
 
     let badge = targetEl.querySelector('.bet-badge');
@@ -3033,26 +3294,24 @@ class PokerApp {
     if (pill) pill.textContent = `Bet placed on ${val}! Spin when ready.`;
 
     this.updateRouletteUI();
-    this.updateTableUI();
-    if (!this.isOnlineRoom) this.saveCurrentGame();
   }
 
   clearRouletteBets() {
     if (this.rouletteSpinning) return;
+    const wallet = EconomyManager.getMiniGameWallet();
     Object.values(this.rouletteBets).forEach(b => {
-      this.players[0].chips += b.amount;
+      wallet.balance += b.amount;
       if (b.el) {
         const badge = b.el.querySelector('.bet-badge');
         if (badge) badge.remove();
       }
     });
+    EconomyManager.saveMiniGameWallet(wallet);
     this.rouletteBets = {};
     sounds.playChip();
     const pill = document.getElementById('roulette-status-pill');
-    if (pill) pill.textContent = 'All bets cleared and refunded to bankroll.';
+    if (pill) pill.textContent = 'All bets cleared and refunded to mini-game wallet.';
     this.updateRouletteUI();
-    this.updateTableUI();
-    if (!this.isOnlineRoom) this.saveCurrentGame();
   }
 
   drawRouletteWheel(angle) {
@@ -3237,7 +3496,9 @@ class PokerApp {
       }
     });
 
-    this.players[0].chips += totalPayout;
+    const wallet = EconomyManager.getMiniGameWallet();
+    wallet.balance += totalPayout;
+    EconomyManager.saveMiniGameWallet(wallet);
     this.rouletteBets = {};
 
     const banner = document.getElementById('roulette-result-display');
@@ -3262,8 +3523,450 @@ class PokerApp {
     }
 
     this.updateRouletteUI();
-    this.updateTableUI();
-    if (!this.isOnlineRoom) this.saveCurrentGame();
+  }
+
+  // ==========================================================================
+  // SOLAR FLARE 3-REEL SLOTS MINI-GAME
+  // ==========================================================================
+  initSlots() {
+    this.slotsModal = document.getElementById('slots-modal');
+    this.btnOpenSlots = document.getElementById('btn-open-slots');
+    this.closeSlotsBtn = document.getElementById('close-slots-btn');
+    this.btnSpinSlots = document.getElementById('btn-spin-slots');
+    this.btnSlotsTransfer = document.getElementById('btn-slots-transfer');
+    this.slotWager = 50;
+    this.slotSpinning = false;
+
+    if (this.btnOpenSlots) {
+      this.btnOpenSlots.addEventListener('click', () => this.openSlotsModal());
+    }
+    if (this.closeSlotsBtn && this.slotsModal) {
+      this.closeSlotsBtn.addEventListener('click', () => this.closeSlotsModal());
+    }
+    if (this.btnSpinSlots) {
+      this.btnSpinSlots.addEventListener('click', () => this.spinSlotMachine());
+    }
+    if (this.btnSlotsTransfer) {
+      this.btnSlotsTransfer.addEventListener('click', () => {
+        this.closeSlotsModal();
+        this.openTransferModal();
+      });
+    }
+
+    // Quick preset wager buttons ($10, $50, $100, MAX)
+    document.querySelectorAll('.slots-preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.slots-preset-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const wagerVal = btn.dataset.wager;
+        const wallet = EconomyManager.getMiniGameWallet();
+        if (wagerVal === 'max') {
+          this.slotWager = Math.max(10, wallet.balance);
+        } else {
+          this.slotWager = Number(wagerVal) || 50;
+        }
+        sounds.playChip();
+        this.updateSlotsUI();
+      });
+    });
+  }
+
+  openSlotsModal() {
+    if (!this.slotsModal) return;
+    this.updateSlotsUI();
+    const banner = document.getElementById('slots-result-banner');
+    if (banner) banner.classList.add('hidden');
+    const winDisplay = document.getElementById('slots-win-display');
+    if (winDisplay) winDisplay.textContent = 'Ready to Spin!';
+    this.slotsModal.classList.remove('hidden');
+  }
+
+  closeSlotsModal() {
+    if (this.slotsModal) this.slotsModal.classList.add('hidden');
+  }
+
+  updateSlotsUI() {
+    const wallet = EconomyManager.getMiniGameWallet();
+    const balEl = document.getElementById('slots-wallet-balance');
+    const wagerEl = document.getElementById('slots-current-wager');
+    if (balEl) balEl.textContent = `$${wallet.balance.toLocaleString()}`;
+    if (wagerEl) wagerEl.textContent = `$${this.slotWager.toLocaleString()}`;
+    this.updateEconomyDashboard();
+  }
+
+  spinSlotMachine() {
+    if (this.slotSpinning) return;
+    const wallet = EconomyManager.getMiniGameWallet();
+    if (wallet.balance < this.slotWager) {
+      sounds.playCheck();
+      const winDisplay = document.getElementById('slots-win-display');
+      if (winDisplay) winDisplay.textContent = '❌ Insufficient Mini-Game funds!';
+      return;
+    }
+
+    this.slotSpinning = true;
+    wallet.balance -= this.slotWager;
+    EconomyManager.saveMiniGameWallet(wallet);
+    this.updateSlotsUI();
+
+    if (this.btnSpinSlots) this.btnSpinSlots.disabled = true;
+    sounds.playSlotSpin();
+
+    const banner = document.getElementById('slots-result-banner');
+    if (banner) banner.classList.add('hidden');
+    const winDisplay = document.getElementById('slots-win-display');
+    if (winDisplay) winDisplay.textContent = 'Spinning reels...';
+
+    // Start reel spin animation
+    const reel1 = document.getElementById('slot-reel-1');
+    const reel2 = document.getElementById('slot-reel-2');
+    const reel3 = document.getElementById('slot-reel-3');
+    [reel1, reel2, reel3].forEach(r => {
+      if (r) r.classList.add('spinning');
+    });
+
+    const pickSymbol = () => {
+      const rand = Math.random();
+      if (rand < 0.08) return '7️⃣';
+      if (rand < 0.18) return '🔥';
+      if (rand < 0.32) return '⭐';
+      const suits = ['♠️', '♥️', '♦️', '♣️'];
+      return suits[Math.floor(Math.random() * suits.length)];
+    };
+
+    const finalReels = [pickSymbol(), pickSymbol(), pickSymbol()];
+
+    // Staggered reel stops
+    setTimeout(() => {
+      if (reel1) {
+        reel1.classList.remove('spinning');
+        reel1.innerHTML = `<div class="slot-symbol">${finalReels[0]}</div>`;
+        sounds.playSlotStop();
+      }
+    }, 600);
+
+    setTimeout(() => {
+      if (reel2) {
+        reel2.classList.remove('spinning');
+        reel2.innerHTML = `<div class="slot-symbol">${finalReels[1]}</div>`;
+        sounds.playSlotStop();
+      }
+    }, 1050);
+
+    setTimeout(() => {
+      if (reel3) {
+        reel3.classList.remove('spinning');
+        reel3.innerHTML = `<div class="slot-symbol">${finalReels[2]}</div>`;
+        sounds.playSlotStop();
+      }
+      this.resolveSlotSpin(finalReels);
+    }, 1500);
+  }
+
+  resolveSlotSpin(reels) {
+    this.slotSpinning = false;
+    if (this.btnSpinSlots) this.btnSpinSlots.disabled = false;
+
+    const [s1, s2, s3] = reels;
+    let multiplier = 0;
+    let title = '';
+
+    // 1. Triple 777 (50x)
+    if (s1 === '7️⃣' && s2 === '7️⃣' && s3 === '7️⃣') {
+      multiplier = 50;
+      title = '🎰 JACKPOT 777! 50x WIN!';
+    }
+    // 2. Triple Wild Flare (30x)
+    else if (s1 === '🔥' && s2 === '🔥' && s3 === '🔥') {
+      multiplier = 30;
+      title = '🔥 SUPER WILD FLARE! 30x WIN!';
+    }
+    // 3. Triple Stars (20x)
+    else if (s1 === '⭐' && s2 === '⭐' && s3 === '⭐') {
+      multiplier = 20;
+      title = '⭐ TRIPLE STARS! 20x WIN!';
+    }
+    // 4. Triple matching royal suits (10x)
+    else if ((s1 === '♠️' || s1 === '♥️' || s1 === '♦️' || s1 === '♣️') && s1 === s2 && s2 === s3) {
+      multiplier = 10;
+      title = '♠️ ROYAL SUITS FLUSH! 10x WIN!';
+    }
+    // 5. Wild Boost: Pair + Wild (5x)
+    else if (reels.filter(s => s === '🔥').length >= 1 && (
+      (s1 === s2) || (s2 === s3) || (s1 === s3) || reels.filter(s => s === '🔥').length >= 2
+    )) {
+      multiplier = 5;
+      title = '🔥 WILD BOOST PAIR! 5x WIN!';
+    }
+    // 6. Any Matching Pair (2x)
+    else if (s1 === s2 || s2 === s3 || s1 === s3) {
+      multiplier = 2;
+      title = '✨ MATCHING PAIR! 2x WIN!';
+    }
+    // 7. Lucky Symbol Push (1x)
+    else if (reels.includes('7️⃣') || reels.includes('⭐')) {
+      multiplier = 1;
+      title = '💎 LUCKY PUSH! Wager Returned';
+    } else {
+      multiplier = 0;
+      title = 'No Match. Try again!';
+    }
+
+    const banner = document.getElementById('slots-result-banner');
+    const bannerTitle = document.getElementById('slots-result-title');
+    const bannerDetail = document.getElementById('slots-result-detail');
+    const winDisplay = document.getElementById('slots-win-display');
+
+    if (multiplier > 0) {
+      const payout = this.slotWager * multiplier;
+      const wallet = EconomyManager.getMiniGameWallet();
+      wallet.balance += payout;
+      EconomyManager.saveMiniGameWallet(wallet);
+
+      if (multiplier >= 20) {
+        sounds.playJackpot();
+      } else {
+        sounds.playWin();
+      }
+
+      if (banner && bannerTitle && bannerDetail) {
+        banner.className = 'slots-result-banner win-glow';
+        banner.classList.remove('hidden');
+        bannerTitle.textContent = title;
+        bannerDetail.textContent = `+ $${payout.toLocaleString()} Added to Mini-Game Wallet!`;
+      }
+      if (winDisplay) {
+        winDisplay.textContent = `Won $${payout.toLocaleString()}! (${multiplier}x)`;
+      }
+    } else {
+      sounds.playFold();
+      if (banner && bannerTitle && bannerDetail) {
+        banner.className = 'slots-result-banner';
+        banner.classList.remove('hidden');
+        bannerTitle.textContent = 'BET LOST';
+        bannerDetail.textContent = `-$${this.slotWager.toLocaleString()} &bull; Spin again to win big!`;
+      }
+      if (winDisplay) {
+        winDisplay.textContent = 'No win on this spin.';
+      }
+    }
+
+    this.updateSlotsUI();
+  }
+
+  // ==========================================================================
+  // BANKROLL TRANSFER TO POKER CAMPAIGN (Strict One-Way Separation)
+  // ==========================================================================
+  initTransfer() {
+    this.transferModal = document.getElementById('transfer-modal');
+    this.btnOpenTransfer = document.getElementById('btn-open-transfer');
+    this.closeTransferBtn = document.getElementById('close-transfer-btn');
+    this.btnCancelTransfer = document.getElementById('btn-cancel-transfer');
+    this.btnConfirmTransfer = document.getElementById('btn-confirm-transfer');
+    this.transferAmtInput = document.getElementById('transfer-amount-input');
+    this.transferError = document.getElementById('transfer-error-msg');
+    this.selectedTransferSlot = 1;
+
+    if (this.btnOpenTransfer) {
+      this.btnOpenTransfer.addEventListener('click', () => this.openTransferModal());
+    }
+    if (this.closeTransferBtn && this.transferModal) {
+      this.closeTransferBtn.addEventListener('click', () => this.closeTransferModal());
+    }
+    if (this.btnCancelTransfer && this.transferModal) {
+      this.btnCancelTransfer.addEventListener('click', () => this.closeTransferModal());
+    }
+    if (this.btnConfirmTransfer) {
+      this.btnConfirmTransfer.addEventListener('click', () => this.executeTransfer());
+    }
+
+    // Preset buttons: +$100, +$250, +$500, All Winnings
+    document.querySelectorAll('.t-preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const amtType = btn.dataset.amt;
+        const wallet = EconomyManager.getMiniGameWallet();
+        if (amtType === 'all') {
+          if (this.transferAmtInput) this.transferAmtInput.value = wallet.balance;
+        } else {
+          if (this.transferAmtInput) this.transferAmtInput.value = Number(amtType) || 100;
+        }
+        sounds.playChip();
+      });
+    });
+  }
+
+  openTransferModal() {
+    if (!this.transferModal) return;
+    const wallet = EconomyManager.getMiniGameWallet();
+    const balEl = document.getElementById('transfer-avail-balance');
+    if (balEl) balEl.textContent = `$${wallet.balance.toLocaleString()}`;
+    if (this.transferError) this.transferError.classList.add('hidden');
+    if (this.transferAmtInput) this.transferAmtInput.value = Math.min(100, wallet.balance);
+
+    this.renderTransferSlots();
+    this.transferModal.classList.remove('hidden');
+  }
+
+  closeTransferModal() {
+    if (this.transferModal) this.transferModal.classList.add('hidden');
+  }
+
+  renderTransferSlots() {
+    const container = document.getElementById('transfer-slot-options');
+    if (!container) return;
+    container.innerHTML = '';
+    const saves = SaveManager.getSaves();
+
+    for (let slotId = 1; slotId <= 3; slotId++) {
+      const slotData = saves[`slot_${slotId}`];
+      const isSelected = (slotId === this.selectedTransferSlot);
+      const card = document.createElement('div');
+      card.className = `transfer-slot-card ${isSelected ? 'selected' : ''}`;
+      card.dataset.slotId = slotId;
+
+      const title = slotData ? `Slot ${slotId}: ${slotData.name || 'Hero'}` : `Slot ${slotId}: New Profile`;
+      const chips = slotData ? `$${(slotData.chips || 0).toLocaleString()} chips` : `$1,000 baseline`;
+      const stage = slotData ? `Stage ${slotData.stage || 1}` : `Fresh Start`;
+
+      card.innerHTML = `
+        <div class="t-slot-title">${title}</div>
+        <div class="t-slot-chips">${chips}</div>
+        <div class="t-slot-stage">${stage}</div>
+      `;
+
+      card.addEventListener('click', () => {
+        this.selectedTransferSlot = slotId;
+        document.querySelectorAll('.transfer-slot-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        sounds.playChip();
+      });
+
+      container.appendChild(card);
+    }
+  }
+
+  executeTransfer() {
+    const amt = Number(this.transferAmtInput ? this.transferAmtInput.value : 0);
+    const wallet = EconomyManager.getMiniGameWallet();
+
+    if (isNaN(amt) || amt <= 0 || amt > wallet.balance) {
+      if (this.transferError) {
+        this.transferError.textContent = '❌ Invalid transfer amount or exceeds available balance!';
+        this.transferError.classList.remove('hidden');
+      }
+      sounds.playCheck();
+      return;
+    }
+
+    const slotId = this.selectedTransferSlot || 1;
+    const res = EconomyManager.transferMiniGameToPoker(slotId, amt);
+    if (!res.success) {
+      if (this.transferError) {
+        this.transferError.textContent = `❌ ${res.message}`;
+        this.transferError.classList.remove('hidden');
+      }
+      sounds.playCheck();
+      return;
+    }
+
+    sounds.playWin();
+    this.setAnnouncement(`💸 Injected $${amt.toLocaleString()} mini-game winnings into Poker Slot ${slotId}!`);
+
+    // If currently playing in this save slot, update hero live chips
+    if (!this.isOnlineRoom && this.activeSlot === slotId && this.players[0]) {
+      this.players[0].chips += amt;
+      this.updateTableUI();
+    }
+
+    this.renderMainMenuSlots();
+    this.updateEconomyDashboard();
+    this.closeTransferModal();
+  }
+
+  // ==========================================================================
+  // DAILY ECONOMY DASHBOARD & TIMERS
+  // ==========================================================================
+  initEconomy() {
+    this.updateEconomyDashboard();
+
+    const miniBtn = document.getElementById('btn-claim-minigame-daily');
+    if (miniBtn) {
+      miniBtn.addEventListener('click', () => {
+        const res = EconomyManager.claimMiniGameDaily();
+        if (res.success) {
+          sounds.playWin();
+          this.updateEconomyDashboard();
+          this.setAnnouncement(`🎁 Claimed $500 Daily Mini-Game Allowance! New balance: $${res.balance.toLocaleString()}`);
+        } else {
+          sounds.playCheck();
+          this.setAnnouncement(`⚠️ ${res.message}`);
+        }
+      });
+    }
+
+    const pokerBtn = document.getElementById('btn-claim-poker-daily');
+    if (pokerBtn) {
+      pokerBtn.addEventListener('click', () => {
+        const slotId = this.activeSlot || 1;
+        const res = EconomyManager.claimPokerDailyForSlot(slotId);
+        if (res.success) {
+          sounds.playWin();
+          if (!this.isOnlineRoom && this.activeSlot === slotId && this.players[0]) {
+            this.players[0].chips += 5000;
+            this.updateTableUI();
+          }
+          this.renderMainMenuSlots();
+          this.updateEconomyDashboard();
+          this.setAnnouncement(`💎 Claimed $5,000 Daily Allowance to Slot ${slotId}!`);
+        } else {
+          sounds.playCheck();
+          this.setAnnouncement(`⚠️ ${res.message}`);
+        }
+      });
+    }
+  }
+
+  updateEconomyDashboard() {
+    const wallet = EconomyManager.getMiniGameWallet();
+    const balEl = document.getElementById('minigame-wallet-balance');
+    if (balEl) balEl.textContent = `$${wallet.balance.toLocaleString()}`;
+
+    const slotsBal = document.getElementById('slots-wallet-balance');
+    if (slotsBal) slotsBal.textContent = `$${wallet.balance.toLocaleString()}`;
+
+    const rouletteBal = document.getElementById('roulette-bankroll');
+    if (rouletteBal) rouletteBal.textContent = `$${wallet.balance.toLocaleString()}`;
+
+    const transferBal = document.getElementById('transfer-avail-balance');
+    if (transferBal) transferBal.textContent = `$${wallet.balance.toLocaleString()}`;
+  }
+
+  startDailyTimersLoop() {
+    const updateTimers = () => {
+      const miniStatus = EconomyManager.getMiniGameClaimStatus();
+      const miniTimerEl = document.getElementById('minigame-claim-timer');
+      const miniBtn = document.getElementById('btn-claim-minigame-daily');
+      if (miniTimerEl) {
+        miniTimerEl.textContent = miniStatus.canClaim ? '🎁 Ready to Claim!' : `Next: ${miniStatus.text}`;
+      }
+      if (miniBtn) {
+        miniBtn.disabled = !miniStatus.canClaim;
+      }
+
+      const pokerSlotId = this.activeSlot || 1;
+      const pokerStatus = EconomyManager.getSlotPokerClaimStatus(pokerSlotId);
+      const pokerTimerEl = document.getElementById('poker-claim-timer');
+      const pokerBtn = document.getElementById('btn-claim-poker-daily');
+      if (pokerTimerEl) {
+        pokerTimerEl.textContent = pokerStatus.canClaim ? `💎 Slot ${pokerSlotId} Ready!` : `Slot ${pokerSlotId}: ${pokerStatus.text}`;
+      }
+      if (pokerBtn) {
+        pokerBtn.disabled = !pokerStatus.canClaim;
+      }
+    };
+
+    updateTimers();
+    setInterval(updateTimers, 1000);
   }
 
   // ==========================================================================
