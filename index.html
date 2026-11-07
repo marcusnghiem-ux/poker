@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="description" content="Royal Texas Hold'em - Luxury High Roller Edition. Play Solo Campaign or Online with Friends in Exclusive Rooms.">
+  <meta name="description" content="Royal Texas Hold'em - Luxury High Roller Edition. Play Solo Campaign or Online with Friends in Private Rooms.">
   <title>Royal Texas Hold'em - Luxury Casino Edition</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +17,7 @@
 </head>
 <body>
   <!-- Atmospheric Luxury Casino Background & Overhead Spotlight -->
-  <div class="casino-bg-effects" id="casino-bg-effects">
+  <div class="casino-bg-effects">
     <div class="bg-art-deco-lattice"></div>
     <div class="bg-light-beams"></div>
     <div class="bg-spotlight"></div>
@@ -25,19 +25,23 @@
     <div class="bg-bokeh bg-bokeh-2"></div>
     <div class="bg-bokeh bg-bokeh-3"></div>
 
-    <!-- Moving Celestial Constellations & Shifting Star Chart (Minimalist Solar Flare) -->
-    <div class="celestial-constellations" id="celestial-constellations">
+    <!-- Moving Celestial Constellations & Shifting Star Chart -->
+    <div class="celestial-constellations">
       <div class="shooting-star ss-1"></div>
       <div class="shooting-star ss-2"></div>
       <svg class="constellations-svg" viewBox="0 0 1400 900" fill="none" xmlns="http://www.w3.org/2000/svg">
         <!-- Constellation Group 1: Corona Borealis (The Royal Crown) -->
         <g class="constellation-cluster cc-crown">
-          <polyline points="150,180 185,150 240,135 300,145 350,175 390,220" stroke="rgba(253, 224, 71, 0.25)" stroke-width="1.1" stroke-dasharray="3 3"/>
-          <line x1="240" y1="135" x2="240" y2="95" stroke="rgba(253, 224, 71, 0.4)" stroke-width="1.2"/>
+          <polyline points="150,180 185,150 240,135 300,145 350,175 390,220" stroke="rgba(253, 224, 71, 0.3)" stroke-width="1.1" stroke-dasharray="3 3"/>
+          <line x1="240" y1="135" x2="240" y2="95" stroke="rgba(253, 224, 71, 0.45)" stroke-width="1.2"/>
+          <line x1="185" y1="150" x2="165" y2="115" stroke="rgba(253, 224, 71, 0.25)" stroke-width="0.8"/>
+          <line x1="300" y1="145" x2="320" y2="115" stroke="rgba(253, 224, 71, 0.25)" stroke-width="0.8"/>
           <circle cx="150" cy="180" r="2.5" fill="#fde047" class="c-star pulse-s"/>
           <circle cx="185" cy="150" r="3" fill="#ffffff" class="c-star"/>
           <circle cx="240" cy="135" r="4.5" fill="#fef08a" class="c-star alpha-star"/>
           <circle cx="240" cy="95" r="3" fill="#ffffff" class="c-star pulse-s"/>
+          <circle cx="165" cy="115" r="2" fill="#fde047" class="c-star"/>
+          <circle cx="320" cy="115" r="2" fill="#fde047" class="c-star"/>
           <circle cx="300" cy="145" r="3.2" fill="#ffffff" class="c-star"/>
           <circle cx="350" cy="175" r="2.8" fill="#fde047" class="c-star"/>
           <circle cx="390" cy="220" r="2.5" fill="#ffffff" class="c-star pulse-s"/>
@@ -45,8 +49,9 @@
 
         <!-- Constellation Group 2: The Ace of Spades Star Map -->
         <g class="constellation-cluster cc-spade">
-          <polygon points="1150,120 1200,195 1175,230 1150,215 1125,230 1100,195" stroke="rgba(56, 189, 248, 0.25)" stroke-width="1.1" stroke-dasharray="2 3"/>
-          <line x1="1150" y1="120" x2="1150" y2="245" stroke="rgba(56, 189, 248, 0.4)" stroke-width="1.2"/>
+          <polygon points="1150,120 1200,195 1175,230 1150,215 1125,230 1100,195" stroke="rgba(56, 189, 248, 0.32)" stroke-width="1.1" stroke-dasharray="2 3"/>
+          <line x1="1150" y1="120" x2="1150" y2="245" stroke="rgba(56, 189, 248, 0.45)" stroke-width="1.2"/>
+          <line x1="1135" y1="245" x2="1165" y2="245" stroke="rgba(56, 189, 248, 0.35)" stroke-width="1"/>
           <circle cx="1150" cy="120" r="4.5" fill="#38bdf8" class="c-star alpha-star"/>
           <circle cx="1200" cy="195" r="3" fill="#ffffff" class="c-star"/>
           <circle cx="1175" cy="230" r="2.5" fill="#bae6fd" class="c-star pulse-s"/>
@@ -58,232 +63,46 @@
 
         <!-- Constellation Group 3: The Royal Diamond / Lyra -->
         <g class="constellation-cluster cc-diamond">
-          <polygon points="1220,620 1280,560 1340,620 1280,680" stroke="rgba(253, 224, 71, 0.2)" stroke-width="1"/>
+          <polygon points="1220,620 1280,560 1340,620 1280,680" stroke="rgba(253, 224, 71, 0.28)" stroke-width="1"/>
+          <line x1="1220" y1="620" x2="1340" y2="620" stroke="rgba(253, 224, 71, 0.2)" stroke-width="0.8" stroke-dasharray="2 2"/>
+          <line x1="1280" y1="560" x2="1280" y2="680" stroke="rgba(253, 224, 71, 0.2)" stroke-width="0.8" stroke-dasharray="2 2"/>
           <circle cx="1220" cy="620" r="3" fill="#fde047" class="c-star"/>
           <circle cx="1280" cy="560" r="4.2" fill="#ffffff" class="c-star alpha-star"/>
           <circle cx="1340" cy="620" r="3" fill="#fde047" class="c-star"/>
           <circle cx="1280" cy="680" r="3.5" fill="#fef08a" class="c-star pulse-s"/>
         </g>
+
+        <!-- Constellation Group 4: The Orion Scepter -->
+        <g class="constellation-cluster cc-scepter">
+          <polyline points="180,680 230,640 290,620 340,650 390,710" stroke="rgba(167, 139, 250, 0.28)" stroke-width="1" stroke-dasharray="3 2"/>
+          <line x1="270" y1="610" x2="310" y2="630" stroke="rgba(253, 224, 71, 0.35)" stroke-width="1.2"/>
+          <circle cx="180" cy="680" r="2.5" fill="#c4b5fd" class="c-star"/>
+          <circle cx="230" cy="640" r="3" fill="#ffffff" class="c-star"/>
+          <circle cx="290" cy="620" r="4.5" fill="#fde047" class="c-star alpha-star"/>
+          <circle cx="340" cy="650" r="3" fill="#ffffff" class="c-star"/>
+          <circle cx="390" cy="710" r="2.8" fill="#c4b5fd" class="c-star pulse-s"/>
+        </g>
       </svg>
     </div>
 
     <div class="bg-vignette"></div>
+    <!-- Floating Gold Dust & Card Suits -->
+    <div class="floating-suits">
+      <span class="float-suit fs-1">♠</span>
+      <span class="float-suit fs-2">♥</span>
+      <span class="float-suit fs-3">♦</span>
+      <span class="float-suit fs-4">♣</span>
+      <span class="float-suit fs-5">♠</span>
+      <span class="float-suit fs-6">♥</span>
+      <span class="float-suit fs-7">♦</span>
+      <span class="float-suit fs-8">♣</span>
+      <span class="float-sparkle sp-1">✦</span>
+      <span class="float-sparkle sp-2">✨</span>
+      <span class="float-sparkle sp-3">✦</span>
+      <span class="float-sparkle sp-4">✨</span>
+      <span class="float-sparkle sp-5">✦</span>
+    </div>
   </div>
-
-  <!-- ======================================================================
-       TOP NAVIGATION BAR (Persistent Luxury Header & Dual Wallet Display)
-       ====================================================================== -->
-  <header id="site-top-bar" class="site-top-bar">
-    <div class="top-bar-left">
-      <button id="btn-toggle-transit-drawer" class="nav-drawer-btn" title="Open Casino Transit Lounge">
-        <span class="hamburger-bar"></span>
-        <span class="hamburger-bar"></span>
-        <span class="hamburger-bar"></span>
-      </button>
-      <div class="nav-brand-wrap">
-        <svg class="nav-crown-svg" width="22" height="18" viewBox="0 0 72 54" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M14 38 Q36 22 58 38 L54 44 Q36 34 18 44 Z" fill="#991b1b"/>
-          <rect x="10" y="42" width="52" height="8" rx="2" fill="#ffd700" stroke="#fef08a" stroke-width="1"/>
-          <path d="M12 42 L8 22 L20 30 L36 12 L52 30 L64 22 L60 42 Z" fill="#ffd700" stroke="#fef08a" stroke-width="1.2"/>
-          <circle cx="36" cy="11" r="3.2" fill="#ffffff"/>
-        </svg>
-        <span class="nav-brand-title">ROYAL POKER</span>
-        <span class="nav-variant-badge" id="nav-variant-badge">TEXAS HOLD'EM</span>
-      </div>
-    </div>
-
-    <!-- Dual Live Wallet Display (Front Page & Table Dashboard) -->
-    <div class="top-bar-center">
-      <div class="dual-wallet-bar" id="dual-wallet-bar">
-        <div class="wallet-pill poker-vault-pill" id="nav-poker-vault-pill" title="Cumulative Poker Savings Vault">
-          <svg class="wallet-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <rect x="3" y="4" width="18" height="16" rx="3" stroke="#ffd700" stroke-width="2"/>
-            <circle cx="12" cy="12" r="4" stroke="#ffd700" stroke-width="1.8"/>
-            <circle cx="12" cy="12" r="1.5" fill="#ffd700"/>
-            <path d="M12 4v4M12 16v4M3 12h4M17 12h4" stroke="#ffd700" stroke-width="1.5"/>
-          </svg>
-          <span class="wallet-label">POKER VAULT:</span>
-          <strong class="wallet-val gold" id="nav-poker-vault-val">$1,000</strong>
-        </div>
-
-        <div class="wallet-pill minigame-wallet-pill" id="nav-minigame-pill" title="Dedicated Mini-Games Wallet">
-          <svg class="wallet-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="9" stroke="#10b981" stroke-width="2"/>
-            <circle cx="12" cy="12" r="5" stroke="#34d399" stroke-width="1.5"/>
-            <path d="M12 7v10M7 12h10" stroke="#10b981" stroke-width="1.4"/>
-          </svg>
-          <span class="wallet-label">MINI-GAMES:</span>
-          <strong class="wallet-val emerald" id="nav-minigame-val">$1,000</strong>
-        </div>
-      </div>
-    </div>
-
-    <div class="top-bar-right">
-      <button id="btn-cashout-exit" class="nav-action-btn gold-cashout-btn hidden" title="Safe Cash Out Active Run into Permanent Savings">
-        <svg class="btn-svg-icon" width="15" height="15" viewBox="0 0 24 24" fill="none">
-          <path d="M19 12H5M12 19l-7-7 7-7" stroke="#ffd700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span>Cash Out</span>
-      </button>
-
-      <button id="btn-nav-stats" class="nav-icon-btn" title="View Career Statistics">
-        <svg class="btn-svg-icon" width="15" height="15" viewBox="0 0 24 24" fill="none">
-          <rect x="3" y="12" width="4" height="8" rx="1" fill="rgba(253,224,71,0.2)" stroke="#fcd34d" stroke-width="1.8"/>
-          <rect x="10" y="8" width="4" height="12" rx="1" fill="rgba(253,224,71,0.2)" stroke="#fcd34d" stroke-width="1.8"/>
-          <rect x="17" y="4" width="4" height="16" rx="1" fill="rgba(253,224,71,0.2)" stroke="#fcd34d" stroke-width="1.8"/>
-        </svg>
-        <span>Stats</span>
-      </button>
-
-      <button id="btn-nav-settings" class="nav-icon-btn" title="Settings &amp; Module Controls">
-        <svg class="btn-svg-icon" width="15" height="15" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="3" stroke="#38bdf8" stroke-width="2"/>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="#38bdf8" stroke-width="1.8"/>
-        </svg>
-        <span>Settings</span>
-      </button>
-
-      <button id="btn-nav-rules" class="nav-icon-btn" title="Interactive Rules &amp; Variant Guides">
-        <svg class="btn-svg-icon" width="15" height="15" viewBox="0 0 24 24" fill="none">
-          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v18H6.5a2.5 2.5 0 0 0-2.5 2.5z" stroke="#93c5fd" stroke-width="2"/>
-          <path d="M6 6h10M6 10h10M6 14h6" stroke="#93c5fd" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-        <span>Rules</span>
-      </button>
-
-      <button id="btn-quick-sound" class="nav-icon-btn sound-toggle" title="Toggle Audio Synthesizer">
-        <svg id="top-sound-svg" class="btn-svg-icon" width="15" height="15" viewBox="0 0 24 24" fill="none">
-          <path d="M11 5L6 9H2v6h4l5 4V5z" stroke="#fde047" stroke-width="2"/>
-          <path d="M15.5 8.5a5 5 0 0 1 0 7" stroke="#fde047" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-      </button>
-    </div>
-  </header>
-
-  <!-- ======================================================================
-       SIDE TRANSIT DRAWER & BACKDROP
-       ====================================================================== -->
-  <div id="drawer-backdrop" class="drawer-backdrop hidden"></div>
-  <aside id="transit-drawer" class="transit-drawer">
-    <div class="drawer-header">
-      <div class="drawer-brand">
-        <svg width="22" height="18" viewBox="0 0 72 54" fill="none">
-          <rect x="10" y="42" width="52" height="8" rx="2" fill="#ffd700" stroke="#fef08a" stroke-width="1"/>
-          <path d="M12 42 L8 22 L20 30 L36 12 L52 30 L64 22 L60 42 Z" fill="#ffd700" stroke="#fef08a" stroke-width="1.2"/>
-        </svg>
-        <span>CASINO TRANSIT LOUNGE</span>
-      </div>
-      <button id="btn-close-drawer" class="drawer-close-btn" title="Close Drawer">&times;</button>
-    </div>
-
-    <div class="drawer-body">
-      <!-- Quick Vault Summary -->
-      <div class="drawer-vault-widget">
-        <div class="d-vault-col">
-          <span class="d-vault-lbl">Cumulative Savings:</span>
-          <strong class="d-vault-val gold" id="d-vault-savings">$1,000</strong>
-        </div>
-        <div class="d-vault-col">
-          <span class="d-vault-lbl">Mini-Game Wallet:</span>
-          <strong class="d-vault-val emerald" id="d-vault-minigame">$1,000</strong>
-        </div>
-      </div>
-
-      <!-- Section: Poker Arenas & Variants -->
-      <div class="drawer-section">
-        <div class="drawer-section-title">POKER ARENAS &amp; VARIANTS</div>
-        <div class="drawer-menu-list">
-          <button class="drawer-item active" id="drawer-item-texas" data-action="variant" data-variant="texas">
-            <div class="d-item-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2C9 7 4 10 4 14.5a6 6 0 0 0 10.5 3.8L12 22h4l-1.5-3.7A6 6 0 0 0 20 14.5C20 10 15 7 12 2z" fill="#ffd700"/></svg>
-            </div>
-            <div class="d-item-info">
-              <span class="d-item-title">Royal Texas Hold'em</span>
-              <span class="d-item-sub">Classic 5-card board &bull; 2 private hole cards</span>
-            </div>
-            <span class="d-item-badge current" id="badge-texas">ACTIVE</span>
-          </button>
-
-          <button class="drawer-item" id="drawer-item-short" data-action="variant" data-variant="shortDeck">
-            <div class="d-item-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10" fill="#f97316" stroke="#fde047" stroke-width="1"/></svg>
-            </div>
-            <div class="d-item-info">
-              <span class="d-item-title">Short Deck (6-Plus)</span>
-              <span class="d-item-sub">Cards 2–5 stripped &bull; Flush beats Full House</span>
-            </div>
-            <span class="d-item-badge">HOT</span>
-          </button>
-
-          <button class="drawer-item" id="drawer-item-omaha" data-action="variant" data-variant="omaha">
-            <div class="d-item-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="8" height="12" rx="1" fill="#38bdf8"/><rect x="13" y="4" width="8" height="12" rx="1" fill="#0284c7"/><rect x="8" y="9" width="8" height="12" rx="1" fill="#7dd3fc" stroke="#0369a1"/></svg>
-            </div>
-            <div class="d-item-info">
-              <span class="d-item-title">Omaha High Poker</span>
-              <span class="d-item-sub">4 hole cards &bull; Use exactly 2 hole + 3 board</span>
-            </div>
-            <span class="d-item-badge">4-CARD</span>
-          </button>
-
-          <button class="drawer-item" id="drawer-item-exclusive" data-action="open-exclusive">
-            <div class="d-item-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="11" rx="2" stroke="#2ec4b6" stroke-width="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="#2ec4b6" stroke-width="2"/></svg>
-            </div>
-            <div class="d-item-info">
-              <span class="d-item-title">Exclusive Room</span>
-              <span class="d-item-sub">Real-time P2P online multiplayer with friends</span>
-            </div>
-            <span class="d-item-badge green">P2P</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Section: Casino Mini-Games -->
-      <div class="drawer-section">
-        <div class="drawer-section-title">CASINO MINI-GAMES</div>
-        <div class="drawer-menu-list">
-          <button class="drawer-item" id="drawer-item-slots" data-action="open-slots">
-            <div class="d-item-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="#f59e0b" stroke-width="2"/><path d="M7 8h10M7 12h10M7 16h10" stroke="#f59e0b" stroke-width="1.8"/></svg>
-            </div>
-            <div class="d-item-info">
-              <span class="d-item-title">Solar Flare Slots</span>
-              <span class="d-item-sub">3-reel machine &bull; 50x Jackpot multipliers</span>
-            </div>
-            <span class="d-item-badge gold">50x</span>
-          </button>
-
-          <button class="drawer-item" id="drawer-item-roulette" data-action="open-roulette">
-            <div class="d-item-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#ef4444" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#ffd700" stroke-width="1.5"/></svg>
-            </div>
-            <div class="d-item-info">
-              <span class="d-item-title">European Roulette</span>
-              <span class="d-item-sub">Single-zero wheel &bull; Authentic table odds</span>
-            </div>
-            <span class="d-item-badge red">36:1</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Section: Vault & Allowances -->
-      <div class="drawer-section">
-        <div class="drawer-section-title">BANKROLL VAULT &amp; ALLOWANCES</div>
-        <div class="drawer-menu-list">
-          <button class="drawer-item" id="drawer-item-transfer" data-action="open-transfer">
-            <div class="d-item-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M17 1v4H1V1h16zm0 18v4H1v-4h16zm4-9l-5-5v3H1v4h15v3l5-5z" fill="#10b981"/></svg>
-            </div>
-            <div class="d-item-info">
-              <span class="d-item-title">Bankroll Transfer</span>
-              <span class="d-item-sub">Inject mini-game winnings into poker savings</span>
-            </div>
-          </button>
-        </div>
-      </div>
-    </div>
-  </aside>
 
   <div id="app-container">
 
@@ -310,11 +129,11 @@
               </defs>
               <path d="M14 38 Q36 22 58 38 L54 44 Q36 34 18 44 Z" fill="url(#velvetRed)"/>
               <rect x="10" y="42" width="52" height="8" rx="2" fill="url(#crownGold)" stroke="#fef08a" stroke-width="0.8"/>
-              <circle cx="18" cy="46" r="2.2" fill="#ef4444"/>
-              <circle cx="27" cy="46" r="2.4" fill="#38bdf8"/>
-              <circle cx="36" cy="46" r="2.8" fill="#10b981"/>
-              <circle cx="45" cy="46" r="2.4" fill="#38bdf8"/>
-              <circle cx="54" cy="46" r="2.2" fill="#ef4444"/>
+              <circle cx="18" cy="46" r="2.2" fill="#ef4444" stroke="#fef08a" stroke-width="0.6"/>
+              <circle cx="27" cy="46" r="2.4" fill="#38bdf8" stroke="#fef08a" stroke-width="0.6"/>
+              <circle cx="36" cy="46" r="2.8" fill="#10b981" stroke="#fef08a" stroke-width="0.6"/>
+              <circle cx="45" cy="46" r="2.4" fill="#38bdf8" stroke="#fef08a" stroke-width="0.6"/>
+              <circle cx="54" cy="46" r="2.2" fill="#ef4444" stroke="#fef08a" stroke-width="0.6"/>
               <path d="M12 42 L8 22 L20 30 L36 12 L52 30 L64 22 L60 42 Z" fill="url(#crownGold)" stroke="#fef08a" stroke-width="1.2"/>
               <circle cx="8" cy="21" r="2.5" fill="#ffffff" stroke="#fcd34d" stroke-width="0.8"/>
               <circle cx="20" cy="29" r="2" fill="#ffffff" stroke="#fcd34d" stroke-width="0.8"/>
@@ -327,51 +146,106 @@
         </div>
         <h1 class="menu-title">ROYAL TEXAS HOLD'EM</h1>
         <div class="menu-subtitle-wrap">
-          <span class="menu-subtitle-diamond">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="#ffd700"><polygon points="12,2 22,12 12,22 2,12"/></svg>
-          </span>
+          <span class="menu-subtitle-diamond">♦</span>
           <span class="menu-subtitle">HIGH STAKES CASINO &bull; MULTIPLAYER EDITION</span>
-          <span class="menu-subtitle-diamond">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="#ffd700"><polygon points="12,2 22,12 12,22 2,12"/></svg>
-          </span>
+          <span class="menu-subtitle-diamond">♦</span>
+        </div>
+        <div class="menu-decor-line">
+          <span class="decor-suit">♠</span>
+          <span class="decor-suit red">♥</span>
+          <span class="decor-suit red">♦</span>
+          <span class="decor-suit">♣</span>
         </div>
       </div>
 
-      <!-- Action Navigation Buttons (Illustrated Vector Badges) -->
+      <!-- Live Global Casino Stats Banner (Hand-Crafted Illustrated Icons) -->
+      <div class="global-stats-banner">
+        <div class="stat-pill">
+          <span class="stat-icon">
+            <svg class="stat-svg" width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="3" stroke="#fcd34d" stroke-width="1.8"/><circle cx="8" cy="12" r="1.5" fill="#fcd34d"/><circle cx="16" cy="12" r="1.5" fill="#fcd34d"/><path d="M12 9v6M9 12h6" stroke="#fcd34d" stroke-width="1.5"/></svg>
+          </span>
+          <span class="stat-label">Hands:</span>
+          <span class="stat-val" id="stat-total-hands">0</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-icon">
+            <svg class="stat-svg" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 3h12v7a6 6 0 0 1-12 0V3z" fill="rgba(253,224,71,0.2)" stroke="#fcd34d" stroke-width="1.8"/><path d="M6 5H3a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M18 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1M12 16v4M8 20h8" stroke="#fcd34d" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </span>
+          <span class="stat-label">Won:</span>
+          <span class="stat-val" id="stat-hands-won">0</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-icon">
+            <svg class="stat-svg" width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#ef4444" stroke-width="1.8"/><circle cx="12" cy="12" r="5" stroke="#fcd34d" stroke-width="1.8"/><circle cx="12" cy="12" r="1.8" fill="#fcd34d"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="#ef4444" stroke-width="1.5"/></svg>
+          </span>
+          <span class="stat-label">Win Rate:</span>
+          <span class="stat-val" id="stat-win-rate">0%</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-icon">
+            <svg class="stat-svg" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 4C9 4 8 7 8 7h8s-1-3-4-3z" stroke="#fcd34d" stroke-width="1.5"/><path d="M5 10c0-2 3-3 7-3s7 1 7 3c0 7-3 11-7 11s-7-4-7-11z" fill="rgba(253,224,71,0.15)" stroke="#fcd34d" stroke-width="1.8"/><path d="M12 11v6M10 13c1-1 3-1 4 0s-1 2-2 2-2 1-1 2c1 1 3 1 3 0" stroke="#fde047" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </span>
+          <span class="stat-label">Biggest Pot:</span>
+          <span class="stat-val" id="stat-biggest-pot">$0</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-icon">
+            <svg class="stat-svg" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2c0 4-5 6-5 11a7 7 0 0 0 14 0c0-4-3-8-4-9-1 3-3 4-5 2z" fill="rgba(239,68,68,0.25)" stroke="#f97316" stroke-width="1.8"/><path d="M12 11c0 2-2 3-2 5a3 3 0 0 0 6 0c0-2-1-3-2-4-1 1-1 1-2-1z" fill="#fde047"/></svg>
+          </span>
+          <span class="stat-label">Best Streak:</span>
+          <span class="stat-val" id="stat-best-streak">0</span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-icon">
+            <svg class="stat-svg" width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="10" height="15" rx="2" transform="rotate(-15 4 5)" fill="#0f172a" stroke="#fcd34d" stroke-width="1.5"/><rect x="10" y="4" width="10" height="15" rx="2" transform="rotate(10 10 4)" fill="#1e293b" stroke="#fcd34d" stroke-width="1.5"/><circle cx="15" cy="11" r="1.5" fill="#ef4444"/></svg>
+          </span>
+          <span class="stat-label">Best Hand:</span>
+          <span class="stat-val" id="stat-best-hand">High Card</span>
+        </div>
+        <div class="stat-pill online-pill">
+          <span class="stat-icon">
+            <svg class="stat-svg pulse-dot" width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#2ec4b6" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="#2ec4b6"/></svg>
+          </span>
+          <span class="stat-label">Exclusive Room:</span>
+          <span class="stat-val" id="stat-room-status">Joinable</span>
+        </div>
+      </div>
+
+      <!-- Action Navigation Buttons with Hand-Crafted SVGs -->
       <div class="menu-action-bar">
         <button id="btn-open-online-room" class="menu-pill-btn gold-glow-btn" title="Enter Exclusive Room with Online Players">
           <span class="btn-icon">
-            <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="11" rx="2.5" fill="rgba(253,224,71,0.2)" stroke="#fde047" stroke-width="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3" stroke="#fde047" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="15" r="1.5" fill="#fde047"/></svg>
+            <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="11" rx="2.5" fill="rgba(253,224,71,0.2)" stroke="#fde047" stroke-width="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3" stroke="#fde047" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="15" r="1.5" fill="#fde047"/><path d="M12 16.5v2" stroke="#fde047" stroke-width="1.5"/></svg>
           </span> Exclusive Room
         </button>
         <button id="btn-open-slots" class="menu-pill-btn ember-glow-btn" title="Play Solar Flare 3-Reel Slots Mini-Game">
-          <span class="btn-icon">
-            <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="#f59e0b" stroke-width="2"/><path d="M7 8h10M7 12h10M7 16h10" stroke="#f59e0b" stroke-width="1.8"/></svg>
-          </span> Solar Slots
+          <span class="btn-icon">🎰</span> Solar Slots
         </button>
         <button id="btn-open-roulette" class="menu-pill-btn ruby-glow-btn" title="Play European Single-Zero Roulette Mini-Game">
-          <span class="btn-icon">
-            <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#ef4444" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#ffd700" stroke-width="1.5"/></svg>
-          </span> European Roulette
+          <span class="btn-icon">🎡</span> European Roulette
         </button>
         <button id="btn-open-transfer" class="menu-pill-btn emerald-glow-btn" title="Transfer Mini-Game Casino Winnings to Your Poker Campaign">
+          <span class="btn-icon">💸</span> Transfer to Poker
+        </button>
+        <button id="menu-rules-btn" class="menu-pill-btn" title="View Comprehensive Poker Rules & Flow">
           <span class="btn-icon">
-            <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M17 1v4H1V1h16zm0 18v4H1v-4h16zm4-9l-5-5v3H1v4h15v3l5-5z" fill="#10b981"/></svg>
-          </span> Transfer to Poker
+            <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v18H6.5a2.5 2.5 0 0 0-2.5 2.5z" fill="rgba(56,189,248,0.15)" stroke="#93c5fd" stroke-width="2"/><path d="M6 6h10M6 10h10M6 14h6" stroke="#93c5fd" stroke-width="1.6" stroke-linecap="round"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="#93c5fd" stroke-width="2"/></svg>
+          </span> Rules & Poker Guide
+        </button>
+        <button id="menu-sound-btn" class="menu-pill-btn" title="Toggle Sound">
+          <span class="btn-icon">
+            <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M11 5L6 9H2v6h4l5 4V5z" fill="rgba(253,224,71,0.2)" stroke="#fde047" stroke-width="2"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a9 9 0 0 1 0 14" stroke="#fde047" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </span> Sound: ON
         </button>
       </div>
 
       <!-- Player Profile & Custom Username Bar -->
       <div class="player-profile-bar">
         <div class="profile-input-wrap">
-          <span class="profile-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#ffd700" stroke-width="1.8"/><path d="M5 20c0-4 3.5-6 7-6s7 2 7 6" stroke="#ffd700" stroke-width="1.8"/></svg>
-          </span>
+          <span class="profile-icon">👤</span>
           <label for="player-username-input" class="profile-label">Player Name:</label>
           <input type="text" id="player-username-input" class="username-input" placeholder="Enter Your Name" maxlength="14" value="High Roller">
-          <button id="btn-save-username" class="btn-save-name" title="Save Username">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
+          <button id="btn-save-username" class="btn-save-name" title="Save Username">✔</button>
         </div>
       </div>
 
@@ -389,15 +263,15 @@
               <span class="eco-val" id="minigame-wallet-balance">$1,000</span>
             </div>
             <button id="btn-claim-minigame-daily" class="mini-claim-btn" title="Claim $500 Daily Mini-Game Allowance">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:4px"><rect x="3" y="8" width="18" height="13" rx="2" stroke="#fff" stroke-width="2"/><path d="M12 8v13M3 13h18M7.5 8a2.5 2.5 0 0 1 0-5c2 0 3.5 3 4.5 5M16.5 8a2.5 2.5 0 0 0 0-5c-2 0-3.5 3-4.5 5" stroke="#fff" stroke-width="1.6"/></svg> Claim $500 Daily
+              🎁 Claim $500 Daily
             </button>
           </div>
           <div class="eco-footer">
-            <span>Dedicated mini-game funds &bull; Winnings can transfer to Poker savings</span>
+            <span>Dedicated mini-game funds &bull; Winnings can transfer to Poker save files</span>
           </div>
         </div>
 
-        <!-- 24-Hour Poker Run Allowance ($5,000 / Day) -->
+        <!-- 24-Hour Poker Run Allowance ($5,000 / Day per slot) -->
         <div class="economy-card poker-allowance-card">
           <div class="eco-header">
             <span class="eco-badge gold-badge">POKER RUN STIPEND</span>
@@ -408,12 +282,12 @@
               <span class="eco-bal-lbl">Allowance:</span>
               <span class="eco-val">$5,000 / Day</span>
             </div>
-            <button id="btn-claim-poker-daily" class="mini-claim-btn gold-claim-btn" title="Claim $5,000 Daily Allowance to Permanent Savings">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:4px"><polygon points="6,3 18,3 22,9 12,21 2,9" fill="rgba(253,224,71,0.2)" stroke="#fde047" stroke-width="1.8"/><path d="M2 9h20M12 21L7 9M12 21l5-12" stroke="#fde047" stroke-width="1.2"/></svg> Claim $5,000 to Vault
+            <button id="btn-claim-poker-daily" class="mini-claim-btn gold-claim-btn" title="Claim $5,000 Daily Allowance for Current Save Slot">
+              💎 Claim $5,000 to Slot
             </button>
           </div>
           <div class="eco-footer">
-            <span>Automatically adds to your cumulative poker savings without overwriting</span>
+            <span>Each of your 3 save slots receives $5,000 every 24 hours</span>
           </div>
         </div>
       </div>
@@ -432,7 +306,7 @@
       </div>
 
       <footer class="menu-footer">
-        <span>Offline AI Tournament &bull; Real-Time Exclusive Room &bull; Dynamic Blinds &bull; Private Device Saves</span>
+        <span>Offline AI Tournament &bull; Real-Time Online Room &bull; Dynamic Blinds &bull; Private Device Saves</span>
       </footer>
     </section>
 
@@ -449,12 +323,14 @@
             </span> <span id="btn-back-label">Menu</span>
           </button>
           <div class="brand">
-            <span class="nav-variant-indicator" id="table-variant-indicator">TEXAS HOLD'EM</span>
+            <span class="suit-icon red">♦</span>
+            <h1>ROYAL TEXAS HOLD'EM</h1>
+            <span class="suit-icon red">♥</span>
           </div>
           <!-- Room Indicator badge when playing in online exclusive room -->
           <div id="online-room-badge" class="badge online-room-badge hidden">
-            <span>Exclusive Room:</span> <strong id="online-room-status-text">Connected</strong>
-            <button id="btn-copy-invite" class="mini-btn" title="Copy Invite Link">Share Link</button>
+            <span>🔒 Exclusive Room:</span> <strong id="online-room-status-text">Connected</strong>
+            <button id="btn-copy-invite" class="mini-btn" title="Copy Invite Link">📋 Share Link</button>
           </div>
         </div>
 
@@ -463,11 +339,14 @@
           <div class="badge" id="difficulty-indicator">Medium</div>
           <div class="badge" id="hand-indicator">Hand #<span id="hand-number">1</span></div>
           <div class="badge" id="blinds-indicator">Blinds: $10 / $20</div>
-          <button id="btn-table-cashout" class="icon-btn gold-cashout-pill" title="Cash out active table chips into permanent vault">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 19l-7-7 7-7" stroke="#ffd700" stroke-width="2"/></svg> Cash Out
-          </button>
           <button id="btn-hand-history" class="icon-btn" title="View Hand History Log">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="#a78bfa" stroke-width="2"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="#a78bfa" stroke-width="1.5"/></svg> History
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:3px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="#a78bfa" stroke-width="2"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="#a78bfa" stroke-width="1.5"/></svg> History
+          </button>
+          <button id="sound-toggle-btn" class="icon-btn" title="Toggle Sound">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:3px"><path d="M11 5L6 9H2v6h4l5 4V5z" stroke="#fde047" stroke-width="2"/><path d="M15.5 8.5a5 5 0 0 1 0 7" stroke="#fde047" stroke-width="1.8" stroke-linecap="round"/></svg> Sound
+          </button>
+          <button id="rules-btn" class="icon-btn" title="View Poker Rules">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:3px"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v18H6.5a2.5 2.5 0 0 0-2.5 2.5z" stroke="#93c5fd" stroke-width="2"/><path d="M6 6h10M6 10h10" stroke="#93c5fd" stroke-width="1.6"/></svg> Guide
           </button>
         </div>
       </header>
@@ -490,10 +369,10 @@
           <div class="countdown-card pause-screen-card">
             <div class="countdown-timer-circle" id="countdown-number">5</div>
             <h3>Hand Finished &bull; Next Hand In 5s</h3>
-            <p>5-Second break &amp; joining window open. Waiting friends dynamically take over AI seats!</p>
+            <p>5-Second break &amp; joining window open. Waiting friends are dealt in!</p>
             <div class="pause-actions-row">
               <button id="btn-pause-leave-room" class="btn btn-secondary pause-leave-btn">
-                Leave Room (Exit to Menu)
+                <span>🚪</span> Leave Room (Exit to Menu)
               </button>
             </div>
           </div>
@@ -502,9 +381,7 @@
         <!-- Loading / Waiting Screen (When joining while a hand is actively running) -->
         <div id="waiting-round-overlay" class="waiting-round-overlay hidden">
           <div class="waiting-box">
-            <div class="waiting-spinner">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="#ffd700" stroke-width="2"/><circle cx="8" cy="8" r="1.5" fill="#ffd700"/><circle cx="16" cy="16" r="1.5" fill="#ffd700"/><circle cx="12" cy="12" r="1.5" fill="#ffd700"/></svg>
-            </div>
+            <div class="waiting-spinner">🎲</div>
             <h3>Hand in Progress</h3>
             <p id="waiting-round-text">You joined during an active hand. Please wait for this round to finish—you will automatically be dealt into the table in the 5-second window!</p>
             <div class="waiting-pulse-bar"></div>
@@ -514,7 +391,7 @@
         <div id="poker-table">
           <!-- Table Center: Community Cards, Single Main Pot, Dealer Info -->
           <div id="table-center">
-            <div class="logo-watermark">ROYAL POKER</div>
+            <div class="logo-watermark">ROYAL HOLD'EM</div>
 
             <!-- Single Main Pot (Clean, Prominent) -->
             <div id="pot-display-wrapper">
@@ -522,7 +399,7 @@
                 <span class="pot-label">TOTAL POT</span>
                 <span id="pot-amount" class="pot-value">$0</span>
               </div>
-              <!-- Optional Side Pot Pill (Only shown when short stack all-in occurs) -->
+              <!-- Optional Side Pot Pill (Only shown if someone goes all-in) -->
               <div id="side-pot-wrapper" class="side-pot-wrapper hidden">
                 <span class="side-pot-pill" id="side-pot-text">Side Pot: $0</span>
               </div>
@@ -545,7 +422,7 @@
           <div class="player-seat" id="seat-1">
             <div class="dealer-button hidden" id="dealer-btn-1">D</div>
             <div class="avatar-ring">
-              <div class="avatar" id="avatar-1"></div>
+              <div class="avatar" id="avatar-1">🐍</div>
             </div>
             <div class="player-card-info">
               <div class="name-row">
@@ -563,7 +440,7 @@
           <div class="player-seat" id="seat-2">
             <div class="dealer-button hidden" id="dealer-btn-2">D</div>
             <div class="avatar-ring">
-              <div class="avatar" id="avatar-2"></div>
+              <div class="avatar" id="avatar-2">🛡️</div>
             </div>
             <div class="player-card-info">
               <div class="name-row">
@@ -581,7 +458,7 @@
           <div class="player-seat" id="seat-3">
             <div class="dealer-button hidden" id="dealer-btn-3">D</div>
             <div class="avatar-ring">
-              <div class="avatar" id="avatar-3"></div>
+              <div class="avatar" id="avatar-3">🌙</div>
             </div>
             <div class="player-card-info">
               <div class="name-row">
@@ -599,7 +476,7 @@
           <div class="player-seat" id="seat-4">
             <div class="dealer-button hidden" id="dealer-btn-4">D</div>
             <div class="avatar-ring">
-              <div class="avatar" id="avatar-4"></div>
+              <div class="avatar" id="avatar-4">🦁</div>
             </div>
             <div class="player-card-info">
               <div class="name-row">
@@ -617,7 +494,7 @@
           <div class="player-seat hero-seat" id="seat-0">
             <div class="dealer-button hidden" id="dealer-btn-0">D</div>
             <div class="avatar-ring hero-ring">
-              <div class="avatar hero-avatar" id="avatar-0"></div>
+              <div class="avatar hero-avatar" id="avatar-0">👑</div>
             </div>
             <div class="player-card-info">
               <div class="name-row">
@@ -640,13 +517,11 @@
           Shuffle up and deal! Welcome to the table.
         </div>
 
-        <!-- 15-SECOND TURN TIMER (Exclusive Room Only) -->
+        <!-- 15-SECOND TURN TIMER (Private Room Only) -->
         <div id="turn-timer-bar" class="turn-timer-bar hidden">
           <div class="turn-timer-info">
             <div class="timer-info-left">
-              <span class="timer-icon">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#ffd700" stroke-width="2"/><path d="M12 6v6l4 2" stroke="#ffd700" stroke-width="2"/></svg>
-              </span>
+              <span class="timer-icon">⏱️</span>
               <span class="timer-label">YOUR TURN</span>
               <span class="timer-warning">&bull; Auto-folds on 0s</span>
             </div>
@@ -672,29 +547,19 @@
 
           <div class="action-buttons-row">
             <button id="btn-fold" class="btn btn-danger" disabled>
-              <span class="btn-icon">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>
-              </span> Fold
+              <span class="btn-icon">✖</span> Fold
             </button>
             <button id="btn-check-call" class="btn btn-primary" disabled>
-              <span class="btn-icon">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>
-              </span> <span id="check-call-text">Check</span>
+              <span class="btn-icon">✓</span> <span id="check-call-text">Check</span>
             </button>
             <button id="btn-raise" class="btn btn-warning" disabled>
-              <span class="btn-icon">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 19V5M5 12l7-7 7 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>
-              </span> <span id="raise-text">Bet $20</span>
+              <span class="btn-icon">▲</span> <span id="raise-text">Bet $20</span>
             </button>
             <button id="btn-allin" class="btn btn-purple" disabled>
-              <span class="btn-icon">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2c0 4-5 6-5 11a7 7 0 0 0 14 0c0-4-3-8-4-9-1 3-3 4-5 2z" fill="#fde047"/></svg>
-              </span> All-In
+              <span class="btn-icon">🔥</span> All-In
             </button>
             <button id="btn-next-hand" class="btn btn-success hidden">
-              <span class="btn-icon">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>
-              </span> Deal Next Hand
+              <span class="btn-icon">➔</span> Deal Next Hand
             </button>
           </div>
         </div>
@@ -707,19 +572,17 @@
     <div id="online-auth-modal" class="modal-overlay hidden">
       <div class="modal-card auth-modal-card">
         <div class="modal-header">
-          <h2>Exclusive Room Access</h2>
+          <h2>🔒 Exclusive Room Access</h2>
           <button id="close-auth-modal-btn" class="close-btn">&times;</button>
         </div>
         <div class="modal-body auth-modal-body">
-          <div class="auth-icon-wrap">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="11" rx="2.5" stroke="#ffd700" stroke-width="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3" stroke="#ffd700" stroke-width="2"/></svg>
-          </div>
+          <div class="auth-icon-wrap">🌐</div>
           <p class="auth-desc">Enter the exclusive room password to play with online players. Everyone joins with a fresh <strong>$1,000</strong> chip stack.</p>
           
           <div class="input-group">
             <label for="room-password-input">Room Password:</label>
             <input type="password" id="room-password-input" class="modal-text-input" placeholder="Enter exclusive room password" autocomplete="off">
-            <span id="auth-error-msg" class="auth-error hidden">Incorrect password. Access denied!</span>
+            <span id="auth-error-msg" class="auth-error hidden">❌ Incorrect password. Access denied!</span>
           </div>
 
           <div class="input-group">
@@ -748,30 +611,22 @@
           <p class="diff-modal-sub">Choose how fiercely the AI opponents will play against you:</p>
           <div class="diff-options-grid">
             <div class="diff-card" data-difficulty="easy">
-              <div class="diff-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><polygon points="12,2 20,6 18,17 12,22 6,17 4,6" fill="rgba(56,189,248,0.2)" stroke="#38bdf8" stroke-width="2"/></svg>
-              </div>
+              <div class="diff-icon">🛡️</div>
               <div class="diff-title">Easy</div>
               <div class="diff-desc">Bots play conservatively, fold often to bets, rarely bluff, and avoid aggressive pots.</div>
             </div>
             <div class="diff-card active-diff" data-difficulty="medium">
-              <div class="diff-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 3v18M3 8l9-5 9 5M6 14a3 3 0 1 0 6 0M12 14a3 3 0 1 0 6 0" stroke="#fcd34d" stroke-width="2"/></svg>
-              </div>
+              <div class="diff-icon">⚖️</div>
               <div class="diff-title">Medium</div>
               <div class="diff-desc">Standard balanced strategy. Bots calculate pot odds, fire continuation bets, and call appropriately.</div>
             </div>
             <div class="diff-card" data-difficulty="hard">
-              <div class="diff-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2c0 4-5 6-5 11a7 7 0 0 0 14 0c0-4-3-8-4-9-1 3-3 4-5 2z" fill="rgba(239,68,68,0.2)" stroke="#ef4444" stroke-width="2"/></svg>
-              </div>
+              <div class="diff-icon">🔥</div>
               <div class="diff-title">Hard / Aggressive</div>
               <div class="diff-desc">Hyper-aggressive sharks! Frequent pre-flop 3-bets, ruthless multi-street bluffs, and relentless pressure.</div>
             </div>
             <div class="diff-card diff-championship" data-difficulty="nightmare">
-              <div class="diff-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><polygon points="6,3 18,3 22,9 12,21 2,9" fill="rgba(253,224,71,0.2)" stroke="#ffd700" stroke-width="2"/></svg>
-              </div>
+              <div class="diff-icon">💎</div>
               <div class="diff-title">Championship High Roller</div>
               <div class="diff-desc">Premier elite tournament tier. World-class opponents calculate precision pot odds, exploit subtle timing tells, and execute relentless championship pressure.</div>
             </div>
@@ -806,18 +661,16 @@
     <div id="rules-modal" class="modal-overlay hidden">
       <div class="modal-card rules-modal-card">
         <div class="modal-header">
-          <h2>Royal Poker Rules &amp; Guide</h2>
+          <h2>♠ Royal Texas Hold'em Guide & Rules ♠</h2>
           <button id="close-rules-btn" class="close-btn">&times;</button>
         </div>
         
         <!-- Rules Tabs -->
         <div class="rules-tabs-nav">
           <button class="rules-tab-btn active" data-tab="tab-ranks">Hand Rankings</button>
-          <button class="rules-tab-btn" data-tab="tab-flow">Texas Hold'em</button>
-          <button class="rules-tab-btn" data-tab="tab-shortdeck">Short Deck (6+)</button>
-          <button class="rules-tab-btn" data-tab="tab-omaha">Omaha High (4-Card)</button>
-          <button class="rules-tab-btn" data-tab="tab-pots">Pots &amp; All-In Rules</button>
-          <button class="rules-tab-btn" data-tab="tab-ai">AI &amp; Exclusive Room</button>
+          <button class="rules-tab-btn" data-tab="tab-flow">Game Flow & Rounds</button>
+          <button class="rules-tab-btn" data-tab="tab-pots">Pots & All-In Rules</button>
+          <button class="rules-tab-btn" data-tab="tab-ai">AI & Online Room</button>
         </div>
 
         <div class="modal-body rules-modal-body">
@@ -827,7 +680,7 @@
               <span class="r-badge gold-bg">1</span>
               <div>
                 <strong>Royal Flush:</strong>
-                <span class="rank-cards-demo">A K Q J 10 (Same Suit)</span>
+                <span class="rank-cards-demo">A♠ K♠ Q♠ J♠ 10♠</span>
                 <p class="rank-sub">The unbeatable hand. Ace-high straight flush of the same suit.</p>
               </div>
             </div>
@@ -835,7 +688,7 @@
               <span class="r-badge">2</span>
               <div>
                 <strong>Straight Flush:</strong>
-                <span class="rank-cards-demo">9 8 7 6 5 (Same Suit)</span>
+                <span class="rank-cards-demo">9♥ 8♥ 7♥ 6♥ 5♥</span>
                 <p class="rank-sub">Five consecutive cards of identical suit.</p>
               </div>
             </div>
@@ -843,7 +696,7 @@
               <span class="r-badge">3</span>
               <div>
                 <strong>Four of a Kind:</strong>
-                <span class="rank-cards-demo">K K K K 4</span>
+                <span class="rank-cards-demo">K♠ K♥ K♦ K♣ 4♦</span>
                 <p class="rank-sub">Four cards of matching rank plus highest kicker.</p>
               </div>
             </div>
@@ -851,7 +704,7 @@
               <span class="r-badge">4</span>
               <div>
                 <strong>Full House:</strong>
-                <span class="rank-cards-demo">J J J 8 8</span>
+                <span class="rank-cards-demo">J♠ J♥ J♦ 8♣ 8♠</span>
                 <p class="rank-sub">Three cards of one rank combined with a pair of another rank.</p>
               </div>
             </div>
@@ -859,7 +712,7 @@
               <span class="r-badge">5</span>
               <div>
                 <strong>Flush:</strong>
-                <span class="rank-cards-demo">A J 9 6 3 (Same Suit)</span>
+                <span class="rank-cards-demo">A♦ J♦ 9♦ 6♦ 3♦</span>
                 <p class="rank-sub">Any five cards of the same suit, not in sequence.</p>
               </div>
             </div>
@@ -867,7 +720,7 @@
               <span class="r-badge">6</span>
               <div>
                 <strong>Straight:</strong>
-                <span class="rank-cards-demo">10 9 8 7 6 (Mixed Suits)</span>
+                <span class="rank-cards-demo">10♠ 9♥ 8♦ 7♣ 6♠</span>
                 <p class="rank-sub">Five consecutive ranks of mixed suits. Ace can count high (A-K-Q-J-10) or low (5-4-3-2-A).</p>
               </div>
             </div>
@@ -875,7 +728,7 @@
               <span class="r-badge">7</span>
               <div>
                 <strong>Three of a Kind:</strong>
-                <span class="rank-cards-demo">7 7 7 K 2</span>
+                <span class="rank-cards-demo">7♠ 7♥ 7♦ K♣ 2♠</span>
                 <p class="rank-sub">Three cards of matching rank with two unmatched kickers.</p>
               </div>
             </div>
@@ -883,7 +736,7 @@
               <span class="r-badge">8</span>
               <div>
                 <strong>Two Pair:</strong>
-                <span class="rank-cards-demo">Q Q 9 9 A</span>
+                <span class="rank-cards-demo">Q♠ Q♥ 9♦ 9♣ A♠</span>
                 <p class="rank-sub">Two distinct pairs with one kicker card.</p>
               </div>
             </div>
@@ -891,7 +744,7 @@
               <span class="r-badge">9</span>
               <div>
                 <strong>One Pair:</strong>
-                <span class="rank-cards-demo">10 10 A 8 4</span>
+                <span class="rank-cards-demo">10♥ 10♦ A♠ 8♣ 4♥</span>
                 <p class="rank-sub">Two cards of identical rank.</p>
               </div>
             </div>
@@ -899,7 +752,7 @@
               <span class="r-badge">10</span>
               <div>
                 <strong>High Card:</strong>
-                <span class="rank-cards-demo">A J 8 6 2</span>
+                <span class="rank-cards-demo">A♠ J♥ 8♦ 6♣ 2♦</span>
                 <p class="rank-sub">No pair or sequence. Evaluated by highest single card down to fifth kicker.</p>
               </div>
             </div>
@@ -908,7 +761,7 @@
           <!-- TAB 2: Game Flow & Rounds -->
           <div class="rules-tab-pane" id="tab-flow">
             <div class="guide-block">
-              <h3>1. The Dealer Button &amp; Forced Blinds</h3>
+              <h3>1. The Dealer Button & Forced Blinds</h3>
               <p>The Dealer Button (D) rotates clockwise each hand. The player left of the dealer posts the <strong>Small Blind</strong>, and the next player posts the <strong>Big Blind</strong>. These forced bets start the action.</p>
             </div>
             <div class="guide-block">
@@ -924,99 +777,83 @@
               <p>A 4th community card is dealt face-up. Players evaluate their made hands and drawing outs before betting.</p>
             </div>
             <div class="guide-block">
-              <h3>5. The River &amp; Showdown</h3>
+              <h3>5. The River & Showdown</h3>
               <p>The 5th and final community card is revealed. Final betting round ensues. If two or more players remain, all reveal their hole cards in the <strong>Showdown</strong>. The best 5-card combination wins the pot!</p>
             </div>
           </div>
 
-          <!-- TAB 3: Short Deck (6-Plus) Rules -->
-          <div class="rules-tab-pane" id="tab-shortdeck">
-            <div class="guide-block">
-              <h3>Short Deck (6-Plus) Hold'em Rules</h3>
-              <p>Short Deck is an action-packed poker variant played with a stripped 36-card deck:</p>
-              <ul class="bullet-list">
-                <li><strong>Stripped Deck:</strong> All 2s, 3s, 4s, and 5s are removed from the deck (ranks 6 through Ace remain).</li>
-                <li><strong>Flush Beats Full House:</strong> Because there are only 9 cards per suit, hitting a flush is statistically harder than making a full house!</li>
-                <li><strong>Three of a Kind Beats Straight:</strong> With only 36 cards, straights occur much more frequently than trips.</li>
-                <li><strong>A-6-7-8-9 Straight:</strong> The Ace acts as both high (10-J-Q-K-A) and low (A-6-7-8-9).</li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- TAB 4: Omaha High Rules -->
-          <div class="rules-tab-pane" id="tab-omaha">
-            <div class="guide-block">
-              <h3>Omaha High (4-Card) Rules</h3>
-              <p>Omaha is the ultimate drawing game with massive multi-way pots:</p>
-              <ul class="bullet-list">
-                <li><strong>4 Hole Cards:</strong> Each player is dealt 4 private hole cards instead of 2.</li>
-                <li><strong>Strict 2 + 3 Requirement:</strong> You <em>must</em> use <strong>exactly 2 cards</strong> from your 4 hole cards and <strong>exactly 3 cards</strong> from the 5 community cards to form your 5-card hand.</li>
-                <li><strong>No Single-Card Flushes:</strong> Having 4 hearts in your hand and 1 on the board does NOT make a flush—you must use exactly 2 hole cards!</li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- TAB 5: Pots & All-In Rules -->
+          <!-- TAB 3: Pots & All-In Rules -->
           <div class="rules-tab-pane" id="tab-pots">
             <div class="guide-block">
-              <h3>Single Main Pot &amp; Corrected Side Pot Mechanics</h3>
-              <p>In standard play, there is <strong>one single central pot</strong> that all active players compete for. Side pots strictly follow professional casino rules:</p>
+              <h3>💰 Single Main Pot & Side Pots Explained</h3>
+              <p>In standard play, there is <strong>one single central pot</strong> that all active players compete for. When a player pushes <strong>All-In</strong> with fewer chips than an opponent:</p>
               <ul class="bullet-list">
-                <li><strong>When Does a Side Pot Form?</strong> A side pot ONLY triggers when a short-stacked player pushes All-In with less money than other active bettors, allowing remaining players with deeper stacks to continue side-betting.</li>
-                <li><strong>No Unnecessary Side Pots:</strong> If two or more players push All-In with equal stacks, or if all active players match the highest All-In amount, NO side pot is created—all chips go cleanly into the single Main Pot!</li>
-                <li><strong>Eligibility:</strong> The short-stacked all-in player is fully eligible to win the Main Pot (their bet matched by others). They cannot win any side pots formed above their all-in amount.</li>
+                <li><strong>Main Pot:</strong> Composed of the all-in player's chips matched by every active player. The all-in player is fully eligible to win this pot!</li>
+                <li><strong>Side Pot:</strong> Any extra chips bet by opponents with deeper stacks above the all-in amount form a separate side pot. The all-in player cannot win the side pot.</li>
               </ul>
             </div>
 
             <div class="guide-block">
-              <h3>Cash Out &amp; Cumulative Savings</h3>
-              <p>You can cash out your stack at any time between hands by clicking <strong>Cash Out</strong>. All your earnings transfer safely into your permanent Cumulative Poker Savings Vault!</p>
+              <h3>💀 Zero Money Busted Rule</h3>
+              <p>If you push all-in and lose, you drop to <strong>$0 completely</strong>. You are eliminated from the table and return to the Main Menu where you can reset your bankroll back to $1,000.</p>
             </div>
 
             <div class="guide-block">
-              <h3>Zero Money Permadeath</h3>
-              <p>If you push all-in and lose all your chips ($0 bankroll), permadeath activates immediately and that save profile is deleted from storage.</p>
+              <h3>🔥 Dynamic Blind Structure</h3>
+              <p>Blinds automatically escalate every 5 hands to keep action fast and competitive:</p>
+              <div class="blinds-table">
+                <div class="bt-row bt-head"><span>Hands</span><span>Small Blind</span><span>Big Blind</span></div>
+                <div class="bt-row"><span>Rounds 1 – 5</span><span>$10</span><span>$20</span></div>
+                <div class="bt-row"><span>Rounds 6 – 10</span><span>$20</span><span>$40</span></div>
+                <div class="bt-row"><span>Rounds 11 – 15</span><span>$40</span><span>$80</span></div>
+                <div class="bt-row"><span>Rounds 16 – 20</span><span>$80</span><span>$160</span></div>
+                <div class="bt-row"><span>Rounds 21+</span><span>$160</span><span>$320</span></div>
+              </div>
             </div>
           </div>
 
-          <!-- TAB 6: AI & Exclusive Room -->
+          <!-- TAB 4: AI & Online Room -->
           <div class="rules-tab-pane" id="tab-ai">
             <div class="guide-block">
-              <h3>Exclusive Room (5-Second Joining Window &amp; Dynamic Bot Takeover)</h3>
+              <h3>🌐 Exclusive Room (5-Second Joining Window & Dynamic Bot Takeover)</h3>
               <p>Play with real friends over peer-to-peer WebRTC connections:</p>
               <ul class="bullet-list">
                 <li>Click <strong>Exclusive Room</strong> on the Main Menu and enter the room password.</li>
                 <li>Share the link with friends to sit at the exact same table!</li>
                 <li>Each player joins with <strong>$1,000</strong>.</li>
-                <li><strong>Dynamic Bot Replacement:</strong> During the 5-second window between hands, joining friends dynamically replace an active AI bot at the table and inherit its seat and chips immediately!</li>
-                <li><strong>Action Timer:</strong> In the Exclusive Room, a 15-second countdown timer runs on each turn. Failure to act results in an automatic fold.</li>
+                <li><strong>Dynamic Bot Replacement:</strong> During the 5-second window between hands, joining friends dynamically replace an active AI bot at the table and take over its seat and chips immediately!</li>
+                <li><strong>Loading Screen:</strong> If a friend connects while a hand is actively in progress, they see a loading screen waiting for the round to end, and get automatically dealt into the table on the next hand!</li>
               </ul>
             </div>
             
             <div class="guide-block">
-              <h3>Solo Bot Personalities</h3>
+              <h3>🤖 Solo Bot Personalities</h3>
               <div class="ai-profile-card">
+                <span class="ai-avatar">🐍</span>
                 <div class="ai-info">
                   <h4>Viper &bull; Shark (TAG)</h4>
                   <p>Aggressive pre-flop raiser and value sizing expert with premium hands.</p>
                 </div>
               </div>
               <div class="ai-profile-card">
+                <span class="ai-avatar">🛡️</span>
                 <div class="ai-info">
                   <h4>Atlas &bull; Solid (TAG)</h4>
                   <p>Disciplined and mathematical. Respects pot odds and drawing equities.</p>
                 </div>
               </div>
               <div class="ai-profile-card">
+                <span class="ai-avatar">🌙</span>
                 <div class="ai-info">
                   <h4>Luna &bull; Nit (Rock)</h4>
                   <p>Ultra-tight. Only puts serious money in with monster hands.</p>
                 </div>
               </div>
               <div class="ai-profile-card">
+                <span class="ai-avatar">🦁</span>
                 <div class="ai-info">
                   <h4>Duke &bull; Maniac</h4>
-                  <p>Unpredictable wild card. Loves multi-street bluffing and pushing all-ins.</p>
+                  <p>Hyper-aggressive table disruptor. Shoves, 3-bets, and calls all-ins fearlessly.</p>
                 </div>
               </div>
             </div>
@@ -1026,262 +863,12 @@
     </div>
 
     <!-- ======================================================================
-         7A. CAREER STATISTICS MODAL
-         ====================================================================== -->
-    <div id="stats-modal" class="modal-overlay hidden">
-      <div class="modal-card stats-modal-card">
-        <div class="modal-header">
-          <h2>Career Casino Analytics</h2>
-          <button id="close-stats-modal-btn" class="close-btn">&times;</button>
-        </div>
-        <div class="modal-body stats-modal-body">
-          <div class="stats-overview-grid">
-            <div class="career-stat-card">
-              <span class="c-stat-lbl">Cumulative Savings Vault</span>
-              <strong class="c-stat-val gold" id="c-stat-savings">$1,000</strong>
-            </div>
-            <div class="career-stat-card">
-              <span class="c-stat-lbl">Total Hands Played</span>
-              <strong class="c-stat-val" id="c-stat-total-hands">0</strong>
-            </div>
-            <div class="career-stat-card">
-              <span class="c-stat-lbl">Hands Won</span>
-              <strong class="c-stat-val" id="c-stat-won">0</strong>
-            </div>
-            <div class="career-stat-card">
-              <span class="c-stat-lbl">Win Rate</span>
-              <strong class="c-stat-val" id="c-stat-win-rate">0%</strong>
-            </div>
-            <div class="career-stat-card">
-              <span class="c-stat-lbl">Biggest Single Pot</span>
-              <strong class="c-stat-val gold" id="c-stat-biggest-pot">$0</strong>
-            </div>
-            <div class="career-stat-card">
-              <span class="c-stat-lbl">Best Win Streak</span>
-              <strong class="c-stat-val" id="c-stat-best-streak">0</strong>
-            </div>
-            <div class="career-stat-card">
-              <span class="c-stat-lbl">Best Lifetime Hand</span>
-              <strong class="c-stat-val" id="c-stat-best-hand">High Card</strong>
-            </div>
-            <div class="career-stat-card">
-              <span class="c-stat-lbl">Online Room Hands</span>
-              <strong class="c-stat-val" id="c-stat-online-hands">0</strong>
-            </div>
-          </div>
-
-          <div class="stats-variant-breakdown">
-            <h3>Poker Variant Records</h3>
-            <div class="variant-stat-row">
-              <span>Classic Texas Hold'em:</span>
-              <strong id="v-stat-texas">Unlocked</strong>
-            </div>
-            <div class="variant-stat-row">
-              <span>Short Deck (6-Plus):</span>
-              <strong id="v-stat-short">Unlocked</strong>
-            </div>
-            <div class="variant-stat-row">
-              <span>Omaha High (4-Card):</span>
-              <strong id="v-stat-omaha">Unlocked</strong>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ======================================================================
-         7B. SETTINGS & FEATURE MODULES MODAL (Reversible Architecture)
-         ====================================================================== -->
-    <div id="settings-modal" class="modal-overlay hidden">
-      <div class="modal-card settings-modal-card">
-        <div class="modal-header">
-          <h2>Game Settings &amp; Module Controls</h2>
-          <button id="close-settings-modal-btn" class="close-btn">&times;</button>
-        </div>
-        <div class="modal-body settings-modal-body">
-          <!-- Audio & Volume Controls -->
-          <div class="settings-group">
-            <h3>Audio Synthesizer &amp; Sound FX</h3>
-            <div class="setting-row">
-              <label for="setting-audio-toggle">Master Sound FX:</label>
-              <input type="checkbox" id="setting-audio-toggle" class="setting-toggle" checked>
-            </div>
-            <div class="setting-row">
-              <label for="setting-volume-slider">SFX Volume Level:</label>
-              <input type="range" id="setting-volume-slider" min="0" max="100" value="80" class="setting-range">
-              <span id="setting-volume-val" class="setting-val-tag">80%</span>
-            </div>
-          </div>
-
-          <!-- Visuals & Graphics Quality -->
-          <div class="settings-group">
-            <h3>Visual Graphics &amp; Theme Quality</h3>
-            <div class="setting-row">
-              <label for="setting-quality-select">Graphics Quality:</label>
-              <select id="setting-quality-select" class="setting-select">
-                <option value="high">High (Full Constellations &amp; Glow)</option>
-                <option value="medium">Medium (Subtle Space Theme)</option>
-                <option value="low">Low (Minimal Performance)</option>
-              </select>
-            </div>
-            <div class="setting-row">
-              <label for="setting-bg-toggle">Solar Flare Constellation FX:</label>
-              <input type="checkbox" id="setting-bg-toggle" class="setting-toggle" checked>
-            </div>
-          </div>
-
-          <!-- Reversible Modules & Feature Flags -->
-          <div class="settings-group">
-            <h3>Modular Feature Flags (Reversible Architecture)</h3>
-            <p class="setting-desc">Toggle specific gameplay modules on/off dynamically without breaking core poker gameplay:</p>
-            
-            <div class="setting-row">
-              <span>Short Deck (6-Plus) Variant:</span>
-              <input type="checkbox" id="flag-short-deck" class="setting-toggle" checked>
-            </div>
-            <div class="setting-row">
-              <span>Omaha High (4-Card) Variant:</span>
-              <input type="checkbox" id="flag-omaha" class="setting-toggle" checked>
-            </div>
-            <div class="setting-row">
-              <span>Solar Flare Slots Mini-Game:</span>
-              <input type="checkbox" id="flag-slots" class="setting-toggle" checked>
-            </div>
-            <div class="setting-row">
-              <span>European Roulette Mini-Game:</span>
-              <input type="checkbox" id="flag-roulette" class="setting-toggle" checked>
-            </div>
-            <div class="setting-row">
-              <span>Strict Short-Stack Side Pot Rule:</span>
-              <input type="checkbox" id="flag-side-pot-rule" class="setting-toggle" checked>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ======================================================================
-         7C. CASH OUT CONFIRMATION MODAL
-         ====================================================================== -->
-    <div id="cashout-modal" class="modal-overlay hidden">
-      <div class="modal-card cashout-modal-card">
-        <div class="cashout-vault-icon">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-            <rect x="3" y="4" width="18" height="16" rx="3" stroke="#ffd700" stroke-width="2"/>
-            <circle cx="12" cy="12" r="4" stroke="#ffd700" stroke-width="2"/>
-            <circle cx="12" cy="12" r="1.5" fill="#ffd700"/>
-            <path d="M12 4v4M12 16v4M3 12h4M17 12h4" stroke="#ffd700" stroke-width="1.8"/>
-          </svg>
-        </div>
-        <h2>CASH OUT &amp; SAFE VAULT</h2>
-        <p>Transfer your active table earnings into your permanent Cumulative Poker Savings Vault?</p>
-        <div class="cashout-amount-box">
-          <span>Active Table Chips:</span>
-          <strong class="cashout-chips-display" id="cashout-amount-display">$1,000</strong>
-        </div>
-        <p class="cashout-subtext">Cashing out safely secures your chips from table risk. You can return to the main menu with your earnings guaranteed.</p>
-        <div class="modal-actions-row">
-          <button id="btn-cancel-cashout" class="btn btn-secondary">Stay at Table</button>
-          <button id="btn-confirm-cashout" class="btn btn-primary gold-action-btn">Confirm Cash Out</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ======================================================================
-         8. SOLAR FLARE 3-REEL SLOT MACHINE MINI-GAME (Deep Vector Graphics)
-         ====================================================================== -->
-    <div id="slots-modal" class="modal-overlay hidden">
-      <div class="modal-card slots-modal-card">
-        <div class="modal-header">
-          <h2>Solar Flare 3-Reel Slots</h2>
-          <button id="close-slots-btn" class="close-btn">&times;</button>
-        </div>
-        <div class="modal-body slots-modal-body">
-          <div class="slots-top-bar">
-            <div class="slots-stat-pill">
-              <span>Mini-Game Wallet:</span> <strong id="slots-wallet-balance">$1,000</strong>
-            </div>
-            <div id="slots-win-display" class="slots-stat-pill slots-win-pill">
-              Ready to Spin!
-            </div>
-            <div class="slots-stat-pill">
-              <span>Current Wager:</span> <strong id="slots-current-wager">$50</strong>
-            </div>
-          </div>
-
-          <!-- 3-Reel Slot Cabinet -->
-          <div class="slots-cabinet">
-            <div class="slots-payline-indicator left">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="#ffd700"><polygon points="6,2 20,12 6,22"/></svg>
-            </div>
-            <div class="slots-reels-stage">
-              <div class="slot-reel-wrap" id="reel-wrap-1">
-                <div class="slot-reel" id="slot-reel-1">
-                  <div class="slot-symbol-wrap" data-symbol="seven"></div>
-                </div>
-              </div>
-              <div class="slot-reel-wrap" id="reel-wrap-2">
-                <div class="slot-reel" id="slot-reel-2">
-                  <div class="slot-symbol-wrap" data-symbol="flare"></div>
-                </div>
-              </div>
-              <div class="slot-reel-wrap" id="reel-wrap-3">
-                <div class="slot-reel" id="slot-reel-3">
-                  <div class="slot-symbol-wrap" data-symbol="star"></div>
-                </div>
-              </div>
-            </div>
-            <div class="slots-payline-indicator right">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="#ffd700"><polygon points="18,2 4,12 18,22"/></svg>
-            </div>
-          </div>
-
-          <div id="slots-result-banner" class="slots-result-banner hidden">
-            <span id="slots-result-title">JACKPOT WIN!</span>
-            <span id="slots-result-detail">+ $1,500</span>
-          </div>
-
-          <!-- Quick Preset Wager Controls -->
-          <div class="slots-wager-controls">
-            <span class="wager-label">Select Wager:</span>
-            <div class="preset-buttons-row">
-              <button class="slots-preset-btn" data-wager="10">$10</button>
-              <button class="slots-preset-btn active" data-wager="50">$50</button>
-              <button class="slots-preset-btn" data-wager="100">$100</button>
-              <button class="slots-preset-btn max-btn" data-wager="max">MAX</button>
-            </div>
-            <button id="btn-spin-slots" class="btn btn-primary slots-spin-btn">
-              SPIN REELS
-            </button>
-          </div>
-
-          <!-- Paytable Multipliers Drawer -->
-          <div class="slots-paytable">
-            <div class="pt-item"><span class="pt-sym-lbl">7 7 7</span> <span class="pt-mult gold">50x Jackpot Multiplier</span></div>
-            <div class="pt-item"><span class="pt-sym-lbl">FLARE x3</span> <span class="pt-mult orange">30x Wild Flare</span></div>
-            <div class="pt-item"><span class="pt-sym-lbl">STAR x3</span> <span class="pt-mult yellow">20x Starlight Stars</span></div>
-            <div class="pt-item"><span class="pt-sym-lbl">SUIT x3</span> <span class="pt-mult blue">10x Royal Suits</span></div>
-            <div class="pt-item"><span class="pt-sym-lbl">Pair + Wild</span> <span class="pt-mult green">5x Wild Boost</span></div>
-            <div class="pt-item"><span class="pt-sym-lbl">Any Pair</span> <span class="pt-mult cyan">2x Payout</span></div>
-            <div class="pt-item"><span class="pt-sym-lbl">7 or Star</span> <span class="pt-mult gray">1x Push</span></div>
-          </div>
-
-          <div class="slots-footer-actions">
-            <button id="btn-slots-transfer" class="btn btn-secondary transfer-shortcut-btn">
-              Transfer Winnings to Poker
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ======================================================================
-         9. EUROPEAN SINGLE-ZERO ROULETTE MINI-GAME
+         7. EUROPEAN ROULETTE MINI-GAME MODAL (Streamlined Controls)
          ====================================================================== -->
     <div id="roulette-modal" class="modal-overlay hidden">
       <div class="modal-card roulette-modal-card">
         <div class="modal-header">
-          <h2>European Single-Zero Roulette</h2>
+          <h2>🎡 European Single-Zero Roulette</h2>
           <button id="close-roulette-btn" class="close-btn">&times;</button>
         </div>
         <div class="modal-body roulette-modal-body">
@@ -1289,7 +876,7 @@
             <div class="roulette-stat-pill">
               <span>Mini-Game Wallet:</span> <strong id="roulette-bankroll">$1,000</strong>
             </div>
-            <div id="roulette-status-pill" class="roulette-stat-pill roulette-status-pill">
+            <div id="roulette-status-pill" class="roulette-stat-pill status-pill">
               Place your bets and click Spin!
             </div>
             <div class="roulette-stat-pill">
@@ -1327,15 +914,21 @@
 
           <!-- European Roulette Betting Table -->
           <div class="roulette-table-board">
+            <!-- Zero Row -->
             <div class="r-grid-zero">
               <button class="r-bet-spot r-spot-zero" data-bet-type="number" data-bet-val="0">0</button>
             </div>
-            <div class="r-grid-numbers" id="roulette-numbers-grid"></div>
+            <!-- Numbers Grid 1-36 -->
+            <div class="r-grid-numbers" id="roulette-numbers-grid">
+              <!-- Dynamically populated 1 to 36 -->
+            </div>
+            <!-- Dozens -->
             <div class="r-grid-dozens">
               <button class="r-bet-spot r-spot-dozen" data-bet-type="dozen" data-bet-val="1">1st 12 (1-12)</button>
               <button class="r-bet-spot r-spot-dozen" data-bet-type="dozen" data-bet-val="2">2nd 12 (13-24)</button>
               <button class="r-bet-spot r-spot-dozen" data-bet-type="dozen" data-bet-val="3">3rd 12 (25-36)</button>
             </div>
+            <!-- Outside Bets: 1-18, Even, Red, Black, Odd, 19-36 -->
             <div class="r-grid-outside">
               <button class="r-bet-spot r-spot-outside" data-bet-type="low" data-bet-val="low">1 to 18</button>
               <button class="r-bet-spot r-spot-outside" data-bet-type="parity" data-bet-val="even">EVEN</button>
@@ -1347,23 +940,107 @@
           </div>
 
           <div class="roulette-actions-row">
-            <button id="btn-roulette-transfer" class="btn btn-secondary transfer-shortcut-btn" title="Transfer Mini-Game Winnings to Poker">
-              Transfer Winnings to Poker
+            <button id="btn-roulette-transfer" class="btn btn-secondary transfer-shortcut-btn" title="Transfer Mini-Game Winnings to Poker Run">
+              💸 Transfer Winnings to Poker
             </button>
             <button id="btn-clear-roulette" class="btn btn-secondary">Clear Bets</button>
-            <button id="btn-spin-roulette" class="btn btn-primary r-spin-btn">SPIN WHEEL</button>
+            <button id="btn-spin-roulette" class="btn btn-primary r-spin-btn">🎡 SPIN WHEEL</button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- ======================================================================
-         10. BANKROLL TRANSFER MODAL (One-Way: Mini-Games -> Poker Savings)
+         7B. SOLAR FLARE 3-REEL SLOT MACHINE MINI-GAME
+         ====================================================================== -->
+    <div id="slots-modal" class="modal-overlay hidden">
+      <div class="modal-card slots-modal-card">
+        <div class="modal-header">
+          <h2>🎰 Solar Flare 3-Reel Slots</h2>
+          <button id="close-slots-btn" class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body slots-modal-body">
+          <div class="slots-top-bar">
+            <div class="slots-stat-pill">
+              <span>Mini-Game Wallet:</span> <strong id="slots-wallet-balance">$1,000</strong>
+            </div>
+            <div id="slots-win-display" class="slots-stat-pill slots-win-pill">
+              Ready to Spin!
+            </div>
+            <div class="slots-stat-pill">
+              <span>Current Wager:</span> <strong id="slots-current-wager">$50</strong>
+            </div>
+          </div>
+
+          <!-- 3-Reel Slot Cabinet -->
+          <div class="slots-cabinet">
+            <div class="slots-payline-indicator left">▶</div>
+            <div class="slots-reels-stage">
+              <div class="slot-reel-wrap" id="reel-wrap-1">
+                <div class="slot-reel" id="slot-reel-1">
+                  <div class="slot-symbol">7️⃣</div>
+                </div>
+              </div>
+              <div class="slot-reel-wrap" id="reel-wrap-2">
+                <div class="slot-reel" id="slot-reel-2">
+                  <div class="slot-symbol">🔥</div>
+                </div>
+              </div>
+              <div class="slot-reel-wrap" id="reel-wrap-3">
+                <div class="slot-reel" id="slot-reel-3">
+                  <div class="slot-symbol">⭐</div>
+                </div>
+              </div>
+            </div>
+            <div class="slots-payline-indicator right">◀</div>
+          </div>
+
+          <div id="slots-result-banner" class="slots-result-banner hidden">
+            <span id="slots-result-title">JACKPOT WIN!</span>
+            <span id="slots-result-detail">+ $1,500</span>
+          </div>
+
+          <!-- Quick Preset Wager Controls -->
+          <div class="slots-wager-controls">
+            <span class="wager-label">Select Wager:</span>
+            <div class="preset-buttons-row">
+              <button class="slots-preset-btn" data-wager="10">$10</button>
+              <button class="slots-preset-btn active" data-wager="50">$50</button>
+              <button class="slots-preset-btn" data-wager="100">$100</button>
+              <button class="slots-preset-btn max-btn" data-wager="max">MAX</button>
+            </div>
+            <button id="btn-spin-slots" class="btn btn-primary slots-spin-btn">
+              ⚡ PULL LEVER / SPIN ⚡
+            </button>
+          </div>
+
+          <!-- Paytable Multipliers Drawer -->
+          <div class="slots-paytable">
+            <div class="pt-item"><span class="pt-sym">7️⃣ 7️⃣ 7️⃣</span> <span class="pt-mult gold">50x Multiplier</span></div>
+            <div class="pt-item"><span class="pt-sym">🔥 🔥 🔥</span> <span class="pt-mult orange">30x Wild Flare</span></div>
+            <div class="pt-item"><span class="pt-sym">⭐ ⭐ ⭐</span> <span class="pt-mult yellow">20x Stars</span></div>
+            <div class="pt-item"><span class="pt-sym">♠️/♥️/♦️/♣️ x3</span> <span class="pt-mult blue">10x Royal Suits</span></div>
+            <div class="pt-item"><span class="pt-sym">Pair + 🔥 Wild</span> <span class="pt-mult green">5x Wild Boost</span></div>
+            <div class="pt-item"><span class="pt-sym">Any Pair</span> <span class="pt-mult cyan">2x Payout</span></div>
+            <div class="pt-item"><span class="pt-sym">Any 7️⃣ or ⭐</span> <span class="pt-mult gray">1x Push</span></div>
+          </div>
+
+          <div class="slots-footer-actions">
+            <button id="btn-slots-transfer" class="btn btn-secondary transfer-shortcut-btn">
+              💸 Transfer Winnings to Poker Run
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         7C. BANKROLL TRANSFER MODAL (One-Way: Mini-Games -> Poker Campaign)
          ====================================================================== -->
     <div id="transfer-modal" class="modal-overlay hidden">
       <div class="modal-card transfer-modal-card">
         <div class="modal-header">
-          <h2>Bankroll Transfer to Poker Savings</h2>
+          <h2>💸 Bankroll Transfer to Poker Campaign</h2>
           <button id="close-transfer-btn" class="close-btn">&times;</button>
         </div>
         <div class="modal-body transfer-modal-body">
@@ -1373,13 +1050,15 @@
               <strong id="transfer-avail-balance">$1,000</strong>
             </div>
             <p class="transfer-rule-alert">
-              <strong>Strict One-Way Separation:</strong> Winnings from Solar Slots and Roulette can be safely injected into your permanent Cumulative Poker Savings Vault. However, main poker savings can never be transferred or spent in mini-games!
+              <strong>⚡ Strict One-Way Separation:</strong> Winnings from Solar Slots and Roulette can be injected into any active poker save file. However, main poker save funds can <em>never</em> be transferred or spent in mini-games!
             </p>
           </div>
 
           <div class="input-group">
             <label>Select Destination Poker Save Slot:</label>
-            <div class="transfer-slot-options" id="transfer-slot-options"></div>
+            <div class="transfer-slot-options" id="transfer-slot-options">
+              <!-- Dynamically populated with Slot 1, 2, 3 metadata -->
+            </div>
           </div>
 
           <div class="input-group">
@@ -1391,24 +1070,24 @@
               <button class="t-preset-btn" data-amt="all">All Winnings</button>
             </div>
             <input type="number" id="transfer-amount-input" class="modal-text-input" min="10" placeholder="Enter amount to inject" value="100">
-            <span id="transfer-error-msg" class="auth-error hidden">Amount exceeds available mini-game balance!</span>
+            <span id="transfer-error-msg" class="auth-error hidden">❌ Amount exceeds available mini-game balance!</span>
           </div>
 
           <div class="modal-actions-row">
             <button id="btn-cancel-transfer" class="btn btn-secondary">Cancel</button>
-            <button id="btn-confirm-transfer" class="btn btn-primary gold-action-btn">Confirm Transfer</button>
+            <button id="btn-confirm-transfer" class="btn btn-primary gold-action-btn">Confirm Transfer 💸</button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- ======================================================================
-         11. HAND HISTORY LOG PANEL (Collapsible Drawer / Modal)
+         8. HAND HISTORY LOG PANEL (Collapsible Drawer / Modal)
          ====================================================================== -->
     <div id="hand-history-panel" class="modal-overlay hidden">
       <div class="modal-card history-modal-card">
         <div class="modal-header">
-          <h2>Hand History &amp; Action Log</h2>
+          <h2>📜 Hand History & Action Log</h2>
           <button id="close-history-btn" class="close-btn">&times;</button>
         </div>
         <div class="modal-body history-modal-body">
@@ -1424,16 +1103,11 @@
     </div>
 
     <!-- ======================================================================
-         12. STAGE ADVANCEMENT / VICTORY MODAL (100% Table Dominance)
+         9. STAGE ADVANCEMENT / VICTORY MODAL (100% Table Dominance)
          ====================================================================== -->
     <div id="stage-victory-modal" class="modal-overlay hidden">
       <div class="modal-card victory-modal-card">
-        <div class="victory-trophy-glow">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-            <path d="M6 3h12v7a6 6 0 0 1-12 0V3z" fill="rgba(253,224,71,0.3)" stroke="#ffd700" stroke-width="2"/>
-            <path d="M6 5H3a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M18 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1M12 16v4M8 20h8" stroke="#ffd700" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </div>
+        <div class="victory-trophy-glow">🏆</div>
         <h2>STAGE CONQUERED!</h2>
         <p class="victory-subtitle">All opponents knocked out! You dominate 100% of the table chips.</p>
         <div class="victory-stats-box">
@@ -1443,33 +1117,26 @@
         </div>
         <div class="modal-actions-row">
           <button id="btn-victory-menu" class="btn btn-secondary">Main Menu</button>
-          <button id="btn-advance-stage" class="btn btn-primary victory-next-btn">Advance to Next Stage</button>
+          <button id="btn-advance-stage" class="btn btn-primary victory-next-btn">Advance to Next Stage ⚔️</button>
         </div>
       </div>
     </div>
 
     <!-- ======================================================================
-         13. PERMADEATH GAME OVER & QUICK REBUY MODAL
+         10. PERMADEATH GAME OVER & QUICK REBUY MODAL
          ====================================================================== -->
     <div id="game-over-modal" class="modal-overlay hidden">
       <div class="modal-card gameover-modal-card">
-        <div class="gameover-skull-icon">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2C7.5 2 4 5.5 4 10c0 3 1.8 5.5 4 6.8V20h8v-3.2c2.2-1.3 4-3.8 4-6.8 0-4.5-3.5-8-8-8z" fill="rgba(239,68,68,0.2)" stroke="#ef4444" stroke-width="2"/>
-            <circle cx="9" cy="10" r="1.5" fill="#ef4444"/>
-            <circle cx="15" cy="10" r="1.5" fill="#ef4444"/>
-            <path d="M10 18v2M14 18v2M12 14v1" stroke="#ef4444" stroke-width="1.5"/>
-          </svg>
-        </div>
+        <div class="gameover-skull-icon">💀</div>
         <h2>YOU BUSTED OUT!</h2>
         <p class="gameover-tagline">Your bankroll dropped to $0.</p>
         <div class="permadeath-notice-box">
-          <strong>Permadeath Activated:</strong>
-          <p>This save profile has been permanently deleted from storage. Start fresh with a clean $1,000 bankroll or draw from your permanent Cumulative Savings Vault.</p>
+          <strong>⚡ Permadeath Activated:</strong>
+          <p>This save profile has been permanently deleted from storage. Start fresh with a clean $1,000 bankroll to climb back to glory.</p>
         </div>
         <div class="modal-actions-row">
           <button id="btn-gameover-menu" class="btn btn-secondary">Exit to Menu</button>
-          <button id="btn-quick-rebuy" class="btn btn-primary quick-rebuy-btn">Start New Run ($1,000)</button>
+          <button id="btn-quick-rebuy" class="btn btn-primary quick-rebuy-btn">Start New Run ($1,000) ⚡</button>
         </div>
       </div>
     </div>
