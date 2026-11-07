@@ -92,13 +92,14 @@ try { this.renderMainMenuSlots(); } catch (err) { console.error("renderSlots err
 
 ---
 
-## 🛠️ Required Feature Specs for Future Implementation
+## 🛠️ Feature Specs & Implementation Status
 
-### 1. Corrected Side Pot Rule
+### 1. Corrected Side Pot Rule ✅ COMPLETED & VERIFIED
 - **Rule:** Side pots form **ONLY** when a short-stacked player goes All-In with strictly less chips than deeper active bettors.
 - **Equal Stack All-Ins:** When players with equal stacks shove, or when all calls match the all-in amount, **EXACTLY 1 Main Pot is created (ZERO side pots)**.
+- Implemented in both `pot_manager.py` and `app.js` (`PotManager.calculateSidePots`).
 
-### 2. Poker Game Variants
+### 2. Poker Game Variants ✅ COMPLETED & VERIFIED
 - **Short Deck (6-Plus):**
   - Deck stripped to 36 cards (ranks 6 through Ace; ranks 2–5 removed).
   - Rankings: Royal Flush > Straight Flush > Four of a Kind > **Flush** > **Full House** > **Three of a Kind** > Straight > Two Pair > One Pair > High Card.
@@ -106,11 +107,22 @@ try { this.renderMainMenuSlots(); } catch (err) { console.error("renderSlots err
 - **Omaha High (4-Card):**
   - Deal 4 hole cards per player.
   - Players **must** use exactly 2 hole cards and exactly 3 community cards (all $\binom{4}{2} \times \binom{5}{3} = 60$ combinations evaluated).
+- Implemented in `app.js` (`evaluateShortDeck5Cards`, `evaluateOmahaBestHand`, `Deck.reset(variant)`).
 
-### 3. Cumulative Savings Vault & Cash Out
-- Table winnings can be preserved via an explicit **"Cash Out & Exit"** button.
-- Cashed out chips are moved into `royal_poker_cumulative_savings_v1` in `localStorage`, safe from permadeath.
-- Permadeath triggers only when active chips on the table reach $0.
+### 3. Cumulative Savings Vault & Cash Out ✅ COMPLETED & VERIFIED
+- Table winnings preserved via dedicated **"Cash Out & Exit"** button (`btn-cashout-exit` and `btn-top-cashout`).
+- Cashed out chips moved into `royal_poker_cumulative_savings_v1` in `localStorage`, safe from permadeath.
+- Permadeath permanently deletes save slot on $0 bankroll with quick-rebuy option.
+- Implemented in `EconomyManager.cashOutRunToSavings`, `openCashoutModal`, `confirmCashout`.
+
+### 4. Custom Vector Graphics Overhaul (Zero Emojis) ✅ COMPLETED & VERIFIED
+- Replaced all visible emojis in UI, buttons, announcements, and badges with custom high-definition SVG vector assets (`AvatarSVGs`, `SlotSymbolSVGs`, `renderAvatar`, `renderSlotSymbol`).
+- Preserved internal token keys for seamless backward compatibility.
+
+### 5. Persistent Navigation & Side Transit Drawer ✅ COMPLETED & VERIFIED
+- Fixed Top Navigation Bar (`#site-top-bar`) with dual wallet indicators and modal triggers.
+- Animated Side Transit Drawer (`#transit-drawer`) for rapid jumping between Texas Hold'em, Short Deck, Omaha, Exclusive Room, Slots, Roulette, and Savings Vault.
+- Career Statistics Modal (`#stats-modal`), Settings Modal with feature toggles and volume slider (`#settings-modal`), Rules Modal (`#rules-modal`), and Cashout Modal (`#cashout-modal`).
 
 ---
 
@@ -124,3 +136,4 @@ try { this.renderMainMenuSlots(); } catch (err) { console.error("renderSlots err
   - `python verify_syntax.py`
   - `python simulate_10_runs.py`
   - `python test_poker.py`
+

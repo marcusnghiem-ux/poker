@@ -1,23 +1,75 @@
 /* ==========================================================================
-   ROYAL TEXAS HOLD'EM - ADVANCED CASINO ENGINE
-   Features:
-   - Peer-to-Peer Friends Online Multiplayer via PeerJS (No Leaked Passwords)
-   - 5-Second Joining Window Between Hands + Mid-Round Waiting Screen
-   - Device-Isolated Private 3 Save Slots (Online games never alter solo saves)
-   - Expanded Global Stats (Hands, Won, Win Rate %, Biggest Pot, Best Streak, Best Hand)
-   - Single Main Pot with Clean All-In Side Pot
-   - Realistic All-In Shoves & Auto Dramatic Board Runout
-   - Dynamic Blinds Escalation every 5 hands
-   - Busted Zero Money System with Main Menu Reset Option
+   ROYAL TEXAS HOLD'EM - ADVANCED MODULAR CASINO ENGINE
+   Architecture & Modules:
+   - FeatureManager: Dynamic, reversible feature toggles
+   - Zero System Emojis: 100% custom vector illustrations & metallic SVG assets
+   - Persistent Top Nav Bar & Animated Side Transit Drawer
+   - Dual Wallet Live Display (Poker Savings Vault vs Mini-Games Wallet)
+   - Permadeath on $0 bankroll with permanent save deletion & quick-rebuy
+   - Cash Out & Cumulative Poker Savings Vault (infinite accumulation)
+   - Short Deck (6-Plus) Hold'em (36 cards, Flush > Full House, Trips > Straight, A-6-7-8-9)
+   - Omaha High (4-Card) Combinatorial Evaluation (2 hole + 3 board = 60 combos)
+   - Streamlined European Roulette & Solar Flare 3-Reel Slots (custom SVG symbols)
+   - Corrected Side Pot Mechanics (side pot ONLY on short-stack all-in; equal all-ins = 1 pot)
+   - Exclusive Room: Dynamic 5s bot replacement with inherited chips & 15s turn auto-fold
+   - Hidden Nightmare AI: Disguised Championship mode with ~55-60% equity bias & 20% bluff engine
    ========================================================================== */
 
-// ============================================================================
-// 1. AUDIO SYNTHESIZER (Web Audio API - Pure synthesized sound, zero assets)
-// ============================================================================
+class FeatureManager {
+  static STORAGE_KEY = 'royal_poker_feature_flags_v1';
+  static DEFAULT_FLAGS = {
+    shortDeck: true,
+    omaha: true,
+    slots: true,
+    roulette: true,
+    sidePotRule: true,
+    solarFlareTheme: true,
+    exclusiveRoom: true,
+    permadeath: true
+  };
+
+  static getFlags() {
+    try {
+      const data = localStorage.getItem(FeatureManager.STORAGE_KEY);
+      if (data) {
+        return { ...FeatureManager.DEFAULT_FLAGS, ...JSON.parse(data) };
+      }
+    } catch (e) {}
+    return { ...FeatureManager.DEFAULT_FLAGS };
+  }
+
+  static isEnabled(featureKey) {
+    const flags = FeatureManager.getFlags();
+    return flags[featureKey] !== false;
+  }
+
+  static setFlag(featureKey, enabled) {
+    const flags = FeatureManager.getFlags();
+    flags[featureKey] = !!enabled;
+    try {
+      localStorage.setItem(FeatureManager.STORAGE_KEY, JSON.stringify(flags));
+    } catch (e) {}
+    return flags;
+  }
+
+  static resetToDefaults() {
+    try {
+      localStorage.setItem(FeatureManager.STORAGE_KEY, JSON.stringify(FeatureManager.DEFAULT_FLAGS));
+    } catch (e) {}
+    return { ...FeatureManager.DEFAULT_FLAGS };
+  }
+}
+
 class SoundManager {
   constructor() {
     this.enabled = localStorage.getItem('royal_poker_sound_muted') !== 'true';
+    this.volume = parseFloat(localStorage.getItem('royal_poker_volume') || '0.8');
     this.ctx = null;
+  }
+
+  setVolume(vol) {
+    this.volume = Math.max(0, Math.min(1, vol));
+    localStorage.setItem('royal_poker_volume', this.volume.toString());
   }
 
   init() {
@@ -291,10 +343,11 @@ class Deck {
     this.cards = [];
     this.reset();
   }
-  reset() {
+  reset(variant = 'texas') {
     this.cards = [];
+    const minRank = (variant === 'shortDeck') ? 6 : 2;
     for (const suit of SUITS) {
-      for (let r = 2; r <= 14; r++) {
+      for (let r = minRank; r <= 14; r++) {
         this.cards.push(new Card(r, suit));
       }
     }
@@ -413,7 +466,114 @@ function compareScores(evalA, evalB) {
   return 0;
 }
 
-function evaluateBestHand(holeCards, communityCards) {
+
+const SHORT_DECK_HAND_RANKS = {
+  HIGH_CARD: 1,
+  ONE_PAIR: 2,
+  TWO_PAIR: 3,
+  STRAIGHT: 4,
+  THREE_OF_A_KIND: 5, // In Short Deck: Trips beats Straight!
+  FULL_HOUSE: 6,
+  FLUSH: 7,           // In Short Deck: Flush beats Full House!
+  FOUR_OF_A_KIND: 8,
+  STRAIGHT_FLUSH: 9
+};
+
+function evaluateShortDeck5Cards(cards) {
+  const ranks = cards.map(c => c.rank).sort((a, b) => b - a);
+  const suits = cards.map(c => c.suit.name);
+  const isFlush = suits.every(s => s === suits[0]);
+
+  let isStraight = false;
+  let straightHigh = 0;
+  const uniqueRanks = [...new Set(ranks)];
+
+  if (uniqueRanks.length === 5) {
+    if (uniqueRanks[0] - uniqueRanks[4] === 4) {
+      isStraight = true;
+      straightHigh = uniqueRanks[0];
+    } else if (
+      uniqueRanks[0] === 14 &&
+      uniqueRanks[1] === 9 &&
+      uniqueRanks[2] === 8 &&
+      uniqueRanks[3] === 7 &&
+      uniqueRanks[4] === 6
+    ) {
+      // Ace plays low for straight in 6-plus: A-6-7-8-9 (9 is straight high)
+      isStraight = true;
+      straightHigh = 9;
+    }
+  }
+
+  const counts = {};
+  for (const r of ranks) counts[r] = (counts[r] || 0) + 1;
+  const countEntries = Object.entries(counts).map(([r, c]) => ({ rank: Number(r), count: c }));
+  countEntries.sort((a, b) => b.count - a.count || b.rank - a.rank);
+
+  const freqs = countEntries.map(e => e.count);
+  const orderedRanks = countEntries.map(e => e.rank);
+
+  if (isFlush && isStraight) {
+    const desc = straightHigh === 14 ? 'Royal Flush' : `Straight Flush, ${RANK_FULL[straightHigh]} High`;
+    return { category: SHORT_DECK_HAND_RANKS.STRAIGHT_FLUSH, score: [straightHigh], desc };
+  }
+  if (freqs[0] === 4) {
+    return { category: SHORT_DECK_HAND_RANKS.FOUR_OF_A_KIND, score: [orderedRanks[0], orderedRanks[1]], desc: `Four of a Kind, ${RANK_FULL[orderedRanks[0]]}s` };
+  }
+  // In Short Deck: Flush beats Full House!
+  if (isFlush) {
+    return { category: SHORT_DECK_HAND_RANKS.FLUSH, score: ranks, desc: `Flush, ${RANK_FULL[ranks[0]]} High` };
+  }
+  if (freqs[0] === 3 && freqs[1] === 2) {
+    return { category: SHORT_DECK_HAND_RANKS.FULL_HOUSE, score: [orderedRanks[0], orderedRanks[1]], desc: `Full House, ${RANK_FULL[orderedRanks[0]]}s full of ${RANK_FULL[orderedRanks[1]]}s` };
+  }
+  // In Short Deck: Three of a Kind beats Straight!
+  if (freqs[0] === 3) {
+    return { category: SHORT_DECK_HAND_RANKS.THREE_OF_A_KIND, score: orderedRanks, desc: `Three of a Kind, ${RANK_FULL[orderedRanks[0]]}s` };
+  }
+  if (isStraight) {
+    return { category: SHORT_DECK_HAND_RANKS.STRAIGHT, score: [straightHigh], desc: `Straight, ${RANK_FULL[straightHigh]} High` };
+  }
+  if (freqs[0] === 2 && freqs[1] === 2) {
+    return { category: SHORT_DECK_HAND_RANKS.TWO_PAIR, score: orderedRanks, desc: `Two Pair, ${RANK_FULL[orderedRanks[0]]}s and ${RANK_FULL[orderedRanks[1]]}s` };
+  }
+  if (freqs[0] === 2) {
+    return { category: SHORT_DECK_HAND_RANKS.ONE_PAIR, score: orderedRanks, desc: `Pair of ${RANK_FULL[orderedRanks[0]]}s` };
+  }
+  return { category: SHORT_DECK_HAND_RANKS.HIGH_CARD, score: ranks, desc: `High Card, ${RANK_FULL[ranks[0]]}` };
+}
+
+function evaluateOmahaBestHand(holeCards, communityCards) {
+  if (communityCards.length < 3) {
+    if (holeCards.length >= 2) {
+      return { category: HAND_RANKS.HIGH_CARD, desc: `Omaha Hand (${holeCards.length} cards)`, bestCards: holeCards.slice(0, 2) };
+    }
+    return { category: HAND_RANKS.HIGH_CARD, desc: 'Omaha Starting Hand', bestCards: holeCards };
+  }
+  // Omaha constraint: Player MUST use exactly 2 hole cards and exactly 3 community cards!
+  // Combinations: C(4,2) * C(5,3) = 6 * 10 = 60 combinations
+  const holePairs = getCombinations(holeCards, 2);
+  const boardTriplets = getCombinations(communityCards, 3);
+  let best = null;
+
+  for (const hPair of holePairs) {
+    for (const bTrip of boardTriplets) {
+      const combo5 = [...hPair, ...bTrip];
+      const res = evaluate5Cards(combo5);
+      res.bestCards = combo5;
+      if (!best || compareScores(res, best) > 0) {
+        best = res;
+      }
+    }
+  }
+  return best;
+}
+
+function evaluateBestHand(holeCards, communityCards, variant = 'texas') {
+  if (variant === 'omaha') {
+    return evaluateOmahaBestHand(holeCards, communityCards);
+  }
+
   const allCards = [...holeCards, ...communityCards];
   if (allCards.length < 5) {
     if (holeCards.length === 2) {
@@ -428,8 +588,10 @@ function evaluateBestHand(holeCards, communityCards) {
 
   const combos = getCombinations(allCards, 5);
   let best = null;
+  const evalFn = (variant === 'shortDeck') ? evaluateShortDeck5Cards : evaluate5Cards;
+
   for (const combo of combos) {
-    const res = evaluate5Cards(combo);
+    const res = evalFn(combo);
     res.bestCards = combo;
     if (!best || compareScores(res, best) > 0) {
       best = res;
@@ -485,6 +647,17 @@ class PotManager {
     if (activeOrAllin.length === 0) {
       const total = contributors.reduce((acc, p) => acc + p.totalBet, 0);
       return [new SidePot(total, [])];
+    }
+
+    // Side pots form ONLY when a short-stacked player goes All-In with strictly fewer chips
+    // than opponents who contributed more. If all bets are equal or no short-stack all-in exists,
+    // exactly 1 Main Pot is created and 0 side pots.
+    const maxBet = Math.max(...activeOrAllin.map(p => p.totalBet));
+    const hasShortStackAllIn = activeOrAllin.some(p => p.allIn && p.totalBet < maxBet);
+
+    if (!hasShortStackAllIn) {
+      const total = contributors.reduce((acc, p) => acc + p.totalBet, 0);
+      return [new SidePot(total, activeOrAllin)];
     }
 
     const betLevels = [...new Set(activeOrAllin.map(p => p.totalBet))].sort((a, b) => a - b);
@@ -545,8 +718,50 @@ class SaveManager {
       bestStreak: 0,
       bestHandDesc: 'High Card',
       bestHandRank: 1,
-      onlineHandsPlayed: 0
+      onlineHandsPlayed: 0,
+      texasHands: 0,
+      shortDeckHands: 0,
+      omahaHands: 0,
+      exclusiveHands: 0,
+      slotsSpins: 0,
+      rouletteSpins: 0,
+      totalCashedOut: 0
     };
+  }
+
+  static recordVariantHand(variant) {
+    const stats = SaveManager.getGlobalStats();
+    if (variant === 'shortDeck') stats.shortDeckHands = (stats.shortDeckHands || 0) + 1;
+    else if (variant === 'omaha') stats.omahaHands = (stats.omahaHands || 0) + 1;
+    else if (variant === 'exclusive') stats.exclusiveHands = (stats.exclusiveHands || 0) + 1;
+    else stats.texasHands = (stats.texasHands || 0) + 1;
+    try {
+      localStorage.setItem(SaveManager.GLOBAL_KEY, JSON.stringify(stats));
+    } catch (e) {}
+  }
+
+  static recordSlotSpin() {
+    const stats = SaveManager.getGlobalStats();
+    stats.slotsSpins = (stats.slotsSpins || 0) + 1;
+    try {
+      localStorage.setItem(SaveManager.GLOBAL_KEY, JSON.stringify(stats));
+    } catch (e) {}
+  }
+
+  static recordRouletteSpin() {
+    const stats = SaveManager.getGlobalStats();
+    stats.rouletteSpins = (stats.rouletteSpins || 0) + 1;
+    try {
+      localStorage.setItem(SaveManager.GLOBAL_KEY, JSON.stringify(stats));
+    } catch (e) {}
+  }
+
+  static recordCashout(amount) {
+    const stats = SaveManager.getGlobalStats();
+    stats.totalCashedOut = (stats.totalCashedOut || 0) + amount;
+    try {
+      localStorage.setItem(SaveManager.GLOBAL_KEY, JSON.stringify(stats));
+    } catch (e) {}
   }
 
   static recordHandStats(won, pot, handEval = null, isOnline = false) {
@@ -625,7 +840,47 @@ class SaveManager {
 class EconomyManager {
   static MINIGAME_STORAGE_KEY = 'royal_poker_minigame_wallet_v2';
   static POKER_ALLOWANCE_KEY = 'royal_poker_daily_allowance_v2';
+  static CUMULATIVE_SAVINGS_KEY = 'royal_poker_cumulative_savings_v1';
   static CYCLE_MS = 24 * 60 * 60 * 1000; // Persistent 24-hour cycle
+
+  static getCumulativeSavings() {
+    try {
+      const val = localStorage.getItem(EconomyManager.CUMULATIVE_SAVINGS_KEY);
+      if (val !== null) {
+        const num = parseInt(val, 10);
+        if (!isNaN(num) && num >= 0) return num;
+      }
+    } catch (e) {}
+    const initial = 1000;
+    EconomyManager.saveCumulativeSavings(initial);
+    return initial;
+  }
+
+  static saveCumulativeSavings(amount) {
+    try {
+      localStorage.setItem(EconomyManager.CUMULATIVE_SAVINGS_KEY, amount.toString());
+    } catch (e) {}
+  }
+
+  static addCumulativeSavings(amount) {
+    const cur = EconomyManager.getCumulativeSavings();
+    const updated = cur + Math.max(0, Math.floor(amount));
+    EconomyManager.saveCumulativeSavings(updated);
+    return updated;
+  }
+
+  static cashOutRunToSavings(slotId, chips) {
+    const amt = Math.max(0, Math.floor(chips));
+    const newTotal = EconomyManager.addCumulativeSavings(amt);
+    SaveManager.recordCashout(amt);
+    let slot = SaveManager.getSave(slotId);
+    if (slot) {
+      slot.chips = 0;
+      slot.cashedOut = true;
+      SaveManager.saveSlot(slotId, slot);
+    }
+    return newTotal;
+  }
 
   static getMiniGameWallet() {
     try {
@@ -780,6 +1035,264 @@ class EconomyManager {
 }
 
 // ============================================================================
+
+// ============================================================================
+// CUSTOM VECTOR GRAPHICS ASSETS (Zero Emojis • Deep Illustrative Renders)
+// ============================================================================
+const AvatarSVGs = {
+  hero: `<svg class="avatar-svg avatar-hero" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="24" cy="24" r="22" fill="#09132c" stroke="#d4af37" stroke-width="2"/>
+    <circle cx="24" cy="24" r="18" fill="url(#hero-radial)" stroke="rgba(253, 224, 71, 0.4)" stroke-width="1"/>
+    <path d="M14 28 L17 18 L24 23 L31 18 L34 28 Z" fill="url(#hero-gold)" stroke="#fef08a" stroke-width="1.2"/>
+    <circle cx="17" cy="18" r="1.8" fill="#fef08a"/>
+    <circle cx="24" cy="23" r="1.8" fill="#fef08a"/>
+    <circle cx="31" cy="18" r="1.8" fill="#fef08a"/>
+    <rect x="15" y="28" width="18" height="4" rx="1.5" fill="#78350f" stroke="#fcd34d" stroke-width="0.8"/>
+    <circle cx="20" cy="30" r="1" fill="#ef4444"/>
+    <circle cx="24" cy="30" r="1" fill="#38bdf8"/>
+    <circle cx="28" cy="30" r="1" fill="#10b981"/>
+    <defs>
+      <radialGradient id="hero-radial" cx="50%" cy="40%" r="50%">
+        <stop offset="0%" stop-color="#1e293b"/>
+        <stop offset="100%" stop-color="#09132c"/>
+      </radialGradient>
+      <linearGradient id="hero-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#fef08a"/>
+        <stop offset="50%" stop-color="#d4af37"/>
+        <stop offset="100%" stop-color="#854d0e"/>
+      </linearGradient>
+    </defs>
+  </svg>`,
+
+  viper: `<svg class="avatar-svg avatar-viper" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="24" cy="24" r="22" fill="#061f18" stroke="#10b981" stroke-width="2"/>
+    <path d="M24 10 C18 10 14 14 14 20 C14 26 20 27 24 30 C28 33 29 36 26 38 C23 40 18 38 18 38" stroke="url(#viper-grad)" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path d="M24 10 L28 14 L24 18 L20 14 Z" fill="#10b981"/>
+    <circle cx="22" cy="13" r="1.2" fill="#ef4444"/>
+    <circle cx="26" cy="13" r="1.2" fill="#ef4444"/>
+    <defs>
+      <linearGradient id="viper-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#34d399"/>
+        <stop offset="50%" stop-color="#10b981"/>
+        <stop offset="100%" stop-color="#047857"/>
+      </linearGradient>
+    </defs>
+  </svg>`,
+
+  atlas: `<svg class="avatar-svg avatar-atlas" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="24" cy="24" r="22" fill="#0d1b2a" stroke="#38bdf8" stroke-width="2"/>
+    <path d="M24 11 L35 16 V26 C35 33 24 38 24 38 C24 38 13 33 13 26 V16 Z" fill="url(#atlas-grad)" stroke="#7dd3fc" stroke-width="1.5"/>
+    <path d="M24 16 L31 19 V25 C31 30 24 33 24 33 C24 33 17 30 17 25 V19 Z" fill="#0c2440" stroke="#38bdf8" stroke-width="1"/>
+    <circle cx="24" cy="24" r="3" fill="#38bdf8"/>
+    <defs>
+      <linearGradient id="atlas-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#38bdf8"/>
+        <stop offset="100%" stop-color="#0284c7"/>
+      </linearGradient>
+    </defs>
+  </svg>`,
+
+  luna: `<svg class="avatar-svg avatar-luna" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="24" cy="24" r="22" fill="#13112b" stroke="#a78bfa" stroke-width="2"/>
+    <path d="M28 12 C20 13 15 20 16 28 C17 35 24 39 31 37 C22 36 18 27 22 18 C23 15 26 13 28 12 Z" fill="url(#luna-grad)" stroke="#c4b5fd" stroke-width="1.2"/>
+    <circle cx="34" cy="15" r="1.5" fill="#fef08a"/>
+    <circle cx="15" cy="18" r="1" fill="#ddd6fe"/>
+    <circle cx="33" cy="30" r="1.2" fill="#ddd6fe"/>
+    <defs>
+      <linearGradient id="luna-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#c4b5fd"/>
+        <stop offset="50%" stop-color="#8b5cf6"/>
+        <stop offset="100%" stop-color="#6d28d9"/>
+      </linearGradient>
+    </defs>
+  </svg>`,
+
+  duke: `<svg class="avatar-svg avatar-duke" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="24" cy="24" r="22" fill="#2d130a" stroke="#f97316" stroke-width="2"/>
+    <circle cx="24" cy="24" r="16" fill="url(#duke-grad)" stroke="#fdba74" stroke-width="1.2"/>
+    <path d="M16 16 L20 22 L24 17 L28 22 L32 16 L30 27 L18 27 Z" fill="#b45309" stroke="#fef08a" stroke-width="1"/>
+    <circle cx="20" cy="24" r="1.5" fill="#fef08a"/>
+    <circle cx="28" cy="24" r="1.5" fill="#fef08a"/>
+    <path d="M22 28 L24 31 L26 28 Z" fill="#fef08a"/>
+    <defs>
+      <linearGradient id="duke-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#ea580c"/>
+        <stop offset="50%" stop-color="#c2410c"/>
+        <stop offset="100%" stop-color="#7c2d12"/>
+      </linearGradient>
+    </defs>
+  </svg>`,
+
+  guest: `<svg class="avatar-svg avatar-guest" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="24" cy="24" r="22" fill="#0f172a" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="24" cy="18" r="6" fill="#cbd5e1" stroke="#f8fafc" stroke-width="1"/>
+    <path d="M14 36 C14 30 18 27 24 27 C30 27 34 30 34 36 Z" fill="#94a3b8" stroke="#cbd5e1" stroke-width="1"/>
+  </svg>`,
+
+  bot: `<svg class="avatar-svg avatar-bot" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="24" cy="24" r="22" fill="#1e1b4b" stroke="#6366f1" stroke-width="2"/>
+    <rect x="15" y="16" width="18" height="14" rx="3" fill="#312e81" stroke="#818cf8" stroke-width="1.2"/>
+    <circle cx="20" cy="22" r="2" fill="#38bdf8"/>
+    <circle cx="28" cy="22" r="2" fill="#38bdf8"/>
+    <line x1="20" y1="26" x2="28" y2="26" stroke="#818cf8" stroke-width="1.2"/>
+    <line x1="24" y1="12" x2="24" y2="16" stroke="#818cf8" stroke-width="1.5"/>
+    <circle cx="24" cy="11" r="1.5" fill="#f43f5e"/>
+  </svg>`
+};
+
+// Aliases for internal emoji tokens to support seamless backward compatibility
+AvatarSVGs['👑'] = AvatarSVGs.hero;
+AvatarSVGs['🐍'] = AvatarSVGs.viper;
+AvatarSVGs['🛡️'] = AvatarSVGs.atlas;
+AvatarSVGs['🌙'] = AvatarSVGs.luna;
+AvatarSVGs['🦁'] = AvatarSVGs.duke;
+AvatarSVGs['👤'] = AvatarSVGs.guest;
+
+const SlotSymbolSVGs = {
+  seven: `<svg class="slot-sym-svg" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="48" height="48" rx="8" fill="url(#seven-bg)" stroke="#ffd700" stroke-width="1.5"/>
+    <path d="M13 14 H35 L22 36 H16 L27 19 H13 Z" fill="url(#seven-gold)" stroke="#fff" stroke-width="0.8"/>
+    <defs>
+      <linearGradient id="seven-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#1e1b4b"/>
+        <stop offset="100%" stop-color="#0f172a"/>
+      </linearGradient>
+      <linearGradient id="seven-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#fef08a"/>
+        <stop offset="50%" stop-color="#eab308"/>
+        <stop offset="100%" stop-color="#a16207"/>
+      </linearGradient>
+    </defs>
+  </svg>`,
+
+  flare: `<svg class="slot-sym-svg" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="48" height="48" rx="8" fill="url(#flare-bg)" stroke="#f97316" stroke-width="1.5"/>
+    <circle cx="24" cy="24" r="8" fill="#fef08a"/>
+    <path d="M24 7 L26 18 L37 13 L29 22 L40 24 L29 26 L37 35 L26 30 L24 41 L22 30 L11 35 L19 26 L8 24 L19 22 L11 13 L22 18 Z" fill="url(#flare-fire)" opacity="0.9"/>
+    <defs>
+      <linearGradient id="flare-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#3b0764"/>
+        <stop offset="100%" stop-color="#180424"/>
+      </linearGradient>
+      <linearGradient id="flare-fire" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#fef08a"/>
+        <stop offset="50%" stop-color="#f97316"/>
+        <stop offset="100%" stop-color="#dc2626"/>
+      </linearGradient>
+    </defs>
+  </svg>`,
+
+  star: `<svg class="slot-sym-svg" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="48" height="48" rx="8" fill="url(#star-bg)" stroke="#38bdf8" stroke-width="1.5"/>
+    <path d="M24 8 L27 18 L37 20 L29 27 L32 37 L24 31 L16 37 L19 27 L11 20 L21 18 Z" fill="url(#star-gold)" stroke="#fff" stroke-width="0.8"/>
+    <defs>
+      <linearGradient id="star-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#0c4a6e"/>
+        <stop offset="100%" stop-color="#082f49"/>
+      </linearGradient>
+      <linearGradient id="star-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#fef08a"/>
+        <stop offset="50%" stop-color="#eab308"/>
+      </linearGradient>
+    </defs>
+  </svg>`,
+
+  spade: `<svg class="slot-sym-svg" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="48" height="48" rx="8" fill="#0f172a" stroke="#cbd5e1" stroke-width="1.5"/>
+    <path d="M24 11 C20 18 14 22 14 27 C14 31 17 34 21 34 C23 34 24 33 24 33 V37 H20 V39 H28 V37 H24 V33 C24 33 25 34 27 34 C31 34 34 31 34 27 C34 22 28 18 24 11 Z" fill="url(#spade-grad)" stroke="#e2e8f0" stroke-width="0.8"/>
+    <defs>
+      <linearGradient id="spade-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#94a3b8"/>
+        <stop offset="100%" stop-color="#334155"/>
+      </linearGradient>
+    </defs>
+  </svg>`,
+
+  heart: `<svg class="slot-sym-svg" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="48" height="48" rx="8" fill="#2d0a0a" stroke="#ef4444" stroke-width="1.5"/>
+    <path d="M24 37 C24 37 13 29 13 20 C13 14 18 11 22 14 C23 15 24 17 24 17 C24 17 25 15 26 14 C30 11 35 14 35 20 C35 29 24 37 24 37 Z" fill="url(#heart-grad)" stroke="#fca5a5" stroke-width="0.8"/>
+    <defs>
+      <linearGradient id="heart-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#f87171"/>
+        <stop offset="50%" stop-color="#ef4444"/>
+        <stop offset="100%" stop-color="#991b1b"/>
+      </linearGradient>
+    </defs>
+  </svg>`,
+
+  diamond: `<svg class="slot-sym-svg" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="48" height="48" rx="8" fill="#042f2e" stroke="#06b6d4" stroke-width="1.5"/>
+    <path d="M24 10 L35 24 L24 38 L13 24 Z" fill="url(#dia-grad)" stroke="#a5f3fc" stroke-width="0.8"/>
+    <line x1="13" y1="24" x2="35" y2="24" stroke="#e0f2fe" stroke-width="0.5"/>
+    <line x1="24" y1="10" x2="24" y2="38" stroke="#e0f2fe" stroke-width="0.5"/>
+    <defs>
+      <linearGradient id="dia-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#67e8f9"/>
+        <stop offset="50%" stop-color="#06b6d4"/>
+        <stop offset="100%" stop-color="#0e7490"/>
+      </linearGradient>
+    </defs>
+  </svg>`,
+
+  club: `<svg class="slot-sym-svg" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="48" height="48" rx="8" fill="#052e16" stroke="#22c55e" stroke-width="1.5"/>
+    <circle cx="24" cy="18" r="6" fill="url(#club-grad)" stroke="#86efac" stroke-width="0.8"/>
+    <circle cx="18" cy="27" r="6" fill="url(#club-grad)" stroke="#86efac" stroke-width="0.8"/>
+    <circle cx="30" cy="27" r="6" fill="url(#club-grad)" stroke="#86efac" stroke-width="0.8"/>
+    <path d="M23 27 H25 V37 H21 V39 H27 V37 H25 V27 Z" fill="#86efac"/>
+    <defs>
+      <linearGradient id="club-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#4ade80"/>
+        <stop offset="50%" stop-color="#22c55e"/>
+        <stop offset="100%" stop-color="#15803d"/>
+      </linearGradient>
+    </defs>
+  </svg>`
+};
+
+function renderSlotSymbol(symbol) {
+  const map = {
+    '7️⃣': 'seven',
+    'seven': 'seven',
+    '🔥': 'flare',
+    'flare': 'flare',
+    '⭐': 'star',
+    'star': 'star',
+    '👑': 'spade',
+    'spade': 'spade',
+    '💎': 'diamond',
+    'diamond': 'diamond',
+    '🍒': 'heart',
+    'heart': 'heart',
+    '🔔': 'club',
+    'club': 'club'
+  };
+  const key = map[symbol] || symbol;
+  return SlotSymbolSVGs[key] || `<span class="slot-text-sym">${symbol}</span>`;
+}
+
+function renderAvatar(seatIdx, avatarKey) {
+  const el = document.getElementById(`avatar-${seatIdx}`);
+  if (!el) return;
+  const map = {
+    '👑': 'hero',
+    'hero': 'hero',
+    '🐍': 'viper',
+    'viper': 'viper',
+    '🛡️': 'atlas',
+    'atlas': 'atlas',
+    '🌙': 'luna',
+    'luna': 'luna',
+    '🦁': 'duke',
+    'duke': 'duke',
+    '👤': 'guest',
+    'guest': 'guest'
+  };
+  const key = map[avatarKey] || avatarKey;
+  const svg = AvatarSVGs[key] || AvatarSVGs.hero || AvatarSVGs.guest || AvatarSVGs.bot;
+  el.innerHTML = svg;
+}
+
 // 6. BOT PROFILES & DIFFICULTY
 // ============================================================================
 const BASE_BOT_PROFILES = {
@@ -849,14 +1362,20 @@ class PokerApp {
       { id: 4, name: 'Duke', style: 'Maniac', avatar: '🦁', chips: 1000, currentBet: 0, totalBet: 0, cards: [], folded: false, allIn: false, knockedOut: false, isBot: true, isRemote: false }
     ];
 
-    this.bindDOM();
-    this.initRoulette();
-    this.initSlots();
-    this.initTransfer();
-    this.initEconomy();
-    this.startDailyTimersLoop();
-    this.updateGlobalStatsUI();
-    this.renderMainMenuSlots();
+    this.variant = localStorage.getItem('royal_poker_active_variant') || 'texas';
+
+    // Wrap ALL initializers in defensive try/catch as mandated by handoff guide!
+    try { this.bindDOM(); } catch (err) { console.error("bindDOM error:", err); }
+    try { this.bindTopNavAndModals(); } catch (err) { console.error("bindTopNav error:", err); }
+    try { this.setGameVariant(this.variant); } catch (err) { console.error("setGameVariant error:", err); }
+    try { this.initRoulette(); } catch (err) { console.error("initRoulette error:", err); }
+    try { this.initSlots(); } catch (err) { console.error("initSlots error:", err); }
+    try { this.initTransfer(); } catch (err) { console.error("initTransfer error:", err); }
+    try { this.initEconomy(); } catch (err) { console.error("initEconomy error:", err); }
+    try { this.startDailyTimersLoop(); } catch (err) { console.error("startDailyTimersLoop error:", err); }
+    try { this.updateGlobalStatsUI(); } catch (err) { console.error("updateGlobalStatsUI error:", err); }
+    try { this.updateDualWalletUI(); } catch (err) { console.error("updateDualWalletUI error:", err); }
+    try { this.renderMainMenuSlots(); } catch (err) { console.error("renderSlots error:", err); }
 
     // Check if URL has ?room=join or ?room=private
     const urlParams = new URLSearchParams(window.location.search);
@@ -864,6 +1383,346 @@ class PokerApp {
       this.promptOnlineRoomPassword();
     }
   }
+
+  // ==========================================================================
+  // TOP NAVIGATION, TRANSIT DRAWER & MODAL CONTROLLERS
+  // ==========================================================================
+  toggleTransitDrawer(open) {
+    if (!this.transitDrawer) return;
+    const isOpen = open !== undefined ? open : !this.transitDrawer.classList.contains('open');
+    this.transitDrawer.classList.toggle('open', isOpen);
+    if (this.drawerBackdrop) this.drawerBackdrop.classList.toggle('open', isOpen);
+  }
+
+  bindTopNavAndModals() {
+    // 1. Persistent Top Nav Bar Buttons
+    this.btnToggleTransit = document.getElementById('btn-toggle-transit-drawer');
+    this.transitDrawer = document.getElementById('transit-drawer');
+    this.drawerBackdrop = document.getElementById('drawer-backdrop');
+    this.btnCloseTransit = document.getElementById('btn-close-drawer') || document.getElementById('btn-close-transit');
+
+    if (this.btnToggleTransit) this.btnToggleTransit.addEventListener('click', () => this.toggleTransitDrawer());
+    if (this.drawerBackdrop) this.drawerBackdrop.addEventListener('click', () => this.toggleTransitDrawer(false));
+    if (this.btnCloseTransit) this.btnCloseTransit.addEventListener('click', () => this.toggleTransitDrawer(false));
+
+    // Transit links in drawer
+    document.querySelectorAll('.transit-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        const dest = item.dataset.transit;
+        this.toggleTransitDrawer(false);
+        this.handleTransitNavigation(dest);
+      });
+    });
+
+    // Quick sound toggle in header
+    this.btnQuickSound = document.getElementById('btn-quick-sound');
+    if (this.btnQuickSound) {
+      this.btnQuickSound.addEventListener('click', () => {
+        sounds.toggle();
+        this.updateAudioControlsUI();
+      });
+    }
+
+    // Stats modal trigger
+    this.btnNavStats = document.getElementById('btn-nav-stats');
+    this.statsModal = document.getElementById('stats-modal');
+    this.closeStatsBtn = document.getElementById('close-stats-btn');
+    if (this.btnNavStats && this.statsModal) {
+      this.btnNavStats.addEventListener('click', () => this.openStatsModal());
+    }
+    if (this.closeStatsBtn && this.statsModal) {
+      this.closeStatsBtn.addEventListener('click', () => this.statsModal.classList.add('hidden'));
+    }
+
+    // Settings modal trigger
+    this.btnNavSettings = document.getElementById('btn-nav-settings');
+    this.settingsModal = document.getElementById('settings-modal');
+    this.closeSettingsBtn = document.getElementById('close-settings-btn');
+    if (this.btnNavSettings && this.settingsModal) {
+      this.btnNavSettings.addEventListener('click', () => this.openSettingsModal());
+    }
+    if (this.closeSettingsBtn && this.settingsModal) {
+      this.closeSettingsBtn.addEventListener('click', () => this.settingsModal.classList.add('hidden'));
+    }
+
+    // Rules modal from top bar
+    this.btnNavRules = document.getElementById('btn-nav-rules');
+    if (this.btnNavRules && this.rulesModal) {
+      this.btnNavRules.addEventListener('click', () => this.rulesModal.classList.remove('hidden'));
+    }
+
+    // Cash Out Modal triggers (both game footer button and header action button)
+    this.btnCashoutExit = document.getElementById('btn-cashout-exit');
+    this.btnTopCashout = document.getElementById('btn-top-cashout');
+    this.cashoutModal = document.getElementById('cashout-modal');
+    this.closeCashoutBtn = document.getElementById('close-cashout-btn');
+    this.btnConfirmCashout = document.getElementById('btn-confirm-cashout');
+    this.btnCancelCashout = document.getElementById('btn-cancel-cashout');
+
+    if (this.btnCashoutExit && this.cashoutModal) {
+      this.btnCashoutExit.addEventListener('click', () => this.openCashoutModal());
+    }
+    if (this.btnTopCashout && this.cashoutModal) {
+      this.btnTopCashout.addEventListener('click', () => this.openCashoutModal());
+    }
+    if (this.closeCashoutBtn && this.cashoutModal) {
+      this.closeCashoutBtn.addEventListener('click', () => this.cashoutModal.classList.add('hidden'));
+    }
+    if (this.btnCancelCashout && this.cashoutModal) {
+      this.btnCancelCashout.addEventListener('click', () => this.cashoutModal.classList.add('hidden'));
+    }
+    if (this.btnConfirmCashout) {
+      this.btnConfirmCashout.addEventListener('click', () => this.confirmCashout());
+    }
+
+    // Audio & Volume controls in Settings
+    const settingSoundToggle = document.getElementById('setting-sound-toggle');
+    if (settingSoundToggle) {
+      settingSoundToggle.checked = sounds.enabled;
+      settingSoundToggle.addEventListener('change', (e) => {
+        sounds.enabled = e.target.checked;
+        localStorage.setItem('royal_poker_sound_muted', (!sounds.enabled).toString());
+        this.updateAudioControlsUI();
+      });
+    }
+
+    const volSlider = document.getElementById('setting-volume-slider');
+    const volVal = document.getElementById('setting-volume-val');
+    if (volSlider) {
+      volSlider.value = Math.round(sounds.volume * 100);
+      if (volVal) volVal.textContent = `${volSlider.value}%`;
+      volSlider.addEventListener('input', (e) => {
+        const v = Number(e.target.value) / 100;
+        sounds.setVolume(v);
+        if (volVal) volVal.textContent = `${e.target.value}%`;
+      });
+    }
+
+    // Feature Flag Switches in Settings
+    const flagToggles = [
+      { id: 'flag-short-deck', key: 'shortDeck' },
+      { id: 'flag-omaha', key: 'omaha' },
+      { id: 'flag-slots', key: 'slots' },
+      { id: 'flag-roulette', key: 'roulette' },
+      { id: 'flag-side-pot-rule', key: 'sidePotRule' }
+    ];
+    flagToggles.forEach(({ id, key }) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.checked = FeatureManager.isEnabled(key);
+        el.addEventListener('change', (e) => {
+          FeatureManager.setFlag(key, e.target.checked);
+          this.setAnnouncement(`[CONFIG] Module '${key}' is now ${e.target.checked ? 'ACTIVE' : 'DISABLED'}`);
+        });
+      }
+    });
+
+    // Visual Theme / Quality Selector
+    const qualitySelect = document.getElementById('setting-quality');
+    if (qualitySelect) {
+      const savedQ = localStorage.getItem('royal_poker_quality') || 'high';
+      qualitySelect.value = savedQ;
+      document.body.dataset.quality = savedQ;
+      qualitySelect.addEventListener('change', (e) => {
+        localStorage.setItem('royal_poker_quality', e.target.value);
+        document.body.dataset.quality = e.target.value;
+      });
+    }
+
+    this.updateDualWalletUI();
+    this.updateAudioControlsUI();
+  }
+
+  updateAudioControlsUI() {
+    if (this.menuSoundBtn) {
+      this.menuSoundBtn.innerHTML = `<span class="btn-icon"></span> Sound: ${sounds.enabled ? 'ON' : 'OFF'}`;
+    }
+    if (this.soundToggleBtn) {
+      this.soundToggleBtn.textContent = sounds.enabled ? 'Sound ON' : 'Sound OFF';
+    }
+    if (this.btnQuickSound) {
+      this.btnQuickSound.title = sounds.enabled ? 'Mute Audio' : 'Unmute Audio';
+      this.btnQuickSound.classList.toggle('audio-muted', !sounds.enabled);
+    }
+    const settingSoundToggle = document.getElementById('setting-sound-toggle');
+    if (settingSoundToggle) {
+      settingSoundToggle.checked = sounds.enabled;
+    }
+  }
+
+  handleTransitNavigation(dest) {
+    if (dest === 'texas') {
+      this.setGameVariant('texas');
+      this.showGameView();
+      if (!this.handInProgress) this.startNewHand();
+    } else if (dest === 'shortDeck') {
+      if (!FeatureManager.isEnabled('shortDeck')) {
+        alert('Short Deck (6+) variant is disabled in Settings.');
+        return;
+      }
+      this.setGameVariant('shortDeck');
+      this.showGameView();
+      if (!this.handInProgress) this.startNewHand();
+    } else if (dest === 'omaha') {
+      if (!FeatureManager.isEnabled('omaha')) {
+        alert('Omaha High (4-Card) variant is disabled in Settings.');
+        return;
+      }
+      this.setGameVariant('omaha');
+      this.showGameView();
+      if (!this.handInProgress) this.startNewHand();
+    } else if (dest === 'exclusive') {
+      this.promptOnlineRoomPassword();
+    } else if (dest === 'slots') {
+      if (!FeatureManager.isEnabled('slots')) {
+        alert('Slot Machine mini-game is disabled in Settings.');
+        return;
+      }
+      const slotModal = document.getElementById('slots-modal');
+      if (slotModal) slotModal.classList.remove('hidden');
+      this.updateSlotsUI();
+    } else if (dest === 'roulette') {
+      if (!FeatureManager.isEnabled('roulette')) {
+        alert('European Roulette is disabled in Settings.');
+        return;
+      }
+      this.openRouletteModal();
+    } else if (dest === 'vault') {
+      const trModal = document.getElementById('transfer-modal');
+      if (trModal) trModal.classList.remove('hidden');
+      this.updateTransferModal();
+    }
+  }
+
+  setGameVariant(v) {
+    this.variant = v;
+    localStorage.setItem('royal_poker_active_variant', v);
+    const badge = document.getElementById('nav-variant-badge');
+    if (badge) {
+      if (v === 'shortDeck') badge.textContent = "SHORT DECK (6+)";
+      else if (v === 'omaha') badge.textContent = "OMAHA (4-CARD)";
+      else if (v === 'exclusive') badge.textContent = "EXCLUSIVE ROOM";
+      else badge.textContent = "TEXAS HOLD'EM";
+    }
+  }
+
+  openStatsModal() {
+    if (!this.statsModal) return;
+    const stats = SaveManager.getGlobalStats();
+    const vaultBal = EconomyManager.getCumulativeSavings();
+
+    const sHands = document.getElementById('stat-career-hands');
+    const sWon = document.getElementById('stat-career-won');
+    const sRate = document.getElementById('stat-career-winrate');
+    const sPot = document.getElementById('stat-career-biggest-pot');
+    const sStreak = document.getElementById('stat-career-streak');
+    const sBest = document.getElementById('stat-career-besthand');
+
+    if (sHands) sHands.textContent = stats.totalHands || 0;
+    if (sWon) sWon.textContent = stats.handsWon || 0;
+    const rate = stats.totalHands > 0 ? Math.round(((stats.handsWon || 0) / stats.totalHands) * 100) : 0;
+    if (sRate) sRate.textContent = `${rate}%`;
+    if (sPot) sPot.textContent = `$${(stats.biggestPot || 0).toLocaleString()}`;
+    if (sStreak) sStreak.textContent = stats.bestStreak || 0;
+    if (sBest) sBest.textContent = stats.bestHandDesc || 'High Card';
+
+    const sVault = document.getElementById('stat-career-vault');
+    const sCashed = document.getElementById('stat-career-cashed');
+    const sTex = document.getElementById('stat-career-texas') || document.getElementById('stat-texas-hands');
+    const sShort = document.getElementById('stat-career-short') || document.getElementById('stat-shortdeck-hands');
+    const sOmaha = document.getElementById('stat-career-omaha') || document.getElementById('stat-omaha-hands');
+    const sExcl = document.getElementById('stat-career-exclusive') || document.getElementById('stat-exclusive-hands');
+    const sMinigames = document.getElementById('stat-career-minigames');
+    const sSlots = document.getElementById('stat-slots-spins');
+    const sRoulette = document.getElementById('stat-roulette-spins');
+
+    if (sVault) sVault.textContent = `$${vaultBal.toLocaleString()}`;
+    if (sCashed) sCashed.textContent = `$${(stats.totalCashedOut || 0).toLocaleString()}`;
+    if (sTex) sTex.textContent = stats.texasHands || (stats.totalHands || 0);
+    if (sShort) sShort.textContent = stats.shortDeckHands || 0;
+    if (sOmaha) sOmaha.textContent = stats.omahaHands || 0;
+    if (sExcl) sExcl.textContent = stats.exclusiveHands || (stats.onlineHandsPlayed || 0);
+    if (sMinigames) sMinigames.textContent = `${stats.slotsSpins || 0} / ${stats.rouletteSpins || 0}`;
+    if (sSlots) sSlots.textContent = stats.slotsSpins || 0;
+    if (sRoulette) sRoulette.textContent = stats.rouletteSpins || 0;
+
+    this.statsModal.classList.remove('hidden');
+  }
+
+  openSettingsModal() {
+    if (!this.settingsModal) return;
+    const settingSoundToggle = document.getElementById('setting-sound-toggle');
+    if (settingSoundToggle) settingSoundToggle.checked = sounds.enabled;
+    const volSlider = document.getElementById('setting-volume-slider');
+    const volVal = document.getElementById('setting-volume-val');
+    if (volSlider) {
+      volSlider.value = Math.round(sounds.volume * 100);
+      if (volVal) volVal.textContent = `${volSlider.value}%`;
+    }
+    this.settingsModal.classList.remove('hidden');
+  }
+
+  openCashoutModal() {
+    if (!this.cashoutModal) return;
+    const hero = this.players[0];
+    const stack = hero ? hero.chips : 0;
+    const vault = EconomyManager.getCumulativeSavings();
+    const curStackEl = document.getElementById('cashout-chips-val') || document.getElementById('cashout-current-stack');
+    const vaultTotEl = document.getElementById('cashout-vault-total');
+    if (curStackEl) curStackEl.textContent = `$${stack.toLocaleString()}`;
+    if (vaultTotEl) vaultTotEl.textContent = `$${(vault + stack).toLocaleString()}`;
+    this.cashoutModal.classList.remove('hidden');
+  }
+
+  confirmCashout() {
+    const hero = this.players[0];
+    const amountToCash = hero ? hero.chips : 0;
+    if (amountToCash <= 0) {
+      sounds.playCheck();
+      alert('No active table chips to cash out!');
+      if (this.cashoutModal) this.cashoutModal.classList.add('hidden');
+      return;
+    }
+
+    EconomyManager.cashOutRunToSavings(this.activeSlot, amountToCash);
+    hero.chips = 0;
+    hero.knockedOut = true;
+
+    sounds.playWin();
+    if (this.cashoutModal) this.cashoutModal.classList.add('hidden');
+    this.setAnnouncement(`[VAULT] Cashed out $${amountToCash.toLocaleString()} into Cumulative Poker Savings Vault!`);
+    this.updateDualWalletUI();
+    this.showMenuView();
+  }
+
+  updateDualWalletUI() {
+    const vaultBal = EconomyManager.getCumulativeSavings();
+    const miniWallet = EconomyManager.getMiniGameWallet();
+
+    const vaultEl = document.getElementById('nav-poker-vault-val');
+    if (vaultEl) vaultEl.textContent = `$${vaultBal.toLocaleString()}`;
+
+    const miniEl = document.getElementById('nav-minigame-val');
+    if (miniEl) miniEl.textContent = `$${miniWallet.balance.toLocaleString()}`;
+
+    const drawerVaultEl = document.getElementById('d-vault-savings') || document.getElementById('drawer-vault-val');
+    if (drawerVaultEl) drawerVaultEl.textContent = `$${vaultBal.toLocaleString()}`;
+
+    const drawerMiniEl = document.getElementById('d-vault-minigame') || document.getElementById('d-vault-mini') || document.getElementById('drawer-mini-val');
+    if (drawerMiniEl) drawerMiniEl.textContent = `$${miniWallet.balance.toLocaleString()}`;
+
+    const menuVaultEl = document.getElementById('menu-poker-vault-val');
+    if (menuVaultEl) menuVaultEl.textContent = `$${vaultBal.toLocaleString()}`;
+
+    const menuMiniEl = document.getElementById('menu-minigame-val');
+    if (menuMiniEl) menuMiniEl.textContent = `$${miniWallet.balance.toLocaleString()}`;
+  }
+
+  renderAvatar(seatIdx, avatarKey) {
+    renderAvatar(seatIdx, avatarKey);
+  }
+
 
   getBaselineBlinds(stage = 1) {
     if (stage === 1) return { sb: 10, bb: 20 };
@@ -952,7 +1811,7 @@ class PokerApp {
     this.heroHandBadge = document.getElementById('hero-hand-rank-badge');
 
     // Back to Menu (Mid-round lockdown in online room!)
-    this.btnBackMenu.addEventListener('click', () => {
+    if (this.btnBackMenu) this.btnBackMenu.addEventListener('click', () => {
       if (this.isOnlineRoom && this.handInProgress) {
         this.setAnnouncement('⚠️ Mid-round lockdown active! You can only leave during the 5-second pause between hands.');
         sounds.playCheck();
@@ -975,9 +1834,9 @@ class PokerApp {
 
     // Rules Modal
     const openRules = () => this.rulesModal.classList.remove('hidden');
-    this.rulesBtn.addEventListener('click', openRules);
-    this.menuRulesBtn.addEventListener('click', openRules);
-    this.closeRulesBtn.addEventListener('click', () => this.rulesModal.classList.add('hidden'));
+    if (this.rulesBtn) this.rulesBtn.addEventListener('click', openRules);
+    if (this.menuRulesBtn) this.menuRulesBtn.addEventListener('click', openRules);
+    if (this.closeRulesBtn && this.rulesModal) this.closeRulesBtn.addEventListener('click', () => this.rulesModal.classList.add('hidden'));
 
     // Rules Tabs
     const tabBtns = document.querySelectorAll('.rules-tab-btn');
@@ -997,20 +1856,20 @@ class PokerApp {
       this.menuSoundBtn.innerHTML = `<span class="btn-icon">${sounds.enabled ? '🔊' : '🔇'}</span> Sound: ${sounds.enabled ? 'ON' : 'OFF'}`;
       this.soundToggleBtn.textContent = sounds.enabled ? '🔊 Sound' : '🔇 Muted';
     };
-    this.menuSoundBtn.addEventListener('click', toggleAudio);
-    this.soundToggleBtn.addEventListener('click', toggleAudio);
+    if (this.menuSoundBtn) this.menuSoundBtn.addEventListener('click', toggleAudio);
+    if (this.soundToggleBtn) this.soundToggleBtn.addEventListener('click', toggleAudio);
 
     // Online Room Auth
-    this.btnOpenOnlineRoom.addEventListener('click', () => this.promptOnlineRoomPassword());
-    this.closeAuthBtn.addEventListener('click', () => this.authModal.classList.add('hidden'));
-    this.btnCancelAuth.addEventListener('click', () => this.authModal.classList.add('hidden'));
-    this.btnSubmitAuth.addEventListener('click', () => this.handleOnlineAuthSubmit());
+    if (this.btnOpenOnlineRoom) this.btnOpenOnlineRoom.addEventListener('click', () => this.promptOnlineRoomPassword());
+    if (this.closeAuthBtn && this.authModal) this.closeAuthBtn.addEventListener('click', () => this.authModal.classList.add('hidden'));
+    if (this.btnCancelAuth && this.authModal) this.btnCancelAuth.addEventListener('click', () => this.authModal.classList.add('hidden'));
+    if (this.btnSubmitAuth) this.btnSubmitAuth.addEventListener('click', () => this.handleOnlineAuthSubmit());
     this.roomPassInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') this.handleOnlineAuthSubmit();
     });
 
     // Copy Invite Link (Safe link, never leaks password)
-    this.btnCopyInvite.addEventListener('click', () => {
+    if (this.btnCopyInvite) this.btnCopyInvite.addEventListener('click', () => {
       const url = `${window.location.origin}${window.location.pathname}?room=join`;
       navigator.clipboard.writeText(url).then(() => {
         this.btnCopyInvite.textContent = '✅ Copied!';
@@ -1030,12 +1889,12 @@ class PokerApp {
         }
       });
     });
-    this.closeDiffBtn.addEventListener('click', () => this.diffModal.classList.add('hidden'));
+    if (this.closeDiffBtn && this.diffModal) this.closeDiffBtn.addEventListener('click', () => this.diffModal.classList.add('hidden'));
 
     // Delete Modal
-    this.closeDeleteBtn.addEventListener('click', () => this.deleteModal.classList.add('hidden'));
-    this.btnCancelDelete.addEventListener('click', () => this.deleteModal.classList.add('hidden'));
-    this.btnConfirmDelete.addEventListener('click', () => {
+    if (this.closeDeleteBtn && this.deleteModal) this.closeDeleteBtn.addEventListener('click', () => this.deleteModal.classList.add('hidden'));
+    if (this.btnCancelDelete && this.deleteModal) this.btnCancelDelete.addEventListener('click', () => this.deleteModal.classList.add('hidden'));
+    if (this.btnConfirmDelete) this.btnConfirmDelete.addEventListener('click', () => {
       if (this.pendingDeleteSlot) {
         SaveManager.deleteSlot(this.pendingDeleteSlot);
         this.pendingDeleteSlot = null;
@@ -1045,7 +1904,7 @@ class PokerApp {
     });
 
     // Slider
-    this.sliderEl.addEventListener('input', () => {
+    if (this.sliderEl) this.sliderEl.addEventListener('input', () => {
       const val = Number(this.sliderEl.value);
       this.sliderValEl.textContent = `$${val}`;
       if (this.currentBet === 0) {
@@ -1078,13 +1937,13 @@ class PokerApp {
     });
 
     // Action buttons
-    this.btnFold.addEventListener('click', () => this.handleActionClick('fold'));
-    this.btnCheckCall.addEventListener('click', () => this.handleActionClick('check_call'));
-    this.btnRaise.addEventListener('click', () => this.handleActionClick('raise', Number(this.sliderEl.value)));
-    this.btnAllin.addEventListener('click', () => this.handleActionClick('allin'));
+    if (this.btnFold) this.btnFold.addEventListener('click', () => this.handleActionClick('fold'));
+    if (this.btnCheckCall) this.btnCheckCall.addEventListener('click', () => this.handleActionClick('check_call'));
+    if (this.btnRaise) this.btnRaise.addEventListener('click', () => this.handleActionClick('raise', Number(this.sliderEl ? this.sliderEl.value : 0)));
+    if (this.btnAllin) this.btnAllin.addEventListener('click', () => this.handleActionClick('allin'));
 
     // Deal Next Hand button
-    this.btnNextHand.addEventListener('click', () => {
+    if (this.btnNextHand) this.btnNextHand.addEventListener('click', () => {
       this.btnNextHand.classList.add('hidden');
       if (this.isOnlineRoom && !this.isHost) {
         // Guest waits for host
@@ -1109,7 +1968,7 @@ class PokerApp {
           if (heroEl) heroEl.textContent = val;
           this.renderMainMenuSlots();
           if (this.btnSaveUsername) {
-            this.btnSaveUsername.textContent = '✅ Saved';
+            this.btnSaveUsername.textContent = 'Saved';
             setTimeout(() => { if (this.btnSaveUsername) this.btnSaveUsername.textContent = 'Save Name'; }, 1500);
           }
         }
@@ -1213,13 +2072,18 @@ class PokerApp {
     this.waitingRoundOverlay.classList.add('hidden');
     this.updateMenuLockState();
     this.updateGlobalStatsUI();
+    this.updateDualWalletUI();
     this.renderMainMenuSlots();
+    if (this.btnCashoutExit) this.btnCashoutExit.classList.add('hidden');
+    if (this.btnTopCashout) this.btnTopCashout.classList.add('hidden');
   }
 
   showGameView() {
     this.mainMenuView.classList.add('hidden');
     this.gameView.classList.remove('hidden');
     this.updateMenuLockState();
+    if (this.btnCashoutExit) this.btnCashoutExit.classList.remove('hidden');
+    if (this.btnTopCashout) this.btnTopCashout.classList.remove('hidden');
   }
 
   updateMenuLockState() {
@@ -1445,7 +2309,7 @@ class PokerApp {
   becomeRoomHost(playerName) {
     this.isHost = true;
     this.onlineRoomStatusText.textContent = 'Table Host';
-    this.setAnnouncement('👑 You are the Table Host! Starting table...');
+    this.setAnnouncement('[HOST] You are the Table Host! Starting table...');
 
     try {
       this.peer = new Peer(POKER_ROOM_HOST_ID);
@@ -1537,7 +2401,7 @@ class PokerApp {
 
     document.getElementById(`name-${seatIdx}`).textContent = name;
     document.getElementById(`style-${seatIdx}`).textContent = 'Friend (Online)';
-    document.getElementById(`avatar-${seatIdx}`).textContent = '👤';
+    this.renderAvatar(seatIdx, 'guest');
     document.getElementById(`chips-${seatIdx}`).textContent = inheritedChips.toString();
 
     this.guestConnections.push({ conn, name, seatIdx, chips: inheritedChips, waiting: false });
@@ -1912,7 +2776,7 @@ class PokerApp {
         const slotUser = slotData.username || localStorage.getItem('royal_poker_username') || 'Hero';
         const slotStage = slotData.stage || 1;
         const diffBadgeClass = slotData.difficulty === 'nightmare' ? 'diff-championship' : `diff-${slotData.difficulty}`;
-        const diffBadgeLabel = slotData.difficulty === 'nightmare' ? '💎 CHAMPIONSHIP' : slotData.difficulty.toUpperCase();
+        const diffBadgeLabel = slotData.difficulty === 'nightmare' ? 'CHAMPIONSHIP' : slotData.difficulty.toUpperCase();
 
         cardEl.innerHTML = `
           <div class="slot-corner-bracket top-left"></div>
@@ -2237,7 +3101,7 @@ class PokerApp {
         if (!potEl.querySelector('.pot-fire-icon')) {
           const fireSpan = document.createElement('span');
           fireSpan.className = 'pot-fire-icon';
-          fireSpan.textContent = '🔥';
+          fireSpan.innerHTML = '<span class="flare-badge">HOT</span>';
           potEl.prepend(fireSpan);
         }
       } else {
@@ -2270,8 +3134,9 @@ class PokerApp {
     });
 
     // Hero hand rank badge
-    if (this.players[0].cards.length === 2 && !this.players[0].folded) {
-      const best = evaluateBestHand(this.players[0].cards, this.communityCards);
+    const minHole = (this.variant === 'omaha') ? 4 : 2;
+    if (this.players[0].cards.length >= minHole && !this.players[0].folded) {
+      const best = evaluateBestHand(this.players[0].cards, this.communityCards, this.variant);
       this.heroHandBadge.textContent = best.desc;
       this.heroHandBadge.classList.remove('hidden');
     } else {
@@ -2395,8 +3260,19 @@ class PokerApp {
     sounds.playShuffle();
     this.setAnnouncement('New hand dealt! Blinds posted.');
 
-    // Deal 2 hole cards to active non-knocked-out players
-    for (let c = 0; c < 2; c++) {
+    this.deck.reset(this.variant);
+    SaveManager.recordVariantHand(this.variant);
+
+    // Render SVG avatars for table seats
+    for (let s = 0; s < 5; s++) {
+      this.renderAvatar(s, this.players[s].avatar);
+      const cBox = document.getElementById(`cards-${s}`);
+      if (cBox) cBox.classList.toggle('omaha-hand', this.variant === 'omaha');
+    }
+
+    // Deal hole cards (4 cards for Omaha, 2 cards for Texas/Short Deck)
+    const holeCount = (this.variant === 'omaha') ? 4 : 2;
+    for (let c = 0; c < holeCount; c++) {
       this.players.forEach((p, idx) => {
         if (!p.knockedOut && !p.folded) {
           const card = this.deck.deal();
@@ -2989,7 +3865,7 @@ class PokerApp {
 
       const evaluated = eligible.map(p => ({
         player: p,
-        eval: evaluateBestHand(p.cards, this.communityCards)
+        eval: evaluateBestHand(p.cards, this.communityCards, this.variant)
       }));
 
       evaluated.sort((a, b) => compareScores(b.eval, a.eval));
@@ -3083,11 +3959,11 @@ class PokerApp {
         SaveManager.deleteSlot(this.activeSlot);
         this.renderMainMenuSlots();
       }
-      this.setAnnouncement('💀 YOU WENT BUST! Zero chips left. Permadeath activated.');
+      this.setAnnouncement('[BUST] Zero chips left. Permadeath activated.');
       if (this.gameOverModal) {
         this.gameOverModal.classList.remove('hidden');
       }
-      this.btnNextHand.textContent = '💀 Start New Run ($1,000)';
+      this.btnNextHand.textContent = 'Start New Run ($1,000)';
       this.btnNextHand.onclick = () => {
         this.btnNextHand.onclick = null;
         this.btnNextHand.textContent = 'Deal Next Hand';
@@ -3124,7 +4000,7 @@ class PokerApp {
 
           document.getElementById(`name-${s}`).textContent = g.name;
           document.getElementById(`style-${s}`).textContent = 'Friend (Online)';
-          document.getElementById(`avatar-${s}`).textContent = '👤';
+          this.renderAvatar(s, 'guest');
           document.getElementById(`chips-${s}`).textContent = inheritedChips.toString();
 
           g.conn.send({
@@ -3398,6 +4274,7 @@ class PokerApp {
       return;
     }
 
+    SaveManager.recordRouletteSpin();
     this.rouletteSpinning = true;
     const spinBtn = document.getElementById('btn-spin-roulette');
     if (spinBtn) spinBtn.disabled = true;
@@ -3637,10 +4514,11 @@ class PokerApp {
     const finalReels = [pickSymbol(), pickSymbol(), pickSymbol()];
 
     // Staggered reel stops
+    SaveManager.recordSlotSpin();
     setTimeout(() => {
       if (reel1) {
         reel1.classList.remove('spinning');
-        reel1.innerHTML = `<div class="slot-symbol">${finalReels[0]}</div>`;
+        reel1.innerHTML = `<div class="slot-symbol">${renderSlotSymbol(finalReels[0])}</div>`;
         sounds.playSlotStop();
       }
     }, 600);
@@ -3648,7 +4526,7 @@ class PokerApp {
     setTimeout(() => {
       if (reel2) {
         reel2.classList.remove('spinning');
-        reel2.innerHTML = `<div class="slot-symbol">${finalReels[1]}</div>`;
+        reel2.innerHTML = `<div class="slot-symbol">${renderSlotSymbol(finalReels[1])}</div>`;
         sounds.playSlotStop();
       }
     }, 1050);
@@ -3656,7 +4534,7 @@ class PokerApp {
     setTimeout(() => {
       if (reel3) {
         reel3.classList.remove('spinning');
-        reel3.innerHTML = `<div class="slot-symbol">${finalReels[2]}</div>`;
+        reel3.innerHTML = `<div class="slot-symbol">${renderSlotSymbol(finalReels[2])}</div>`;
         sounds.playSlotStop();
       }
       this.resolveSlotSpin(finalReels);
@@ -3674,12 +4552,12 @@ class PokerApp {
     // 1. Triple 777 (50x)
     if (s1 === '7️⃣' && s2 === '7️⃣' && s3 === '7️⃣') {
       multiplier = 50;
-      title = '🎰 JACKPOT 777! 50x WIN!';
+      title = 'JACKPOT 777! 50x WIN!';
     }
     // 2. Triple Wild Flare (30x)
     else if (s1 === '🔥' && s2 === '🔥' && s3 === '🔥') {
       multiplier = 30;
-      title = '🔥 SUPER WILD FLARE! 30x WIN!';
+      title = 'SUPER WILD FLARE! 30x WIN!';
     }
     // 3. Triple Stars (20x)
     else if (s1 === '⭐' && s2 === '⭐' && s3 === '⭐') {
@@ -3696,17 +4574,17 @@ class PokerApp {
       (s1 === s2) || (s2 === s3) || (s1 === s3) || reels.filter(s => s === '🔥').length >= 2
     )) {
       multiplier = 5;
-      title = '🔥 WILD BOOST PAIR! 5x WIN!';
+      title = 'WILD BOOST PAIR! 5x WIN!';
     }
     // 6. Any Matching Pair (2x)
     else if (s1 === s2 || s2 === s3 || s1 === s3) {
       multiplier = 2;
-      title = '✨ MATCHING PAIR! 2x WIN!';
+      title = 'MATCHING PAIR! 2x WIN!';
     }
     // 7. Lucky Symbol Push (1x)
     else if (reels.includes('7️⃣') || reels.includes('⭐')) {
       multiplier = 1;
-      title = '💎 LUCKY PUSH! Wager Returned';
+      title = 'LUCKY PUSH! Wager Returned';
     } else {
       multiplier = 0;
       title = 'No Match. Try again!';
@@ -3947,7 +4825,7 @@ class PokerApp {
       const miniTimerEl = document.getElementById('minigame-claim-timer');
       const miniBtn = document.getElementById('btn-claim-minigame-daily');
       if (miniTimerEl) {
-        miniTimerEl.textContent = miniStatus.canClaim ? '🎁 Ready to Claim!' : `Next: ${miniStatus.text}`;
+        miniTimerEl.textContent = miniStatus.canClaim ? 'Ready to Claim!' : `Next: ${miniStatus.text}`;
       }
       if (miniBtn) {
         miniBtn.disabled = !miniStatus.canClaim;
@@ -3958,7 +4836,7 @@ class PokerApp {
       const pokerTimerEl = document.getElementById('poker-claim-timer');
       const pokerBtn = document.getElementById('btn-claim-poker-daily');
       if (pokerTimerEl) {
-        pokerTimerEl.textContent = pokerStatus.canClaim ? `💎 Slot ${pokerSlotId} Ready!` : `Slot ${pokerSlotId}: ${pokerStatus.text}`;
+        pokerTimerEl.textContent = pokerStatus.canClaim ? `Slot ${pokerSlotId} Ready!` : `Slot ${pokerSlotId}: ${pokerStatus.text}`;
       }
       if (pokerBtn) {
         pokerBtn.disabled = !pokerStatus.canClaim;
@@ -4013,7 +4891,7 @@ class PokerApp {
           <span>Stage ${h.stage || 1} &bull; Hand #${h.handNum || 1}</span>
           <span>${h.time || ''}</span>
         </div>
-        <div class="history-item-winner">🏆 Winner: ${h.winner} (+$${(h.amount || 0).toLocaleString()})</div>
+        <div class="history-item-winner">Winner: ${h.winner} (+$${(h.amount || 0).toLocaleString()})</div>
         <div class="history-item-hand">${h.desc || ''}</div>
         ${cardsStr ? `<div class="history-item-cards">Hole: ${cardsStr} ${commStr ? `&bull; ${commStr}` : ''}</div>` : ''}
       `;

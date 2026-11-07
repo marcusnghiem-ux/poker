@@ -32,6 +32,16 @@ class PotManager:
             total = sum(p.total_bet for p in contributors)
             return [SidePot(total, [])]
 
+        max_bet = max(p.total_bet for p in active_or_allin)
+        has_short_stack_all_in = any(p.all_in and p.total_bet < max_bet for p in active_or_allin)
+
+        # Corrected Side Pot Mechanics:
+        # Side pot forms ONLY when a short-stacked player goes All-In with fewer chips than deeper bettors.
+        # Equal stack all-ins or matching all-in calls create ZERO side pots; all chips go into a single Main Pot!
+        if not has_short_stack_all_in:
+            total = sum(p.total_bet for p in contributors)
+            return [SidePot(total, active_or_allin)]
+
         # Distinct bet levels of active/all-in players, sorted ascending
         bet_levels = sorted(list(set(p.total_bet for p in active_or_allin)))
 
