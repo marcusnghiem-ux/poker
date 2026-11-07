@@ -5219,19 +5219,28 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
     ctx.strokeStyle = '#d4af37';
     ctx.stroke();
 
-    // Center hub
+    // Solar Corona Center Spindle Hub
     ctx.beginPath();
-    ctx.arc(0, 0, 36, 0, 2 * Math.PI);
-    ctx.fillStyle = '#78350f';
+    ctx.arc(0, 0, 38, 0, 2 * Math.PI);
+    const sunGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 38);
+    sunGrad.addColorStop(0, '#ffffff');
+    sunGrad.addColorStop(0.3, '#fef08a');
+    sunGrad.addColorStop(0.7, '#f59e0b');
+    sunGrad.addColorStop(1, '#78350f');
+    ctx.fillStyle = sunGrad;
     ctx.fill();
     ctx.lineWidth = 3;
     ctx.strokeStyle = '#ffd700';
     ctx.stroke();
 
+    // Inner Radiant Sun Core
     ctx.beginPath();
     ctx.arc(0, 0, 16, 0, 2 * Math.PI);
-    ctx.fillStyle = '#ffd700';
+    ctx.fillStyle = '#fffbeb';
     ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#f59e0b';
+    ctx.stroke();
 
     ctx.restore();
   }
