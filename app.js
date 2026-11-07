@@ -899,6 +899,14 @@ class EconomyManager {
     } catch (e) {}
   }
 
+    static deductCumulativeSavings(amount) {
+    const cur = EconomyManager.getCumulativeSavings();
+    const toDeduct = Math.max(0, Math.floor(amount));
+    const next = Math.max(0, cur - toDeduct);
+    EconomyManager.saveCumulativeSavings(next);
+    return next;
+  }
+
   static addCumulativeSavings(amount) {
     const cur = EconomyManager.getCumulativeSavings();
     const updated = cur + Math.max(0, Math.floor(amount));
@@ -1404,6 +1412,9 @@ class PokerApp {
 
     // Wrap ALL initializers in defensive try/catch as mandated by handoff guide!
     try { this.bindDOM(); } catch (err) { console.error("bindDOM error:", err); }
+    try { this.initInGameAlerts(); } catch (err) { console.error("initInGameAlerts error:", err); }
+    try { this.initPlayerRegistration(); } catch (err) { console.error("initPlayerRegistration error:", err); }
+    try { this.initBuyInModal(); } catch (err) { console.error("initBuyInModal error:", err); }
     try { this.bindTopNavAndModals(); } catch (err) { console.error("bindTopNav error:", err); }
     try { this.initCasinoLounge(); } catch (err) { console.error("initCasinoLounge error:", err); }
     try { this.initCasinoPortal(); } catch (err) { console.error("initCasinoPortal error:", err); }
@@ -1589,6 +1600,278 @@ class PokerApp {
   // DEDICATED CASINO LOUNGE HUB (Dual-View Slots & European Roulette)
   // ==========================================================================
 
+    // ==========================================================================
+  // IN-GAME MODAL ALERT & CONFIRMATION SYSTEM (Zero Native Browser Popups)
+  // ==========================================================================
+  initInGameAlerts() {
+    const cancelBtn = document.getElementById('in-game-alert-cancel');
+    const okBtn = document.getElementById('in-game-alert-ok');
+    const modal = document.getElementById('in-game-modal-alert');
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.add('hidden');
+      });
+    }
+    const closeBuyin = document.getElementById('close-buyin-modal-btn');
+    const cancelBuyin = document.getElementById('btn-cancel-buyin');
+    const buyinModal = document.getElementById('buyin-modal');
+    if (closeBuyin && buyinModal) closeBuyin.addEventListener('click', () => buyinModal.classList.add('hidden'));
+    if (cancelBuyin && buyinModal) cancelBuyin.addEventListener('click', () => buyinModal.classList.add('hidden'));
+  }
+
+  showInGameAlert({ title, message, type = 'info', onOk = null }) {
+    const modal = document.getElementById('in-game-modal-alert');
+    const titleEl = document.getElementById('in-game-alert-title');
+    const msgEl = document.getElementById('in-game-alert-msg');
+    const iconWrap = document.getElementById('in-game-alert-icon-wrap');
+    const cancelBtn = document.getElementById('in-game-alert-cancel');
+    const okBtn = document.getElementById('in-game-alert-ok');
+    if (!modal) return;
+
+    if (titleEl) titleEl.textContent = title || 'SYSTEM NOTICE';
+    if (msgEl) msgEl.textContent = message || '';
+
+    if (iconWrap) {
+      if (type === 'danger' || type === 'error') {
+        iconWrap.innerHTML = `<svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        iconWrap.style.background = 'rgba(239, 68, 68, 0.15)';
+        iconWrap.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+      } else if (type === 'success') {
+        iconWrap.innerHTML = `<svg width="36" height="36" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#10b981" stroke-width="2"/><path d="M8 12l3 3 5-5" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        iconWrap.style.background = 'rgba(16, 185, 129, 0.15)';
+        iconWrap.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+      } else {
+        iconWrap.innerHTML = `<svg width="36" height="36" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#ffd700" stroke-width="2"/><path d="M12 8v5M12 16h.01" stroke="#ffd700" stroke-width="2.5" stroke-linecap="round"/></svg>`;
+        iconWrap.style.background = 'rgba(253, 224, 71, 0.12)';
+        iconWrap.style.borderColor = 'rgba(253, 224, 71, 0.35)';
+      }
+    }
+
+    if (cancelBtn) cancelBtn.classList.add('hidden');
+    if (okBtn) {
+      okBtn.textContent = 'OK';
+      okBtn.className = 'btn btn-primary gold-glow-btn';
+      okBtn.onclick = () => {
+        modal.classList.add('hidden');
+        if (onOk) onOk();
+      };
+    }
+
+    modal.classList.remove('hidden');
+  }
+
+  showInGameConfirm({ title, message, confirmText = 'Confirm', cancelText = 'Cancel', isDanger = false, onConfirm = null, onCancel = null }) {
+    const modal = document.getElementById('in-game-modal-alert');
+    const titleEl = document.getElementById('in-game-alert-title');
+    const msgEl = document.getElementById('in-game-alert-msg');
+    const iconWrap = document.getElementById('in-game-alert-icon-wrap');
+    const cancelBtn = document.getElementById('in-game-alert-cancel');
+    const okBtn = document.getElementById('in-game-alert-ok');
+    if (!modal) return;
+
+    if (titleEl) titleEl.textContent = title || 'CONFIRM ACTION';
+    if (msgEl) msgEl.textContent = message || '';
+
+    if (iconWrap) {
+      if (isDanger) {
+        iconWrap.innerHTML = `<svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+        iconWrap.style.background = 'rgba(239, 68, 68, 0.18)';
+        iconWrap.style.borderColor = 'rgba(239, 68, 68, 0.5)';
+      } else {
+        iconWrap.innerHTML = `<svg width="36" height="36" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#ffd700" stroke-width="2"/><path d="M12 8v5M12 16h.01" stroke="#ffd700" stroke-width="2.5" stroke-linecap="round"/></svg>`;
+        iconWrap.style.background = 'rgba(253, 224, 71, 0.12)';
+        iconWrap.style.borderColor = 'rgba(253, 224, 71, 0.35)';
+      }
+    }
+
+    if (cancelBtn) {
+      cancelBtn.textContent = cancelText;
+      cancelBtn.classList.remove('hidden');
+      cancelBtn.onclick = () => {
+        modal.classList.add('hidden');
+        if (onCancel) onCancel();
+      };
+    }
+
+    if (okBtn) {
+      okBtn.textContent = confirmText;
+      okBtn.className = isDanger ? 'btn btn-danger-reset' : 'btn btn-primary gold-glow-btn';
+      okBtn.onclick = () => {
+        modal.classList.add('hidden');
+        if (onConfirm) onConfirm();
+      };
+    }
+
+    modal.classList.remove('hidden');
+  }
+
+  // ==========================================================================
+  // MANDATORY PLAYER REGISTRATION (Required Before Playing)
+  // ==========================================================================
+  getPlayerName() {
+    const raw = (localStorage.getItem('royal_poker_username') || '').trim();
+    if (!raw || raw.toLowerCase() === 'you' || raw.toLowerCase() === 'hero') return null;
+    return raw;
+  }
+
+  requirePlayerName(onSuccess) {
+    const name = this.getPlayerName();
+    if (name) {
+      if (onSuccess) onSuccess(name);
+      return true;
+    }
+    this.openPlayerNameModal(onSuccess);
+    return false;
+  }
+
+  initPlayerRegistration() {
+    const modal = document.getElementById('player-name-modal');
+    if (!modal) return;
+    const submitBtn = document.getElementById('player-name-modal-submit');
+    const input = document.getElementById('player-name-modal-input');
+    if (submitBtn) submitBtn.addEventListener('click', () => this.handleRegisterPlayerSubmit());
+    if (input) {
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') this.handleRegisterPlayerSubmit();
+      });
+    }
+  }
+
+  openPlayerNameModal(onSuccess) {
+    this.pendingRegistrationCallback = onSuccess;
+    const modal = document.getElementById('player-name-modal');
+    const input = document.getElementById('player-name-modal-input');
+    const err = document.getElementById('player-name-modal-err');
+    if (!modal) return;
+    if (err) err.classList.add('hidden');
+    if (input) {
+      input.value = '';
+      setTimeout(() => input.focus(), 150);
+    }
+    modal.classList.remove('hidden');
+  }
+
+  handleRegisterPlayerSubmit() {
+    const modal = document.getElementById('player-name-modal');
+    const input = document.getElementById('player-name-modal-input');
+    const err = document.getElementById('player-name-modal-err');
+    const val = (input ? input.value : '').trim();
+
+    if (!val || val.length < 2 || val.length > 16) {
+      if (err) {
+        err.textContent = 'Please enter a valid callsign (2-16 characters).';
+        err.classList.remove('hidden');
+      }
+      return;
+    }
+
+    localStorage.setItem('royal_poker_username', val);
+    this.players[0].name = val;
+    const heroEl = document.getElementById('hero-name');
+    if (heroEl) heroEl.textContent = val;
+    const userInp = document.getElementById('player-username-input');
+    if (userInp) userInp.value = val;
+
+    this.renderMainMenuSlots();
+    if (modal) modal.classList.add('hidden');
+    sounds.playWin();
+    this.setAnnouncement(`[WELCOME] Registered as "${val}". High-Roller access granted!`);
+
+    if (this.pendingRegistrationCallback) {
+      const cb = this.pendingRegistrationCallback;
+      this.pendingRegistrationCallback = null;
+      cb(val);
+    }
+  }
+
+  // ==========================================================================
+  // POKER RUN BUY-IN SELECTION (Funded Strictly from Savings Vault)
+  // ==========================================================================
+  initBuyInModal() {
+    const inputEl = document.getElementById('buyin-amount-input');
+    const errEl = document.getElementById('buyin-err-msg');
+
+    document.querySelectorAll('.buyin-preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.buyin-preset-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const p = btn.dataset.preset;
+        const savings = EconomyManager.getCumulativeSavings();
+        let val = 1000;
+        if (p === 'half') val = Math.max(1000, Math.floor(savings / 2));
+        else if (p === 'max') val = Math.max(1000, savings);
+        else val = Math.min(Number(p) || 1000, savings);
+
+        if (inputEl) inputEl.value = val;
+        if (errEl) errEl.classList.add('hidden');
+      });
+    });
+
+    const confirmBtn = document.getElementById('btn-confirm-buyin');
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', () => this.handleBuyInConfirm());
+    }
+  }
+
+  openBuyInModal(slotId, difficulty) {
+    this.pendingBuyInSlot = slotId;
+    this.pendingBuyInDifficulty = difficulty;
+
+    const savings = EconomyManager.getCumulativeSavings();
+    if (savings < 1000) {
+      sounds.playCheck();
+      this.showInGameAlert({
+        title: 'INSUFFICIENT SAVINGS VAULT',
+        message: `You currently have $${savings.toLocaleString()} in your Savings Vault. A minimum buy-in of $1,000 is required to launch a Poker Run.
+
+Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!`
+      });
+      return;
+    }
+
+    const modal = document.getElementById('buyin-modal');
+    const availEl = document.getElementById('buyin-available-savings');
+    const inputEl = document.getElementById('buyin-amount-input');
+    const errEl = document.getElementById('buyin-err-msg');
+
+    if (availEl) availEl.textContent = `$${savings.toLocaleString()}`;
+    if (inputEl) {
+      inputEl.value = Math.min(1000, savings);
+      inputEl.min = 1000;
+      inputEl.max = savings;
+    }
+    if (errEl) errEl.classList.add('hidden');
+    if (modal) modal.classList.remove('hidden');
+  }
+
+  handleBuyInConfirm() {
+    const inputEl = document.getElementById('buyin-amount-input');
+    const errEl = document.getElementById('buyin-err-msg');
+    const modal = document.getElementById('buyin-modal');
+    const buyIn = Number(inputEl ? inputEl.value : 1000) || 0;
+    const savings = EconomyManager.getCumulativeSavings();
+
+    if (buyIn < 1000) {
+      if (errEl) { errEl.textContent = 'Minimum Poker Run buy-in is $1,000.'; errEl.classList.remove('hidden'); }
+      return;
+    }
+    if (buyIn > savings) {
+      if (errEl) { errEl.textContent = `Insufficient savings! Available balance is only $${savings.toLocaleString()}.`; errEl.classList.remove('hidden'); }
+      return;
+    }
+
+    // Deduct strictly from Cumulative Savings
+    EconomyManager.deductCumulativeSavings(buyIn);
+    this.updateDualWalletUI();
+    this.updateEconomyDashboard();
+    if (modal) modal.classList.add('hidden');
+
+    const slotId = this.pendingBuyInSlot || 1;
+    const diff = this.pendingBuyInDifficulty || 'medium';
+    this.startNewGame(slotId, diff, buyIn);
+  }
+
+
   // ==========================================================================
   // DEDICATED CASINO RESORT PAGE & TRANSITIONS
   // ==========================================================================
@@ -1599,7 +1882,9 @@ class PokerApp {
     this.btnCasinoTransferBtn = document.getElementById('btn-casino-transfer-btn');
 
     if (this.btnEnterCasinoPortal) {
-      this.btnEnterCasinoPortal.addEventListener('click', () => this.showCasinoView());
+      this.btnEnterCasinoPortal.addEventListener('click', () => {
+        this.requirePlayerName(() => this.showCasinoView());
+      });
     }
     if (this.btnCasinoBackPoker) {
       this.btnCasinoBackPoker.addEventListener('click', () => this.hideCasinoView());
@@ -1671,6 +1956,8 @@ class PokerApp {
     this.updateRouletteUI();
     this.updateSlotsUI();
     this.updateDualWalletUI();
+    const meterWin = document.getElementById('meter-win-val');
+    if (meterWin) meterWin.textContent = `$${payout.toLocaleString()}`;
     if (this.drawRouletteWheel) {
       this.drawRouletteWheel(this.rouletteAngle || 0);
     }
@@ -1714,19 +2001,20 @@ class PokerApp {
 
   handleFactoryReset(skipConfirm = false) {
     if (!skipConfirm) {
-      const confirmed = window.confirm(
-        "⚠️ CRITICAL SYSTEM ACTION: COMPLETE FACTORY RESET\n\n" +
-        "This will immediately and permanently erase:\n" +
-        "• All 3 Save Slots & active poker runs\n" +
-        "• Cumulative Poker Savings Vault\n" +
-        "• Dedicated Mini-Games Wallet balance\n" +
-        "• Career Statistics & Records\n" +
-        "• Reset all 24-hour daily allowance cooldowns to 0 (so allowances can be claimed fresh)\n\n" +
-        "Are you absolutely sure you want to perform a complete factory data wipe?"
-      );
-      if (!confirmed) return;
+      this.showInGameConfirm({
+        title: 'SYSTEM FACTORY RESET',
+        message: 'This will immediately and permanently erase all 3 save slots, active poker runs, career statistics, cumulative savings, and mini-game wallet, resetting all 24-hour daily allowance cooldowns to 0 so allowances can be claimed fresh immediately.\n\nAre you absolutely sure you want to perform a complete factory data wipe?',
+        confirmText: 'PURGE ALL DATA',
+        cancelText: 'CANCEL',
+        isDanger: true,
+        onConfirm: () => this.executeFactoryResetPurge()
+      });
+      return;
     }
+    this.executeFactoryResetPurge();
+  }
 
+  executeFactoryResetPurge() {
     try {
       // 1. Wipe all localStorage items
       const knownKeys = [
@@ -1844,7 +2132,11 @@ class PokerApp {
       // 6. Audio and announcement feedback
       sounds.playWin();
       this.setAnnouncement('[RESET] Complete Factory Reset executed. All save slots, wallets, stats, and daily cooldowns restored to baseline.');
-      alert('Factory Reset executed successfully!\n\nAll save slots, wallets, stats, and daily allowance cooldowns have been restored to clean defaults.');
+      this.showInGameAlert({
+        title: 'FACTORY RESET COMPLETE',
+        message: 'All save slots, wallets, career statistics, and 24-hour daily allowance cooldown clocks have been completely wiped and restored to fresh starting baselines.',
+        type: 'success'
+      });
     } catch (err) {
       console.error('Factory reset error:', err);
     }
@@ -1961,7 +2253,11 @@ class PokerApp {
         const wallet = EconomyManager.getMiniGameWallet();
         if (wallet.balance < loungeSlotWager || loungeSlotWager <= 0) {
           sounds.playCheck();
-          alert('Insufficient Mini-Game funds! Claim your daily bonus or transfer chips.');
+          this.showInGameAlert({
+            title: 'INSUFFICIENT CASINO FUNDS',
+            message: 'Your Casino Wallet balance is too low for this wager. Claim your +$500 Daily Allowance or transfer funds from your savings vault.',
+            type: 'warning'
+          });
           return;
         }
 
@@ -2075,7 +2371,11 @@ class PokerApp {
         const wallet = EconomyManager.getMiniGameWallet();
         if (wallet.balance < loungeRouletteWager || loungeRouletteWager <= 0) {
           sounds.playCheck();
-          alert('Insufficient Mini-Game funds! Claim your daily bonus or transfer chips.');
+          this.showInGameAlert({
+            title: 'INSUFFICIENT CASINO FUNDS',
+            message: 'Your Casino Wallet balance is too low for this wager. Claim your +$500 Daily Allowance or transfer funds from your savings vault.',
+            type: 'warning'
+          });
           return;
         }
 
@@ -2166,7 +2466,7 @@ class PokerApp {
       if (!this.handInProgress) this.startNewHand();
     } else if (dest === 'shortDeck') {
       if (!FeatureManager.isEnabled('shortDeck')) {
-        alert('Short Deck (6+) variant is disabled in Settings.');
+        this.showInGameAlert({ title: 'VARIANT DISABLED', message: 'Short Deck (6+) variant is disabled in Settings.' });
         return;
       }
       this.setGameVariant('shortDeck');
@@ -2174,7 +2474,7 @@ class PokerApp {
       if (!this.handInProgress) this.startNewHand();
     } else if (dest === 'omaha') {
       if (!FeatureManager.isEnabled('omaha')) {
-        alert('Omaha High (4-Card) variant is disabled in Settings.');
+        this.showInGameAlert({ title: 'VARIANT DISABLED', message: 'Omaha High (4-Card) variant is disabled in Settings.' });
         return;
       }
       this.setGameVariant('omaha');
@@ -2280,7 +2580,7 @@ class PokerApp {
     const amountToCash = hero ? hero.chips : 0;
     if (amountToCash <= 0) {
       sounds.playCheck();
-      alert('No active table chips to cash out!');
+      this.showInGameAlert({ title: 'NO CHIPS TO CASH OUT', message: 'You have no active chips at the table to cash out into your savings vault.' });
       if (this.cashoutModal) this.cashoutModal.classList.add('hidden');
       return;
     }
@@ -3376,8 +3676,10 @@ class PokerApp {
           <div class="slot-corner-bracket bottom-right"></div>
         `;
         cardEl.onclick = () => {
-          this.pendingSlotTarget = slotId;
-          this.diffModal.classList.remove('hidden');
+          this.requirePlayerName(() => {
+            this.pendingSlotTarget = slotId;
+            this.diffModal.classList.remove('hidden');
+          });
         };
       } else {
         cardEl.className = 'slot-card active-slot';
@@ -3435,7 +3737,7 @@ class PokerApp {
 
         cardEl.querySelector('.slot-btn-play').onclick = (e) => {
           e.stopPropagation();
-          this.loadGame(slotId);
+          this.requirePlayerName(() => this.loadGame(slotId));
         };
 
         cardEl.querySelector('.slot-btn-del').onclick = (e) => {
@@ -3448,7 +3750,7 @@ class PokerApp {
     }
   }
 
-  startNewGame(slotId, difficulty) {
+  startNewGame(slotId, difficulty, buyIn = 1000) {
     this.activeSlot = slotId;
     this.difficulty = difficulty;
     this.stage = 1;
@@ -3462,9 +3764,10 @@ class PokerApp {
     this.bigBlind = baseline.bb;
     this.dealerIdx = 0;
 
-    const customName = localStorage.getItem('royal_poker_username') || 'You';
+    const startingStack = Math.max(1000, Math.floor(Number(buyIn) || 1000));
+    const customName = localStorage.getItem('royal_poker_username') || 'High Roller';
     this.players[0].name = customName;
-    this.players[0].chips = 1000;
+    this.players[0].chips = startingStack;
     this.players[0].knockedOut = false;
     this.players[0].isBot = false;
     this.players[0].isRemote = false;
@@ -3475,7 +3778,7 @@ class PokerApp {
       this.players[i].name = prof.name;
       this.players[i].style = prof.style;
       this.players[i].avatar = prof.avatar;
-      this.players[i].chips = 1000;
+      this.players[i].chips = startingStack;
       this.players[i].knockedOut = false;
       this.players[i].isBot = true;
       this.players[i].isRemote = false;
@@ -4614,7 +4917,7 @@ class PokerApp {
         this.btnNextHand.onclick = null;
         this.btnNextHand.textContent = 'Deal Next Hand';
         if (this.gameOverModal) this.gameOverModal.classList.add('hidden');
-        this.startNewGame(this.activeSlot || 1, this.difficulty || 'medium');
+        this.openBuyInModal(this.activeSlot || 1, this.difficulty || 'medium');
       };
       this.btnNextHand.classList.remove('hidden');
       return;
@@ -4803,12 +5106,18 @@ class PokerApp {
 
   placeRouletteBet(type, val, targetEl) {
     if (this.rouletteSpinning) return;
+    if (!this.requirePlayerName(() => this.placeRouletteBet(type, val, targetEl))) return;
+
     const chipAmt = this.selectedRouletteChip || 10;
     const wallet = EconomyManager.getMiniGameWallet();
     if (wallet.balance < chipAmt) {
       sounds.playCheck();
       const pill = document.getElementById('roulette-status-pill');
       if (pill) pill.textContent = '[ERROR] Insufficient mini-game wallet funds!';
+      this.showInGameAlert({
+        title: 'INSUFFICIENT CASINO FUNDS',
+        message: `You need at least $${chipAmt.toLocaleString()} in your Casino Wallet to place this bet. Your balance is $${wallet.balance.toLocaleString()}. Claim your daily allowance or transfer chips from your savings vault.`
+      });
       return;
     }
 
@@ -5151,6 +5460,10 @@ class PokerApp {
     if (this.btnSpinSlots) {
       this.btnSpinSlots.addEventListener('click', () => this.spinSlotMachine());
     }
+    const leverAssembly = document.getElementById('slot-lever-assembly');
+    if (leverAssembly) {
+      leverAssembly.addEventListener('click', () => this.spinSlotMachine());
+    }
     if (this.btnSlotsTransfer) {
       this.btnSlotsTransfer.addEventListener('click', () => {
         this.closeSlotsModal();
@@ -5205,12 +5518,24 @@ class PokerApp {
 
   spinSlotMachine() {
     if (this.slotSpinning) return;
+    if (!this.requirePlayerName(() => this.spinSlotMachine())) return;
+
     const wallet = EconomyManager.getMiniGameWallet();
     if (wallet.balance < this.slotWager) {
       sounds.playCheck();
       const winDisplay = document.getElementById('slots-win-display');
       if (winDisplay) winDisplay.textContent = 'Insufficient Mini-Game funds!';
+      this.showInGameAlert({
+        title: 'INSUFFICIENT CASINO FUNDS',
+        message: `Your Casino Wallet balance ($${wallet.balance.toLocaleString()}) is insufficient for a $${this.slotWager.toLocaleString()} spin. Reduce your wager, claim your daily allowance, or transfer funds.`
+      });
       return;
+    }
+
+    const leverArm = document.getElementById('slot-lever-arm');
+    if (leverArm) {
+      leverArm.classList.add('pulled');
+      setTimeout(() => leverArm.classList.remove('pulled'), 600);
     }
 
     this.slotSpinning = true;

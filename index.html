@@ -85,6 +85,40 @@
           <circle cx="340" cy="650" r="3" fill="#ffffff" class="c-star"/>
           <circle cx="390" cy="710" r="2.8" fill="#c4b5fd" class="c-star pulse-s"/>
         </g>
+        <!-- Constellation Group 5: Pegasus Wing / Royal High Roller -->
+        <g class="constellation-cluster cc-pegasus">
+          <polygon points="680,100 750,70 820,110 790,180 710,170" stroke="rgba(236, 72, 153, 0.35)" stroke-width="1.2" stroke-dasharray="3 3"/>
+          <line x1="750" y1="70" x2="770" y2="25" stroke="rgba(253, 224, 71, 0.45)" stroke-width="1.2"/>
+          <line x1="820" y1="110" x2="890" y2="130" stroke="rgba(236, 72, 153, 0.3)" stroke-width="1"/>
+          <circle cx="680" cy="100" r="3" fill="#f472b6" class="c-star pulse-s"/>
+          <circle cx="750" cy="70" r="4.2" fill="#ffffff" class="c-star alpha-star"/>
+          <circle cx="770" cy="25" r="3.5" fill="#fde047" class="c-star pulse-s"/>
+          <circle cx="820" cy="110" r="3.8" fill="#ec4899" class="c-star"/>
+          <circle cx="790" cy="180" r="2.8" fill="#ffffff" class="c-star"/>
+          <circle cx="710" cy="170" r="3" fill="#f472b6" class="c-star pulse-s"/>
+          <circle cx="890" cy="130" r="2.5" fill="#fde047" class="c-star"/>
+        </g>
+
+        <!-- Constellation Group 6: Cassiopeia / Celestial Throne -->
+        <g class="constellation-cluster cc-cassiopeia">
+          <polyline points="420,80 470,120 520,75 580,130 630,90" stroke="rgba(56, 189, 248, 0.38)" stroke-width="1.2" stroke-dasharray="2 2"/>
+          <circle cx="420" cy="80" r="3.2" fill="#38bdf8" class="c-star"/>
+          <circle cx="470" cy="120" r="3.5" fill="#ffffff" class="c-star pulse-s"/>
+          <circle cx="520" cy="75" r="4.5" fill="#fef08a" class="c-star alpha-star"/>
+          <circle cx="580" cy="130" r="3.5" fill="#38bdf8" class="c-star"/>
+          <circle cx="630" cy="90" r="3.8" fill="#ffffff" class="c-star pulse-s"/>
+        </g>
+
+        <!-- Constellation Group 7: Cygnus / The Northern Cross -->
+        <g class="constellation-cluster cc-cygnus">
+          <line x1="940" y1="520" x2="1080" y2="680" stroke="rgba(253, 224, 71, 0.32)" stroke-width="1.1"/>
+          <line x1="970" y1="650" x2="1050" y2="550" stroke="rgba(253, 224, 71, 0.32)" stroke-width="1.1"/>
+          <circle cx="940" cy="520" r="3.5" fill="#ffffff" class="c-star"/>
+          <circle cx="1010" cy="600" r="5" fill="#fde047" class="c-star alpha-star"/>
+          <circle cx="1080" cy="680" r="3" fill="#ffffff" class="c-star"/>
+          <circle cx="970" cy="650" r="3" fill="#fef08a" class="c-star pulse-s"/>
+          <circle cx="1050" cy="550" r="3" fill="#fef08a" class="c-star pulse-s"/>
+        </g>
       </svg>
     </div>
 
@@ -562,6 +596,23 @@
         </div>
       </header>
 
+      <!-- High-Roller Neon Ticker Marquee -->
+      <div class="casino-neon-ticker">
+        <div class="neon-ticker-track">
+          <span class="ticker-item">[VIP CASINO RESORT FLOOR]</span>
+          <span class="ticker-item yellow">AUTHENTIC SINGLE-ZERO EUROPEAN ROULETTE (35:1)</span>
+          <span class="ticker-item cyan">100X GRAND JACKPOT HIGH-STAKES SLOTS</span>
+          <span class="ticker-item magenta">SOLAR FLARE 30X MULTIPLIERS</span>
+          <span class="ticker-item emerald">DIRECT POKER VAULT BANK TRANSFERS</span>
+          <span class="ticker-item">[NO HOUSE COMMISSION]</span>
+          <span class="ticker-item gold">CLAIM $500 DAILY ALLOWANCE</span>
+          <span class="ticker-item">[VIP CASINO RESORT FLOOR]</span>
+          <span class="ticker-item yellow">AUTHENTIC SINGLE-ZERO EUROPEAN ROULETTE (35:1)</span>
+          <span class="ticker-item cyan">100X GRAND JACKPOT HIGH-STAKES SLOTS</span>
+          <span class="ticker-item magenta">SOLAR FLARE 30X MULTIPLIERS</span>
+        </div>
+      </div>
+
       <!-- Dual Arena Casino Floor: European Roulette + Multi-Variant Slots -->
       <div class="casino-floor-grid">
         <!-- WING 1: European Single-Zero Roulette Arena -->
@@ -585,6 +636,21 @@
           <div class="roulette-stage-box">
             <div class="roulette-canvas-wrap">
               <canvas id="roulette-canvas" width="320" height="320"></canvas>
+              <div class="roulette-pointer" id="roulette-pointer-main" title="Winning Pocket Indicator">
+                <svg width="28" height="34" viewBox="0 0 28 34" fill="none">
+                  <path d="M14 32 L3 8 Q14 12 25 8 Z" fill="url(#pointerGoldGrad)" stroke="#ffd700" stroke-width="1.8" filter="drop-shadow(0 3px 6px rgba(0,0,0,0.9))"/>
+                  <circle cx="14" cy="12" r="5" fill="#ef4444" stroke="#fca5a5" stroke-width="1.2"/>
+                  <circle cx="14" cy="12" r="2" fill="#ffffff"/>
+                  <defs>
+                    <linearGradient id="pointerGoldGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#fffbeb"/>
+                      <stop offset="40%" stop-color="#fbbf24"/>
+                      <stop offset="80%" stop-color="#d97706"/>
+                      <stop offset="100%" stop-color="#78350f"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
             </div>
             <div id="roulette-result-display" class="roulette-result-banner hidden">
               <span id="roulette-result-ball" class="roulette-ball-badge">0</span>
@@ -669,39 +735,106 @@
             </div>
           </div>
 
-          <!-- 3-Reel Cabinet Display -->
-          <div class="slots-cabinet-main">
-            <div class="cabinet-marquee">
-              <span class="marquee-title" id="slots-marquee-title">SOLAR FLARE &bull; 30x WILD MULTIPLIER</span>
-              <span class="marquee-sub" id="slots-marquee-sub">WILD FLARES &bull; SOLAR STARS &bull; ROYAL SUITS</span>
+          <!-- Physical 3D Slot Machine Cabinet Enclosure -->
+          <div class="slot-physical-cabinet-wrap">
+            <div class="slot-cabinet-chassis">
+              <!-- Top Metallic Marquee Crown Arch -->
+              <div class="cabinet-crown-arch">
+                <div class="crown-arch-lights">
+                  <span class="cab-light cl-1"></span>
+                  <span class="cab-light cl-2"></span>
+                  <span class="cab-light cl-3"></span>
+                  <span class="cab-light cl-4"></span>
+                  <span class="cab-light cl-5"></span>
+                  <span class="cab-light cl-6"></span>
+                  <span class="cab-light cl-7"></span>
+                </div>
+                <div class="cabinet-marquee">
+                  <span class="marquee-title" id="slots-marquee-title">SOLAR FLARE &bull; 30x WILD MULTIPLIER</span>
+                  <span class="marquee-sub" id="slots-marquee-sub">WILD FLARES &bull; SOLAR STARS &bull; ROYAL SUITS</span>
+                </div>
+              </div>
+
+              <!-- Cabinet Reels Section with Chrome Pillars & Payline Markers -->
+              <div class="cabinet-reels-stage">
+                <!-- Left Payline Indicator -->
+                <div class="payline-marker left-marker" title="Center Win Line">
+                  <span class="marker-led"></span>
+                  <span class="marker-arrow">&gt;</span>
+                </div>
+
+                <!-- 3D Cylindrical Reels Glass Window -->
+                <div class="reels-glass-window">
+                  <div class="cylinder-shadow-top"></div>
+                  <div class="slot-reel" id="slot-reel-1">
+                    <div class="slot-symbol">
+                      <svg class="slot-sym-svg" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="8" fill="#1e1b4b" stroke="#ffd700" stroke-width="1.5"/><path d="M13 14 H35 L22 36 H16 L27 19 H13 Z" fill="#ffd700"/></svg>
+                    </div>
+                  </div>
+                  <div class="reel-chrome-divider"></div>
+                  <div class="slot-reel" id="slot-reel-2">
+                    <div class="slot-symbol">
+                      <svg class="slot-sym-svg" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="8" fill="#3b0764" stroke="#f97316" stroke-width="1.5"/><circle cx="24" cy="24" r="8" fill="#fef08a"/></svg>
+                    </div>
+                  </div>
+                  <div class="reel-chrome-divider"></div>
+                  <div class="slot-reel" id="slot-reel-3">
+                    <div class="slot-symbol">
+                      <svg class="slot-sym-svg" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="8" fill="#0c4a6e" stroke="#38bdf8" stroke-width="1.5"/><path d="M24 8 L27 18 L37 20 L29 27 L32 37 L24 31 L16 37 L19 27 L11 20 L21 18 Z" fill="#fef08a"/></svg>
+                    </div>
+                  </div>
+                  <div class="cylinder-shadow-bottom"></div>
+                  <div class="payline-center-laser"></div>
+                </div>
+
+                <!-- Right Payline Indicator -->
+                <div class="payline-marker right-marker" title="Center Win Line">
+                  <span class="marker-arrow">&lt;</span>
+                  <span class="marker-led"></span>
+                </div>
+              </div>
+
+              <!-- Digital LCD Readout Meters -->
+              <div class="cabinet-digital-meters">
+                <div class="digital-meter-cell">
+                  <span class="dm-label">CREDITS</span>
+                  <span class="dm-val emerald" id="meter-credits-val">$1,000</span>
+                </div>
+                <div class="digital-meter-cell">
+                  <span class="dm-label">BET</span>
+                  <span class="dm-val gold" id="meter-bet-val">$50</span>
+                </div>
+                <div class="digital-meter-cell">
+                  <span class="dm-label">WIN PAID</span>
+                  <span class="dm-val cyan" id="meter-win-val">$0</span>
+                </div>
+              </div>
+
+              <!-- Dynamic Win Banner -->
+              <div id="slots-result-banner" class="slots-result-banner hidden">
+                <span id="slots-result-title" class="res-title">JACKPOT WIN!</span>
+                <span id="slots-result-detail" class="res-detail">+ $1,500</span>
+              </div>
+              <div id="slots-win-display" class="slots-status-bar">
+                Select your wager and pull the mechanical lever!
+              </div>
+
+              <!-- Chrome Coin Payout Hopper / Tray -->
+              <div class="cabinet-coin-hopper">
+                <div class="coin-hopper-grill">
+                  <span class="coin-tray-label">WINNER CASINO PAYOUT CHUTE</span>
+                </div>
+              </div>
             </div>
 
-            <!-- Reels Frame -->
-            <div class="reels-glass-window">
-              <div class="slot-reel" id="slot-reel-1">
-                <div class="slot-symbol">
-                  <svg class="slot-sym-svg" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="8" fill="#1e1b4b" stroke="#ffd700" stroke-width="1.5"/><path d="M13 14 H35 L22 36 H16 L27 19 H13 Z" fill="#ffd700"/></svg>
-                </div>
+            <!-- Physical Mechanical Spin Lever Arm Assembly -->
+            <div class="slot-lever-assembly" id="slot-lever-assembly" title="Click or Pull Lever to Spin!" role="button" tabindex="0">
+              <div class="lever-mount-plate"></div>
+              <div class="lever-socket"></div>
+              <div class="lever-arm-shaft" id="slot-lever-arm">
+                <div class="lever-rod"></div>
+                <div class="lever-knob-ball"></div>
               </div>
-              <div class="slot-reel" id="slot-reel-2">
-                <div class="slot-symbol">
-                  <svg class="slot-sym-svg" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="8" fill="#3b0764" stroke="#f97316" stroke-width="1.5"/><circle cx="24" cy="24" r="8" fill="#fef08a"/></svg>
-                </div>
-              </div>
-              <div class="slot-reel" id="slot-reel-3">
-                <div class="slot-symbol">
-                  <svg class="slot-sym-svg" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="8" fill="#0c4a6e" stroke="#38bdf8" stroke-width="1.5"/><path d="M24 8 L27 18 L37 20 L29 27 L32 37 L24 31 L16 37 L19 27 L11 20 L21 18 Z" fill="#fef08a"/></svg>
-                </div>
-              </div>
-            </div>
-
-            <!-- Dynamic Win Banner -->
-            <div id="slots-result-banner" class="slots-result-banner hidden">
-              <span id="slots-result-title" class="res-title">JACKPOT WIN!</span>
-              <span id="slots-result-detail" class="res-detail">+ $1,500</span>
-            </div>
-            <div id="slots-win-display" class="slots-status-bar">
-              Select your wager and pull the lever!
             </div>
           </div>
 
@@ -1047,6 +1180,92 @@
     <!-- ======================================================================
          4. DIFFICULTY SELECTION MODAL (Solo Mode)
          ====================================================================== -->
+        <!-- ======================================================================
+         IN-GAME MODAL ALERT & CONFIRMATION (Zero Browser Popups)
+         ====================================================================== -->
+    <div id="in-game-modal-alert" class="modal-overlay hidden">
+      <div class="modal-card in-game-alert-card">
+        <div class="alert-icon-wrap" id="in-game-alert-icon-wrap">
+          <svg class="alert-icon-svg" width="36" height="36" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="#ffd700" stroke-width="2"/>
+            <path d="M12 8v5M12 16h.01" stroke="#ffd700" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h2 class="alert-modal-title" id="in-game-alert-title">SYSTEM NOTICE</h2>
+        <div class="alert-modal-message" id="in-game-alert-msg">Notification message content.</div>
+        <div class="alert-modal-actions" id="in-game-alert-actions">
+          <button id="in-game-alert-cancel" class="btn btn-secondary hidden" type="button">Cancel</button>
+          <button id="in-game-alert-ok" class="btn btn-primary gold-glow-btn" type="button">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         MANDATORY PLAYER REGISTRATION MODAL
+         ====================================================================== -->
+    <div id="player-name-modal" class="modal-overlay hidden">
+      <div class="modal-card player-reg-card">
+        <div class="reg-emblem">
+          <svg width="44" height="34" viewBox="0 0 72 54" fill="none">
+            <path d="M14 38 Q36 22 58 38 L54 44 Q36 34 18 44 Z" fill="#b91c1c"/>
+            <rect x="10" y="42" width="52" height="8" rx="2" fill="#ffd54f" stroke="#fef08a" stroke-width="1"/>
+            <path d="M12 42 L8 22 L20 30 L36 12 L52 30 L64 22 L60 42 Z" fill="#ffd54f" stroke="#fef08a" stroke-width="1.5"/>
+            <circle cx="36" cy="11" r="3" fill="#fff"/>
+          </svg>
+        </div>
+        <h2 class="reg-title">CASINO MEMBERSHIP REQUIRED</h2>
+        <p class="reg-sub">Enter your player callsign / handle to enter tables and play casino games.</p>
+        <div class="reg-input-wrap">
+          <input type="text" id="player-name-modal-input" class="reg-input" placeholder="ENTER YOUR NAME..." maxlength="16" autocomplete="off" spellcheck="false">
+          <div id="player-name-modal-err" class="reg-err-msg hidden">Please enter a valid callsign (2-16 characters).</div>
+        </div>
+        <div class="reg-actions">
+          <button id="player-name-modal-submit" class="btn btn-primary gold-glow-btn reg-btn" type="button">
+            <span>REGISTER &amp; ENTER CASINO</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         POKER RUN BUY-IN SELECTION MODAL (Funded strictly from Savings Vault)
+         ====================================================================== -->
+    <div id="buyin-modal" class="modal-overlay hidden">
+      <div class="modal-card buyin-modal-card">
+        <div class="modal-header">
+          <h2>Fund Poker Run Buy-In</h2>
+          <button id="close-buyin-modal-btn" class="close-btn" type="button">&times;</button>
+        </div>
+        <div class="modal-body buyin-modal-body">
+          <div class="buyin-savings-summary">
+            <span class="bss-lbl">SAVINGS VAULT BALANCE:</span>
+            <strong class="bss-val gold" id="buyin-available-savings">$1,000</strong>
+          </div>
+          <p class="buyin-note">Select how much to deposit into this poker run from your savings vault (Min $1,000).</p>
+          
+          <div class="buyin-input-block">
+            <label for="buyin-amount-input">Buy-In Amount ($):</label>
+            <input type="number" id="buyin-amount-input" class="buyin-input" min="1000" step="100" value="1000">
+          </div>
+
+          <div class="buyin-quick-presets">
+            <button class="buyin-preset-btn active" data-preset="1000" type="button">Min ($1,000)</button>
+            <button class="buyin-preset-btn" data-preset="2500" type="button">$2,500</button>
+            <button class="buyin-preset-btn" data-preset="5000" type="button">$5,000</button>
+            <button class="buyin-preset-btn" data-preset="half" type="button">50%</button>
+            <button class="buyin-preset-btn" data-preset="max" type="button">MAX</button>
+          </div>
+
+          <div id="buyin-err-msg" class="buyin-err-msg hidden">Insufficient funds in Savings Vault!</div>
+
+          <div class="modal-actions-row">
+            <button id="btn-cancel-buyin" class="btn btn-secondary" type="button">Cancel</button>
+            <button id="btn-confirm-buyin" class="btn btn-primary gold-glow-btn" type="button">Launch Run</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="difficulty-modal" class="modal-overlay hidden">
       <div class="modal-card diff-modal-card">
         <div class="modal-header">

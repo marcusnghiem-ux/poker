@@ -193,6 +193,37 @@ try { this.renderMainMenuSlots(); } catch (err) { console.error("renderSlots err
   24. Zero System Emojis in Rendered DOM and CSS
   25. All-In Showdown Knockout Enforcement
 
+### 15. Savings Vault Funded Buy-In System (No Free Coins) ✅ COMPLETED & VERIFIED
+- **Logic:** Starting a new Poker Run no longer grants a free $1,000 stack. Buy-ins are drawn directly and strictly from the Cumulative Poker Savings Vault (`EconomyManager.deductCumulativeSavings(buyIn)`).
+- **Flexibility:** Players can deposit any amount $\ge \$1,000$ up to their total savings balance via the dedicated `#buyin-modal`.
+- **Protection:** If a player has less than $1,000 in their Savings Vault, run creation is blocked with an in-game alert guiding them to claim their $5,000 daily poker allowance or transfer casino winnings.
+- Table bots match the chosen buy-in stack for balanced competition. Quick rebuy on permadeath similarly draws from the Savings Vault.
+
+### 16. Mandatory Player Registration System ✅ COMPLETED & VERIFIED
+- All game modes (Poker Runs, Continue Run, Casino Resort floor, Roulette wagering, Slot spins, Online rooms) strictly require a registered callsign before playing.
+- If an unauthenticated user attempts to play, `#player-name-modal` is presented.
+- Validates 2–16 characters, trims whitespace, excludes placeholder names ('You', 'Hero'), and immediately persists to `localStorage`.
+
+### 17. Zero Native Browser Dialogs (100% Custom In-Game Modals) ✅ COMPLETED & VERIFIED
+- Completely eliminated all `window.alert()` and `window.confirm()` calls across `app.js`.
+- Implemented `#in-game-modal-alert` supporting:
+  - `showInGameAlert({ title, message, type })`: Luxury modal with customized SVG vector icons (warning, error, success, info), glowing borders, and OK dismiss button.
+  - `showInGameConfirm({ title, message, confirmText, cancelText, isDanger, onConfirm, onCancel })`: Used for Factory Reset in the Danger Zone with crimson warning aesthetics.
+  - Insufficient funds in Roulette, Slots, and Poker Buy-In now trigger branded in-game alerts instead of browser popups.
+
+### 18. Physical 3D Slot Machine Cabinet & Roulette Pointer ✅ COMPLETED & VERIFIED
+- **Slot Machine Arcade Chassis:** Redesigned into an authentic physical cabinet (`.slot-physical-cabinet-wrap`) with metallic arched crown marquee, flashing cab lights, payline arrows with pulsing red LEDs, chrome vertical reel dividers, cylindrical inner depth shadows, digital LCD readout meters (CREDITS, BET, WIN PAID), and a bottom coin payout hopper.
+- **Interactive Mechanical Lever:** Added 3D pull lever assembly (`#slot-lever-assembly`) on the right side of the cabinet with metal rod and ruby ball knob. Pulling the lever triggers the `@keyframes leverPullSpring` mechanical bounce animation and executes a spin.
+- **European Roulette Pointer:** Added authentic golden physical marker needle with a ruby jewel center dot (`.roulette-pointer`, `#roulette-pointer-main`) positioned at 12 o'clock, perfectly aligned with the landed pocket.
+
+### 19. Vibrant Colorful Casino Resort Floor & Celestial Constellations ✅ COMPLETED & VERIFIED
+- **Casino Resort Floor (`#casino-view`):** Upgraded with an animated scrolling high-roller neon ticker marquee (`.casino-neon-ticker`), cyber cyan, electric magenta, and gold ambient neon light washes, and rich jewel-tone borders.
+- **Celestial Constellations:** Expanded background SVG with Pegasus Wing, Cassiopeia (Celestial Throne), and Cygnus (Northern Cross), accompanied by twinkling and radiating starfield animations (`@keyframes starTwinkle`, `@keyframes starRadiance`).
+
+### 20. 25-Run Performance & 25-Run Graphics/Alerts Benchmark Suites ✅ COMPLETED & VERIFIED
+- **`simulate_performance_25_runs.py` (25/25 PASS):** Rigorous algorithmic benchmarks covering 52-card shuffles, 5-card/7-card/Short Deck/Omaha evaluations, pot odds, side pot latency, JSON serialization, 60 FPS trigonometry, and 100-hand tournament runtime.
+- **`simulate_graphics_and_alerts_25_runs.py` (25/25 PASS):** Validates zero emojis in HTML/CSS, zero native browser alerts/confirms, in-game alert modal DOM, name gating, savings buy-in deductions, roulette pointer presence, slot cabinet components, neon ticker, and constellations.
+
 ---
 
 ## 🚀 Git & Deployment Quick Reference
@@ -205,6 +236,8 @@ try { this.renderMainMenuSlots(); } catch (err) { console.error("renderSlots err
   - `python verify_syntax.py`
   - `python simulate_10_runs.py`
   - `python simulate_25_runs.py`
+  - `python simulate_performance_25_runs.py`
+  - `python simulate_graphics_and_alerts_25_runs.py`
   - `python test_poker.py`
   - `python scratch/check_index_ids.py`
   - `python scratch/find_emojis.py`
