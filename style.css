@@ -4264,3 +4264,298 @@ body {
     padding: 0 10px;
   }
 }
+
+
+/* ==========================================================================
+   CASINO LOUNGE HUB (Dual View: Slots & Roulette Side-by-Side Arena)
+   ========================================================================== */
+.featured-hub-btn {
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.25), rgba(249, 115, 22, 0.25)) !important;
+  border-color: #ffd700 !important;
+  color: #fef08a !important;
+  font-weight: 700 !important;
+  box-shadow: 0 0 15px rgba(253, 224, 71, 0.25) !important;
+}
+
+.featured-hub-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 25px rgba(253, 224, 71, 0.45) !important;
+}
+
+.featured-lounge-item {
+  border-left: 3px solid #ffd700 !important;
+  background: rgba(234, 179, 8, 0.08) !important;
+}
+
+.casino-lounge-modal-card {
+  max-width: 1120px !important;
+  width: 96vw !important;
+  max-height: 92vh !important;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(circle at 50% 20%, #15102a 0%, #080612 100%) !important;
+  border: 1px solid rgba(253, 224, 71, 0.35) !important;
+  box-shadow: 0 0 40px rgba(234, 179, 8, 0.18), inset 0 0 30px rgba(0, 0, 0, 0.8) !important;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.casino-lounge-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px 24px;
+  background: linear-gradient(180deg, rgba(30, 27, 75, 0.9), rgba(15, 23, 42, 0.95));
+  border-bottom: 1px solid rgba(253, 224, 71, 0.25);
+}
+
+.lounge-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lounge-header-brand h2 {
+  font-size: 1.25rem;
+  letter-spacing: 1.5px;
+  color: #fef08a;
+  margin: 0;
+  text-shadow: 0 0 10px rgba(253, 224, 71, 0.5);
+}
+
+.lounge-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 3px 8px;
+  background: rgba(234, 179, 8, 0.15);
+  border: 1px solid rgba(234, 179, 8, 0.4);
+  border-radius: 9999px;
+  color: #ffd700;
+}
+
+.lounge-header-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.lounge-wallet-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.8rem;
+}
+
+.lounge-wallet-lbl {
+  color: #94a3b8;
+}
+
+.lounge-wallet-val {
+  color: #34d399;
+  font-weight: 800;
+}
+
+.lounge-claim-btn {
+  background: linear-gradient(135deg, #059669, #10b981);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 3px 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lounge-claim-btn:hover {
+  filter: brightness(1.15);
+  transform: scale(1.04);
+}
+
+.lounge-view-selector {
+  display: flex;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 2px;
+}
+
+.lounge-view-btn {
+  background: transparent;
+  color: #94a3b8;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lounge-view-btn.active {
+  background: rgba(234, 179, 8, 0.2);
+  color: #ffd700;
+  box-shadow: 0 0 8px rgba(234, 179, 8, 0.2);
+}
+
+.casino-lounge-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  transition: all 0.3s ease;
+}
+
+/* Views: split vs slots vs roulette */
+.casino-lounge-body[data-active-view="slots"] {
+  grid-template-columns: 1fr;
+}
+.casino-lounge-body[data-active-view="slots"] .lounge-roulette-pane {
+  display: none !important;
+}
+
+.casino-lounge-body[data-active-view="roulette"] {
+  grid-template-columns: 1fr;
+}
+.casino-lounge-body[data-active-view="roulette"] .lounge-slots-pane {
+  display: none !important;
+}
+
+.lounge-pane {
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.lounge-pane-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 8px;
+}
+
+.pane-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #e2e8f0;
+}
+
+.pane-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+}
+.pane-tag.gold { color: #fde047; border: 1px solid rgba(253, 224, 71, 0.3); }
+.pane-tag.emerald { color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+
+/* Slots mini cabinet */
+.slots-cabinet-mini {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(180deg, #180d2b 0%, #0b0716 100%);
+  border: 2px solid #f59e0b;
+  border-radius: 12px;
+  padding: 14px 10px;
+  box-shadow: 0 0 25px rgba(245, 158, 11, 0.25), inset 0 0 15px rgba(0,0,0,0.8);
+}
+
+.slots-paytable-mini {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(75px, 1fr));
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+.slots-paytable-mini .pt-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Roulette mini stage */
+.roulette-stage-mini {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.roulette-quick-wagers {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.lounge-r-bet-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  color: #e2e8f0;
+  padding: 8px 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lounge-r-bet-btn:hover, .lounge-r-bet-btn.active {
+  border-color: #ffd700;
+  background: rgba(234, 179, 8, 0.2);
+  color: #fef08a;
+  box-shadow: 0 0 10px rgba(234, 179, 8, 0.3);
+}
+
+.roulette-action-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.roulette-bet-summary {
+  font-size: 0.8rem;
+  color: #cbd5e1;
+}
+
+.casino-lounge-footer {
+  padding: 12px 24px;
+  background: rgba(15, 23, 42, 0.9);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+@media (max-width: 860px) {
+  .casino-lounge-body {
+    grid-template-columns: 1fr !important;
+  }
+}

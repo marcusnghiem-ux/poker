@@ -337,6 +337,11 @@
 
       <!-- Action Navigation Buttons with Hand-Crafted SVGs -->
       <div class="menu-action-bar">
+        <button id="btn-open-casino-lounge" class="menu-pill-btn crown-glow-btn featured-hub-btn" title="Open Unified Casino Lounge (Roulette & Solar Slots)">
+          <span class="btn-icon">
+            <svg class="btn-svg-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="3" stroke="#ffd700" stroke-width="2"/><circle cx="8" cy="12" r="3" stroke="#f59e0b" stroke-width="1.5"/><circle cx="16" cy="12" r="3" stroke="#ef4444" stroke-width="1.5"/><path d="M12 4v16" stroke="#ffd700" stroke-width="1.2" stroke-dasharray="2 2"/></svg>
+          </span> 🎰 Casino Lounge
+        </button>
         <button id="btn-open-online-room" class="menu-pill-btn gold-glow-btn" title="Enter Exclusive Room with Online Players">
           <span class="btn-icon">
             <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="11" rx="2.5" fill="rgba(253,224,71,0.2)" stroke="#fde047" stroke-width="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3" stroke="#fde047" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="15" r="1.5" fill="#fde047"/><path d="M12 16.5v2" stroke="#fde047" stroke-width="1.5"/></svg>
@@ -991,6 +996,139 @@
       </div>
     </div>
 
+
+    <!-- ======================================================================
+         7. DEDICATED CASINO LOUNGE HUB (Dual View: Slots & European Roulette)
+         ====================================================================== -->
+    <div id="casino-lounge-modal" class="modal-overlay hidden">
+      <div class="modal-card casino-lounge-modal-card">
+        <div class="modal-header casino-lounge-header">
+          <div class="lounge-header-brand">
+            <svg class="crown-icon-sm" width="24" height="20" viewBox="0 0 72 54" fill="none">
+              <path d="M14 38 Q36 22 58 38 L54 44 Q36 34 18 44 Z" fill="#b91c1c"/>
+              <rect x="10" y="42" width="52" height="8" rx="2" fill="#ffd54f" stroke="#fef08a" stroke-width="1"/>
+              <path d="M12 42 L8 22 L20 30 L36 12 L52 30 L64 22 L60 42 Z" fill="#ffd54f" stroke="#fef08a" stroke-width="1.5"/>
+              <circle cx="36" cy="11" r="3" fill="#fff"/>
+            </svg>
+            <h2>ROYAL CASINO LOUNGE</h2>
+            <span class="lounge-badge">SIDE-BY-SIDE ARENA</span>
+          </div>
+          <div class="lounge-header-controls">
+            <div class="lounge-wallet-pill" title="Shared Dedicated Mini-Games Wallet">
+              <span class="lounge-wallet-lbl">Mini-Game Wallet:</span>
+              <strong class="lounge-wallet-val emerald" id="lounge-wallet-balance">$1,000</strong>
+              <button id="btn-lounge-claim" class="lounge-claim-btn" title="Claim $500 Daily Mini-Game Allowance">
+                + $500 Daily
+              </button>
+            </div>
+            <div class="lounge-view-selector">
+              <button class="lounge-view-btn active" data-view="split">Side-by-Side</button>
+              <button class="lounge-view-btn" data-view="slots">Slots Focus</button>
+              <button class="lounge-view-btn" data-view="roulette">Roulette Focus</button>
+            </div>
+            <button id="close-casino-lounge-btn" class="close-btn" title="Close Casino Lounge">&times;</button>
+          </div>
+        </div>
+
+        <div class="modal-body casino-lounge-body" id="casino-lounge-body" data-active-view="split">
+          <!-- LEFT PANE: Solar Flare 3-Reel Slots -->
+          <div class="lounge-pane lounge-slots-pane" id="lounge-pane-slots">
+            <div class="lounge-pane-header">
+              <span class="pane-title">🎰 SOLAR FLARE 3-REEL SLOTS</span>
+              <span class="pane-tag gold">50x JACKPOT</span>
+            </div>
+            <div class="slots-cabinet-mini">
+              <div class="slots-payline-indicator left">▶</div>
+              <div class="slots-reels-stage">
+                <div class="slot-reel-wrap">
+                  <div class="slot-reel" id="lounge-slot-reel-1"><div class="slot-symbol">7️⃣</div></div>
+                </div>
+                <div class="slot-reel-wrap">
+                  <div class="slot-reel" id="lounge-slot-reel-2"><div class="slot-symbol">🔥</div></div>
+                </div>
+                <div class="slot-reel-wrap">
+                  <div class="slot-reel" id="lounge-slot-reel-3"><div class="slot-symbol">⭐</div></div>
+                </div>
+              </div>
+              <div class="slots-payline-indicator right">◀</div>
+            </div>
+            <div id="lounge-slots-result" class="slots-result-banner hidden">
+              <span id="lounge-slots-result-title">JACKPOT WIN!</span>
+              <span id="lounge-slots-result-detail">+ $1,500</span>
+            </div>
+            <div class="slots-wager-controls">
+              <span class="wager-label">Wager:</span>
+              <div class="preset-buttons-row">
+                <button class="lounge-slots-preset-btn" data-wager="10">$10</button>
+                <button class="lounge-slots-preset-btn active" data-wager="50">$50</button>
+                <button class="lounge-slots-preset-btn" data-wager="100">$100</button>
+                <button class="lounge-slots-preset-btn max-btn" data-wager="max">MAX</button>
+              </div>
+              <button id="btn-lounge-spin-slots" class="btn btn-primary slots-spin-btn">
+                ⚡ SPIN REELS ⚡
+              </button>
+            </div>
+            <div class="slots-paytable-mini">
+              <div class="pt-item"><span>7️⃣ 7️⃣ 7️⃣</span> <strong class="gold">50x</strong></div>
+              <div class="pt-item"><span>🔥 🔥 🔥</span> <strong class="orange">30x</strong></div>
+              <div class="pt-item"><span>⭐ ⭐ ⭐</span> <strong class="yellow">20x</strong></div>
+              <div class="pt-item"><span>♠️/♥️/♦️/♣️ x3</span> <strong class="blue">10x</strong></div>
+              <div class="pt-item"><span>Pair + 🔥</span> <strong class="green">5x</strong></div>
+              <div class="pt-item"><span>Any Pair</span> <strong class="cyan">2x</strong></div>
+              <div class="pt-item"><span>7️⃣ or ⭐</span> <strong class="gray">1x</strong></div>
+            </div>
+          </div>
+
+          <!-- RIGHT PANE: European Single-Zero Roulette -->
+          <div class="lounge-pane lounge-roulette-pane" id="lounge-pane-roulette">
+            <div class="lounge-pane-header">
+              <span class="pane-title">🎡 EUROPEAN SINGLE-ZERO ROULETTE</span>
+              <span class="pane-tag emerald">36:1 PAYOUT</span>
+            </div>
+            <div class="roulette-stage-mini">
+              <div class="roulette-wheel-container">
+                <canvas id="lounge-roulette-canvas" width="280" height="280"></canvas>
+                <div class="roulette-pointer"></div>
+              </div>
+              <div id="lounge-roulette-result" class="roulette-result-banner hidden">
+                <span id="lounge-roulette-ball" class="roulette-ball-badge">0</span>
+                <span id="lounge-roulette-text">Ball landed on 0 Green!</span>
+              </div>
+            </div>
+            <div class="roulette-preset-bar">
+              <span class="chip-sel-label">Quick Wager:</span>
+              <div class="preset-buttons-row">
+                <button class="lounge-r-preset-btn active" data-wager="10">$10</button>
+                <button class="lounge-r-preset-btn" data-wager="50">$50</button>
+                <button class="lounge-r-preset-btn" data-wager="100">$100</button>
+                <button class="lounge-r-preset-btn max-btn" data-wager="max">MAX</button>
+              </div>
+              <div class="roulette-quick-wagers">
+                <button class="lounge-r-bet-btn" data-bet-type="color" data-bet-val="red">🔴 RED</button>
+                <button class="lounge-r-bet-btn" data-bet-type="color" data-bet-val="black">⚫ BLACK</button>
+                <button class="lounge-r-bet-btn" data-bet-type="parity" data-bet-val="even">EVEN</button>
+                <button class="lounge-r-bet-btn" data-bet-type="parity" data-bet-val="odd">ODD</button>
+                <button class="lounge-r-bet-btn" data-bet-type="number" data-bet-val="0">🟢 ZERO</button>
+              </div>
+              <div class="roulette-action-row">
+                <span class="roulette-bet-summary">Bet: <strong id="lounge-roulette-total-bet">$10</strong> on <strong id="lounge-roulette-bet-target">RED</strong></span>
+                <button id="btn-lounge-spin-roulette" class="btn btn-emerald roulette-spin-btn">
+                  🎡 SPIN WHEEL 🎡
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer casino-lounge-footer">
+          <span>Both games draw exclusively from your Mini-Game Wallet. Winnings can be transferred to your Poker campaign anytime.</span>
+          <button id="btn-lounge-transfer" class="btn btn-secondary transfer-shortcut-btn">
+            Transfer Winnings to Poker
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- ======================================================================
          7. EUROPEAN ROULETTE MINI-GAME MODAL (Streamlined Controls)
          ====================================================================== -->
@@ -1353,6 +1491,17 @@
         <div class="drawer-section">
           <div class="drawer-section-title">CASINO MINI-GAMES</div>
           <div class="drawer-menu-list">
+            <button class="drawer-item featured-lounge-item" id="drawer-item-lounge" data-action="open-lounge">
+              <div class="d-item-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="#ffd700" stroke-width="2"/><circle cx="8" cy="8" r="1.5" fill="#fde047"/><circle cx="16" cy="8" r="1.5" fill="#fde047"/><path d="M7 14h10M12 11v6" stroke="#ffd700" stroke-width="1.8"/></svg>
+              </div>
+              <div class="d-item-info">
+                <span class="d-item-title">Casino Lounge Hub</span>
+                <span class="d-item-sub">Dual-view Slots &amp; European Roulette arena</span>
+              </div>
+              <span class="d-item-badge gold">LOUNGE</span>
+            </button>
+
             <button class="drawer-item" id="drawer-item-slots" data-action="open-slots">
               <div class="d-item-icon">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="#f59e0b" stroke-width="2"/><path d="M7 8h10M7 12h10M7 16h10" stroke="#f59e0b" stroke-width="1.8"/></svg>

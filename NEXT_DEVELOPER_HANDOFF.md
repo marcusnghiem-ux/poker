@@ -124,6 +124,19 @@ try { this.renderMainMenuSlots(); } catch (err) { console.error("renderSlots err
 - Animated Side Transit Drawer (`#transit-drawer`) for rapid jumping between Texas Hold'em, Short Deck, Omaha, Exclusive Room, Slots, Roulette, and Savings Vault.
 - Career Statistics Modal (`#stats-modal`), Settings Modal with feature toggles and volume slider (`#settings-modal`), Rules Modal (`#rules-modal`), and Cashout Modal (`#cashout-modal`).
 
+### 6. Dedicated Casino Lounge Hub (Phase 2) ✅ COMPLETED & VERIFIED
+- Unified `#casino-lounge-modal` housing both Solar Flare 3-Reel Slots and European Single-Zero Roulette side-by-side in a responsive dual-view arena.
+- Features quick-wager presets ($10, $50, $100, MAX), single-zero wheel, 50x slot multipliers, and shared Mini-Games Wallet synchronization.
+
+### 7. Global Economy & Shared Daily Bonus (Phase 3) ✅ COMPLETED & VERIFIED
+- Daily bonus distribution system feeds directly into the primary Cumulative Poker Savings Vault (`EconomyManager.claimGlobalPokerDaily()`) rather than isolated per save slot.
+- Global $5,000 poker allowance and $500 mini-game allowance apply strictly on a 24-hour real-world cooldown persisted in `localStorage`.
+
+### 8. Critical All-In Stack Deduction & Elimination Fix (Phase 4) ✅ COMPLETED & VERIFIED
+- Resolved flaw in `nextTurn()` where `acting.length <= 1` prematurely advanced betting streets before an opponent facing an all-in bet could call or fold.
+- Absolute stack deduction strictly enforces full depletion of called all-in chips into the pot.
+- Immediate permanent elimination tags losing all-in bots (`knockedOut = true; folded = true; allIn = false; cards = [];`), preventing zero-chip ghost play on subsequent hands.
+
 ---
 
 ## 🚀 Git & Deployment Quick Reference

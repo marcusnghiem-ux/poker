@@ -841,7 +841,44 @@ class EconomyManager {
   static MINIGAME_STORAGE_KEY = 'royal_poker_minigame_wallet_v2';
   static POKER_ALLOWANCE_KEY = 'royal_poker_daily_allowance_v2';
   static CUMULATIVE_SAVINGS_KEY = 'royal_poker_cumulative_savings_v1';
+  static GLOBAL_POKER_CLAIM_KEY = 'royal_poker_global_poker_claim_v1';
   static CYCLE_MS = 24 * 60 * 60 * 1000; // Persistent 24-hour cycle
+
+  static getGlobalPokerClaimStatus() {
+    let lastClaim = 0;
+    try {
+      const val = localStorage.getItem(EconomyManager.GLOBAL_POKER_CLAIM_KEY);
+      if (val) lastClaim = parseInt(val, 10) || 0;
+    } catch (e) {}
+
+    const now = Date.now();
+    const elapsed = now - lastClaim;
+    if (elapsed >= EconomyManager.CYCLE_MS || lastClaim === 0) {
+      return { canClaim: true, remainingMs: 0, text: 'Ready to Claim!' };
+    }
+    const remainingMs = EconomyManager.CYCLE_MS - elapsed;
+    const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+    const mins = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+    const secs = Math.floor((remainingMs % (1000 * 60)) / 1000);
+    const pad = (n) => n.toString().padStart(2, '0');
+    return {
+      canClaim: false,
+      remainingMs,
+      text: `${pad(hours)}:${pad(mins)}:${pad(secs)}`
+    };
+  }
+
+  static claimGlobalPokerDaily() {
+    const status = EconomyManager.getGlobalPokerClaimStatus();
+    if (!status.canClaim) {
+      return { success: false, message: `24h cycle active! Next claim in ${status.text}` };
+    }
+    const newSavings = EconomyManager.addCumulativeSavings(5000);
+    try {
+      localStorage.setItem(EconomyManager.GLOBAL_POKER_CLAIM_KEY, Date.now().toString());
+    } catch (e) {}
+    return { success: true, newVaultBalance: newSavings };
+  }
 
   static getCumulativeSavings() {
     try {
@@ -977,6 +1014,7 @@ class EconomyManager {
     }
     let slot = SaveManager.getSave(slotId);
     const customName = localStorage.getItem('royal_poker_username') || 'High Roller';
+    EconomyManager.addCumulativeSavings(5000); // Also feeds into primary global savings vault
     if (slot) {
       slot.chips = (slot.chips || 0) + 5000;
       SaveManager.saveSlot(slotId, slot);
@@ -1367,6 +1405,7 @@ class PokerApp {
     // Wrap ALL initializers in defensive try/catch as mandated by handoff guide!
     try { this.bindDOM(); } catch (err) { console.error("bindDOM error:", err); }
     try { this.bindTopNavAndModals(); } catch (err) { console.error("bindTopNav error:", err); }
+    try { this.initCasinoLounge(); } catch (err) { console.error("initCasinoLounge error:", err); }
     try { this.setGameVariant(this.variant); } catch (err) { console.error("setGameVariant error:", err); }
     try { this.initRoulette(); } catch (err) { console.error("initRoulette error:", err); }
     try { this.initSlots(); } catch (err) { console.error("initSlots error:", err); }
@@ -1533,6 +1572,297 @@ class PokerApp {
     this.updateDualWalletUI();
     this.updateAudioControlsUI();
   }
+
+  // ==========================================================================
+  // DEDICATED CASINO LOUNGE HUB (Dual-View Slots & European Roulette)
+  // ==========================================================================
+  openCasinoLounge(view = 'split') {
+    const modal = document.getElementById('casino-lounge-modal');
+    if (!modal) return;
+    this.setCasinoLoungeView(view);
+    this.updateDualWalletUI();
+
+    // Render current slot symbols in lounge
+    for (let r = 1; r <= 3; r++) {
+      const reel = document.getElementById(`lounge-slot-reel-${r}`);
+      if (reel) reel.innerHTML = `<div class="slot-symbol">${renderSlotSymbol(r === 1 ? '7️⃣' : (r === 2 ? '🔥' : '⭐'))}</div>`;
+    }
+
+    // Draw initial roulette wheel on lounge canvas
+    const canvas = document.getElementById('lounge-roulette-canvas');
+    if (canvas && this.drawRouletteWheelOn) {
+      this.drawRouletteWheelOn(canvas, 0);
+    } else if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath();
+        ctx.arc(140, 140, 130, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#ffd700';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+      }
+    }
+
+    modal.classList.remove('hidden');
+  }
+
+  setCasinoLoungeView(view) {
+    const body = document.getElementById('casino-lounge-body');
+    if (body) body.setAttribute('data-active-view', view);
+    document.querySelectorAll('.lounge-view-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.view === view);
+    });
+  }
+
+  initCasinoLounge() {
+    this.loungeModal = document.getElementById('casino-lounge-modal');
+    this.closeLoungeBtn = document.getElementById('close-casino-lounge-btn');
+    this.btnOpenCasinoLounge = document.getElementById('btn-open-casino-lounge');
+    this.drawerItemLounge = document.getElementById('drawer-item-lounge');
+
+    if (this.btnOpenCasinoLounge) {
+      this.btnOpenCasinoLounge.addEventListener('click', () => this.openCasinoLounge('split'));
+    }
+    if (this.drawerItemLounge) {
+      this.drawerItemLounge.addEventListener('click', () => {
+        this.toggleTransitDrawer(false);
+        this.openCasinoLounge('split');
+      });
+    }
+    if (this.closeLoungeBtn && this.loungeModal) {
+      this.closeLoungeBtn.addEventListener('click', () => this.loungeModal.classList.add('hidden'));
+    }
+
+    // View buttons (split / slots / roulette)
+    document.querySelectorAll('.lounge-view-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const v = e.target.dataset.view || 'split';
+        this.setCasinoLoungeView(v);
+      });
+    });
+
+    // Quick claim button in lounge
+    const loungeClaimBtn = document.getElementById('btn-lounge-claim');
+    if (loungeClaimBtn) {
+      loungeClaimBtn.addEventListener('click', () => {
+        const res = EconomyManager.claimMiniGameDaily();
+        if (res.success) {
+          sounds.playWin();
+          this.updateDualWalletUI();
+          this.updateEconomyDashboard();
+          this.setAnnouncement(`[CLAIMED] Claimed $500 Daily Mini-Game Allowance! New balance: $${res.balance.toLocaleString()}`);
+        } else {
+          sounds.playCheck();
+          this.setAnnouncement(`⚠️ ${res.message}`);
+        }
+      });
+    }
+
+    // Lounge Slots Wager Preset Buttons
+    let loungeSlotWager = 50;
+    document.querySelectorAll('.lounge-slots-preset-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.lounge-slots-preset-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const w = btn.dataset.wager;
+        if (w === 'max') {
+          loungeSlotWager = Math.min(500, EconomyManager.getMiniGameWallet().balance);
+        } else {
+          loungeSlotWager = Number(w);
+        }
+      });
+    });
+
+    // Lounge Spin Slots
+    const btnLoungeSpinSlots = document.getElementById('btn-lounge-spin-slots');
+    if (btnLoungeSpinSlots) {
+      btnLoungeSpinSlots.addEventListener('click', () => {
+        const wallet = EconomyManager.getMiniGameWallet();
+        if (wallet.balance < loungeSlotWager || loungeSlotWager <= 0) {
+          sounds.playCheck();
+          alert('Insufficient Mini-Game funds! Claim your daily bonus or transfer chips.');
+          return;
+        }
+
+        // Deduct wager
+        wallet.balance -= loungeSlotWager;
+        EconomyManager.saveMiniGameWallet(wallet);
+        this.updateDualWalletUI();
+        SaveManager.recordSlotSpin();
+
+        sounds.playSlotPull();
+        btnLoungeSpinSlots.disabled = true;
+
+        const r1 = document.getElementById('lounge-slot-reel-1');
+        const r2 = document.getElementById('lounge-slot-reel-2');
+        const r3 = document.getElementById('lounge-slot-reel-3');
+        [r1, r2, r3].forEach(el => el && el.classList.add('spinning'));
+
+        // Roll reels
+        const randSym = () => {
+          const rand = Math.random();
+          if (rand < 0.05) return '7️⃣';
+          if (rand < 0.18) return '🔥';
+          if (rand < 0.35) return '⭐';
+          if (rand < 0.55) return ['♠️', '♥️', '♦️', '♣️'][Math.floor(Math.random() * 4)];
+          return ['👑', '💎', '🍒'][Math.floor(Math.random() * 3)];
+        };
+
+        const f1 = randSym();
+        const f2 = randSym();
+        const f3 = randSym();
+
+        setTimeout(() => {
+          if (r1) { r1.classList.remove('spinning'); r1.innerHTML = `<div class="slot-symbol">${renderSlotSymbol(f1)}</div>`; sounds.playSlotStop(); }
+        }, 500);
+        setTimeout(() => {
+          if (r2) { r2.classList.remove('spinning'); r2.innerHTML = `<div class="slot-symbol">${renderSlotSymbol(f2)}</div>`; sounds.playSlotStop(); }
+        }, 850);
+        setTimeout(() => {
+          if (r3) { r3.classList.remove('spinning'); r3.innerHTML = `<div class="slot-symbol">${renderSlotSymbol(f3)}</div>`; sounds.playSlotStop(); }
+
+          // Evaluate win
+          let mult = 0;
+          let title = 'NO WIN';
+          const reels = [f1, f2, f3];
+          if (f1 === '7️⃣' && f2 === '7️⃣' && f3 === '7️⃣') { mult = 50; title = 'JACKPOT 777! 50x WIN!'; }
+          else if (f1 === '🔥' && f2 === '🔥' && f3 === '🔥') { mult = 30; title = 'SUPER WILD FLARE! 30x WIN!'; }
+          else if (f1 === '⭐' && f2 === '⭐' && f3 === '⭐') { mult = 20; title = 'TRIPLE STARS! 20x WIN!'; }
+          else if (['♠️', '♥️', '♦️', '♣️'].includes(f1) && f1 === f2 && f2 === f3) { mult = 10; title = 'ROYAL SUITS! 10x WIN!'; }
+          else if (reels.includes('🔥') && (f1 === f2 || f2 === f3 || f1 === f3 || reels.filter(s => s === '🔥').length >= 2)) { mult = 5; title = 'WILD BOOST PAIR! 5x WIN!'; }
+          else if (f1 === f2 || f2 === f3 || f1 === f3) { mult = 2; title = 'MATCHING PAIR! 2x WIN!'; }
+          else if (reels.includes('7️⃣') || reels.includes('⭐')) { mult = 1; title = 'LUCKY PUSH! Wager Returned'; }
+
+          const payout = loungeSlotWager * mult;
+          if (payout > 0) {
+            wallet.balance += payout;
+            EconomyManager.saveMiniGameWallet(wallet);
+            sounds.playWin();
+          }
+
+          const resEl = document.getElementById('lounge-slots-result');
+          const tEl = document.getElementById('lounge-slots-result-title');
+          const dEl = document.getElementById('lounge-slots-result-detail');
+          if (resEl && tEl && dEl) {
+            tEl.textContent = title;
+            dEl.textContent = payout > 0 ? `+ $${payout.toLocaleString()}` : `Better luck next spin!`;
+            resEl.classList.remove('hidden');
+            setTimeout(() => resEl.classList.add('hidden'), 3500);
+          }
+
+          this.updateDualWalletUI();
+          btnLoungeSpinSlots.disabled = false;
+        }, 1200);
+      });
+    }
+
+    // Lounge Roulette Quick Bet Selection
+    let loungeRouletteWager = 10;
+    let loungeRouletteBetType = 'color';
+    let loungeRouletteBetVal = 'red';
+
+    document.querySelectorAll('.lounge-r-preset-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.lounge-r-preset-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const w = btn.dataset.wager;
+        if (w === 'max') {
+          loungeRouletteWager = Math.min(500, EconomyManager.getMiniGameWallet().balance);
+        } else {
+          loungeRouletteWager = Number(w);
+        }
+        const bTot = document.getElementById('lounge-roulette-total-bet');
+        if (bTot) bTot.textContent = `$${loungeRouletteWager}`;
+      });
+    });
+
+    document.querySelectorAll('.lounge-r-bet-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.lounge-r-bet-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        loungeRouletteBetType = btn.dataset.betType;
+        loungeRouletteBetVal = btn.dataset.betVal;
+        const bTarg = document.getElementById('lounge-roulette-bet-target');
+        if (bTarg) bTarg.textContent = (loungeRouletteBetVal || '').toUpperCase();
+      });
+    });
+
+    // Lounge Spin Roulette
+    const btnLoungeSpinRoulette = document.getElementById('btn-lounge-spin-roulette');
+    if (btnLoungeSpinRoulette) {
+      btnLoungeSpinRoulette.addEventListener('click', () => {
+        const wallet = EconomyManager.getMiniGameWallet();
+        if (wallet.balance < loungeRouletteWager || loungeRouletteWager <= 0) {
+          sounds.playCheck();
+          alert('Insufficient Mini-Game funds! Claim your daily bonus or transfer chips.');
+          return;
+        }
+
+        wallet.balance -= loungeRouletteWager;
+        EconomyManager.saveMiniGameWallet(wallet);
+        this.updateDualWalletUI();
+        SaveManager.recordRouletteSpin();
+
+        sounds.playChip();
+        btnLoungeSpinRoulette.disabled = true;
+
+        const redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+        const winningNumber = Math.floor(Math.random() * 37);
+        const isRed = redNumbers.includes(winningNumber);
+        const color = winningNumber === 0 ? 'green' : (isRed ? 'red' : 'black');
+        const isEven = winningNumber !== 0 && winningNumber % 2 === 0;
+
+        let won = false;
+        let payout = 0;
+
+        if (loungeRouletteBetType === 'color' && loungeRouletteBetVal === color) {
+          won = true; payout = loungeRouletteWager * 2;
+        } else if (loungeRouletteBetType === 'parity') {
+          if (loungeRouletteBetVal === 'even' && isEven) { won = true; payout = loungeRouletteWager * 2; }
+          else if (loungeRouletteBetVal === 'odd' && !isEven && winningNumber !== 0) { won = true; payout = loungeRouletteWager * 2; }
+        } else if (loungeRouletteBetType === 'number' && Number(loungeRouletteBetVal) === winningNumber) {
+          won = true; payout = loungeRouletteWager * 36;
+        }
+
+        setTimeout(() => {
+          if (won) {
+            wallet.balance += payout;
+            EconomyManager.saveMiniGameWallet(wallet);
+            sounds.playWin();
+          }
+
+          const resEl = document.getElementById('lounge-roulette-result');
+          const ballEl = document.getElementById('lounge-roulette-ball');
+          const textEl = document.getElementById('lounge-roulette-text');
+          if (resEl && ballEl && textEl) {
+            ballEl.textContent = winningNumber.toString();
+            ballEl.className = `roulette-ball-badge r-color-${color}`;
+            textEl.textContent = won ? `Landed on ${winningNumber} ${color.toUpperCase()}! Won $${payout.toLocaleString()}!` : `Landed on ${winningNumber} ${color.toUpperCase()}! No win.`;
+            resEl.classList.remove('hidden');
+            setTimeout(() => resEl.classList.add('hidden'), 4000);
+          }
+
+          this.updateDualWalletUI();
+          btnLoungeSpinRoulette.disabled = false;
+        }, 1500);
+      });
+    }
+
+    // Lounge transfer shortcut
+    const btnLoungeTransfer = document.getElementById('btn-lounge-transfer');
+    if (btnLoungeTransfer) {
+      btnLoungeTransfer.addEventListener('click', () => {
+        if (this.loungeModal) this.loungeModal.classList.add('hidden');
+        const trModal = document.getElementById('transfer-modal');
+        if (trModal) trModal.classList.remove('hidden');
+        this.updateTransferModal();
+      });
+    }
+  }
+
 
   updateAudioControlsUI() {
     if (this.menuSoundBtn) {
@@ -1717,6 +2047,9 @@ class PokerApp {
 
     const menuMiniEl = document.getElementById('menu-minigame-val');
     if (menuMiniEl) menuMiniEl.textContent = `$${miniWallet.balance.toLocaleString()}`;
+
+    const loungeWalletEl = document.getElementById('lounge-wallet-balance');
+    if (loungeWalletEl) loungeWalletEl.textContent = `$${miniWallet.balance.toLocaleString()}`;
   }
 
   renderAvatar(seatIdx, avatarKey) {
@@ -3200,7 +3533,7 @@ class PokerApp {
     }
 
     // 2. Table Dominance Check: If all bots are knocked out, trigger victory!
-    if (!this.isOnlineRoom && this.players.slice(1).every(p => p.chips <= 0)) {
+    if (!this.isOnlineRoom && this.players.slice(1).every(p => p.chips <= 0 || p.knockedOut)) {
       this.triggerStageVictory();
       return;
     }
@@ -3232,14 +3565,14 @@ class PokerApp {
       document.getElementById(id).innerHTML = '';
     });
 
-    // Reset player round states and tag knockouts
+    // Reset player round states and tag knockouts: eliminated bots stay knocked out & folded
     this.players.forEach(p => {
       p.cards = [];
       p.currentBet = 0;
       p.totalBet = 0;
-      p.knockedOut = (p.chips <= 0);
+      p.knockedOut = (p.chips <= 0 || p.knockedOut);
       p.folded = p.knockedOut;
-      p.allIn = (p.chips === 0);
+      p.allIn = false; // Eliminated players are NOT all-in; they are out of the hand
       if (p.isBot) p.wasPreflopRaiser = false;
 
       const seat = document.getElementById(`seat-${p.id}`);
@@ -3320,26 +3653,26 @@ class PokerApp {
       }
     }
 
-    // Rotate dealer button among active (non-knocked-out) players
+    // Rotate dealer button among active (non-knocked-out) players with chips > 0
     let d = (this.dealerIdx + 1) % this.players.length;
     let dAttempts = 0;
-    while (this.players[d].knockedOut && dAttempts < this.players.length) {
+    while ((this.players[d].knockedOut || this.players[d].chips <= 0) && dAttempts < this.players.length) {
       d = (d + 1) % this.players.length;
       dAttempts++;
     }
     this.dealerIdx = d;
 
-    // Small and Big Blind indices strictly from active players
+    // Small and Big Blind indices strictly from active players with chips > 0
     let sbIdx = (this.dealerIdx + 1) % this.players.length;
     let sbAttempts = 0;
-    while (this.players[sbIdx].knockedOut && sbAttempts < this.players.length) {
+    while ((this.players[sbIdx].knockedOut || this.players[sbIdx].chips <= 0) && sbAttempts < this.players.length) {
       sbIdx = (sbIdx + 1) % this.players.length;
       sbAttempts++;
     }
 
     let bbIdx = (sbIdx + 1) % this.players.length;
     let bbAttempts = 0;
-    while ((this.players[bbIdx].knockedOut || bbIdx === sbIdx) && bbAttempts < this.players.length) {
+    while ((this.players[bbIdx].knockedOut || this.players[bbIdx].chips <= 0 || bbIdx === sbIdx) && bbAttempts < this.players.length) {
       bbIdx = (bbIdx + 1) % this.players.length;
       bbAttempts++;
     }
@@ -3354,8 +3687,10 @@ class PokerApp {
     this.broadcastTableState();
 
     let utgIdx = (bbIdx + 1) % this.players.length;
-    while (this.players[utgIdx].knockedOut || this.players[utgIdx].folded) {
+    let utgAttempts = 0;
+    while ((this.players[utgIdx].knockedOut || this.players[utgIdx].folded || this.players[utgIdx].chips <= 0) && utgAttempts < this.players.length) {
       utgIdx = (utgIdx + 1) % this.players.length;
+      utgAttempts++;
     }
     this.startBettingRound('pre-flop', utgIdx);
   }
@@ -3388,27 +3723,37 @@ class PokerApp {
     this.updateTableUI();
     this.broadcastTableState();
 
-    const active = this.players.filter(p => !p.folded);
+    const active = this.players.filter(p => !p.folded && !p.knockedOut && p.chips >= 0);
     if (active.length === 1) {
       this.resolveEarlyWin(active[0]);
       return;
     }
 
-    const acting = this.players.filter(p => !p.folded && !p.allIn);
+    const acting = active.filter(p => !p.allIn);
 
-    // If all or all-but-one remaining players are all-in: TRIGGER DRAMATIC AUTO-RUNOUT
-    if (acting.length <= 1 && active.length >= 2) {
-      const allMatched = acting.length === 0 || acting[0].currentBet === this.currentBet;
-      if (allMatched) {
+    // 1. All remaining active players are all-in: TRIGGER DRAMATIC AUTO-RUNOUT
+    if (acting.length === 0 && active.length >= 2) {
+      this.runoutAllInBoard();
+      return;
+    }
+
+    // 2. Exactly one non-all-in player remains, and they have matched the bet and acted:
+    if (acting.length === 1 && active.length >= 2) {
+      if (acting[0].currentBet === this.currentBet && this.hasActed.has(acting[0].id)) {
         this.runoutAllInBoard();
         return;
       }
     }
 
+    // 3. Normal betting round: All acting players have matched currentBet and acted
     const allMatched = acting.every(p => p.currentBet === this.currentBet);
     const allActed = acting.every(p => this.hasActed.has(p.id));
 
-    if ((allMatched && allActed) || acting.length <= 1) {
+    if (allMatched && allActed && acting.length > 0) {
+      if (acting.length <= 1 && active.length >= 2) {
+        this.runoutAllInBoard();
+        return;
+      }
       this.advanceStage();
       return;
     }
@@ -3697,10 +4042,22 @@ class PokerApp {
       else if (isPair) postFlopEquity = 0.38;
 
       if (toCall > 0) {
-        // Evaluate calling vs pot odds
+        // Evaluate calling vs pot odds & all-in confrontations
+        const isFacingAllIn = isHeroAllIn || toCall >= bot.chips;
         const justifiedByOdds = postFlopEquity >= (potOdds * (isNightmare ? 0.9 : 0.8));
 
-        if (isMonster || isStrong || justifiedByOdds) {
+        if (isFacingAllIn) {
+          // Absolute stack deduction: Calling an all-in commits bot's entire remaining stack
+          if (isMonster || isStrong || (justifiedByOdds && Math.random() < 0.70)) {
+            const called = this.postBet(bot, toCall);
+            this.showActionBubble(bot.id, `CALL ALL-IN!`);
+            this.setAnnouncement(`[CALL] ${bot.name} calls the all-in shove (${best.desc})!`);
+          } else {
+            bot.folded = true;
+            this.showActionBubble(bot.id, 'Fold');
+            this.setAnnouncement(`${bot.name} folds to the all-in shove.`);
+          }
+        } else if (isMonster || isStrong || justifiedByOdds) {
           const called = this.postBet(bot, toCall);
           this.showActionBubble(bot.id, `Call $${called}`);
           this.setAnnouncement(`${bot.name} calls $${called} (${best.desc}).`);
@@ -3928,6 +4285,40 @@ class PokerApp {
     SaveManager.recordHandStats(heroWonAny, totalPotAmount, heroBestEval, this.isOnlineRoom);
     this.updateGlobalStatsUI();
 
+    // Absolute Stack Deduction & Elimination Enforcement (Phase 4)
+    const newlyEliminated = [];
+    this.players.forEach((p, idx) => {
+      if (p.chips <= 0) {
+        p.chips = 0;
+        p.knockedOut = true;
+        p.allIn = false;
+        p.folded = true;
+        p.cards = [];
+        const seatEl = document.getElementById(`seat-${idx}`);
+        if (seatEl) {
+          seatEl.classList.add('knocked-out');
+          let badge = seatEl.querySelector('.knockout-stamp');
+          if (!badge) {
+            badge = document.createElement('div');
+            badge.className = 'knockout-stamp';
+            badge.textContent = 'BUSTED';
+            seatEl.appendChild(badge);
+          }
+        }
+        const chipEl = document.getElementById(`chips-${idx}`);
+        if (chipEl) chipEl.textContent = '0';
+        const cBox = document.getElementById(`cards-${idx}`);
+        if (cBox) cBox.innerHTML = '';
+        if (idx > 0 && !this.isOnlineRoom) {
+          newlyEliminated.push(p.name);
+        }
+      }
+    });
+
+    if (newlyEliminated.length > 0) {
+      announcements.push(`💀 ${newlyEliminated.join(' & ')} lost all chips and was eliminated from the table!`);
+    }
+
     this.setAnnouncement(announcements.join(' '));
     this.updateTableUI();
     this.broadcastTableState();
@@ -3974,8 +4365,21 @@ class PokerApp {
       return;
     }
 
+    // Immediate permanent bot elimination check
+    this.players.forEach((p, idx) => {
+      if (p.chips <= 0) {
+        p.chips = 0;
+        p.knockedOut = true;
+        p.allIn = false;
+        p.folded = true;
+        p.cards = [];
+        const seatEl = document.getElementById(`seat-${idx}`);
+        if (seatEl) seatEl.classList.add('knocked-out');
+      }
+    });
+
     // Check if ALL bots have 0 chips: Table Conquered!
-    if (!this.isOnlineRoom && this.players.slice(1).every(p => p.chips <= 0)) {
+    if (!this.isOnlineRoom && this.players.slice(1).every(p => p.chips <= 0 || p.knockedOut)) {
       this.triggerStageVictory();
       return;
     }
@@ -4785,17 +5189,12 @@ class PokerApp {
     const pokerBtn = document.getElementById('btn-claim-poker-daily');
     if (pokerBtn) {
       pokerBtn.addEventListener('click', () => {
-        const slotId = this.activeSlot || 1;
-        const res = EconomyManager.claimPokerDailyForSlot(slotId);
+        const res = EconomyManager.claimGlobalPokerDaily();
         if (res.success) {
           sounds.playWin();
-          if (!this.isOnlineRoom && this.activeSlot === slotId && this.players[0]) {
-            this.players[0].chips += 5000;
-            this.updateTableUI();
-          }
-          this.renderMainMenuSlots();
+          this.updateDualWalletUI();
           this.updateEconomyDashboard();
-          this.setAnnouncement(`💎 Claimed $5,000 Daily Allowance to Slot ${slotId}!`);
+          this.setAnnouncement(`[CLAIMED] Claimed $5,000 Global Allowance directly into Cumulative Poker Savings Vault!`);
         } else {
           sounds.playCheck();
           this.setAnnouncement(`⚠️ ${res.message}`);
@@ -4831,12 +5230,11 @@ class PokerApp {
         miniBtn.disabled = !miniStatus.canClaim;
       }
 
-      const pokerSlotId = this.activeSlot || 1;
-      const pokerStatus = EconomyManager.getSlotPokerClaimStatus(pokerSlotId);
+      const pokerStatus = EconomyManager.getGlobalPokerClaimStatus();
       const pokerTimerEl = document.getElementById('poker-claim-timer');
       const pokerBtn = document.getElementById('btn-claim-poker-daily');
       if (pokerTimerEl) {
-        pokerTimerEl.textContent = pokerStatus.canClaim ? `Slot ${pokerSlotId} Ready!` : `Slot ${pokerSlotId}: ${pokerStatus.text}`;
+        pokerTimerEl.textContent = pokerStatus.canClaim ? 'Ready to Claim!' : `Next: ${pokerStatus.text}`;
       }
       if (pokerBtn) {
         pokerBtn.disabled = !pokerStatus.canClaim;
