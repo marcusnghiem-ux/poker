@@ -385,3 +385,51 @@ equirePlayerName() when player was already registered, permanently fixing slot b
 4. **All Tests Verified:**
    - 10 complete tournament games to >= $2,000 (`simulate_10_full_games_to_2000.py`) passing 100%.
    - 0 tag errors, 0 missing IDs, 0 system emojis.
+
+## 27. RELEASE 1.0275: GRAPHICS IMPROVE — SOLAR FLARE DEEP OBSIDIAN & MAGMA BACKGROUND OVERHAUL
+
+### Visual Diagnostic & Root Cause of the 'Palish Gray' Background
+1. **Cold Slate Overlay Obscuration:**
+   - Previous implementation had `.bg-art-deco-lattice` with `background: radial-gradient(circle at 50% 50%, rgba(8, 14, 28, 0.85) 0%, #03050a 100%);` at `opacity: 0.95`.
+   - In HTML stacking order, this element sat directly **after** `<div class="layer0-starfield-container">`, casting an 85-95% opaque cold slate-gray veil over all SVG vector artwork and dimming its vivid colors.
+   - The root background color `--bg-dark: #04080c` and `.casino-bg-effects { background: #03050a; }` were cold slate/blue-gray tones rather than the warm obsidian black seen in the reference photos.
+2. **Keyframe Transform Clipping on SVG Groups:**
+   - `.celestial-portal-group` keyframes had an explicit `transform: translate(380px, 500px)` which overrode the SVG inline coordinate `transform="translate(960, 520)"`, shifting the portal off-center and interfering with viewbox rendering.
+
+### Comprehensive Visual Overhaul & Enhancements
+1. **Pristine Layered Architecture & Stacking Order:**
+   - **Base Layer (`z-index: 0`):** `.bg-solar-flare-plasma` with multi-stop magma radial gradients (`rgba(234, 88, 12, 0.22)`, `rgba(154, 52, 18, 0.14)`, `rgba(10, 3, 1, 0.95)` to deep obsidian `#060201`).
+   - **Lattice Layer (`z-index: 1`):** `.layer0-cosmic-grid` with warm amber geometric perspective lines (`rgba(245, 158, 11, 0.11)` 54px grid).
+   - **Artwork Layer (`z-index: 2`):** `.layer0-starfield-container` placed above all ambient glows so 100% of the SVG lines, bevels, gradients, and starbursts are razor-sharp with zero haze or wash-out.
+   - **Vignette Layer (`z-index: 3`):** `.bg-solar-vignette` framing screen borders (`box-shadow: inset 0 0 160px rgba(0, 0, 0, 0.92)`).
+2. **Faithful Geometry Dash Solar Flare SVG Deco Architecture (All 4 Reference Screenshots):**
+   - **Monumental Top & Bottom Diamond Temple Arches (Screenshots 3 & 4):**
+     - Symmetrical 520px-wide diamond arches pointing inward with multi-tiered gold and amber bevels (`#fde047`, `#f59e0b`, `#ea580c`), nested chevron bands, and glowing diamond cores.
+   - **Monumental Left & Right Diamond Temple Towers (Screenshots 1, 3, 4):**
+     - Colossal 780px-tall diamond shells flanking the scene with high-contrast bevel outlines (`url(#goldBevelGrad)` stroke-width 4.5), inner chevron teeth rims, and radiant sun-diamond matrix cores.
+   - **Celestial Midnight Blue Nebula Portal (Screenshot 2):**
+     - 460px circular deep sapphire/blue cosmic aperture (`#0284c7` -> `#0c1938` -> `#03071e`).
+     - Framed by thick curved gold and orange diamond arches (`url(#goldBevelGrad)`, `#fde047`) on the outer perimeter.
+     - Constellation network lines (`stroke="#38bdf8"`, stroke-dasharray) connecting 9 planetary star nodes with glowing white/cyan halos.
+     - 4-pointed radiant sparkle stars and glowing cyan chevron flow markers pointing right.
+   - **Blazing Solar Flare Core & Concentric Planetary Orbits (Screenshots 1 & 3):**
+     - Radiant central sun sphere (`#fef08a` core, `#f59e0b` rim, drop-shadow glow) with corona prominence spikes.
+     - 3 concentric orbital rings (radii 150, 230, 320) carrying orbiting planetary satellite nodes with spiky teeth.
+   - **Rotating Spiky Solar Saw Cogs (Screenshots 1, 3, 4):**
+     - 5 mechanical saw gears distributed across four quadrants and center (radii 50-100px, 6 to 12 sharp triangular teeth), rotating continuously clockwise and counter-clockwise (`cog-spin-cw`, `cog-spin-ccw`) with `transform-box: fill-box; transform-origin: center;`.
+   - **Floating Crystals, Rhombus Shards & Radiant 4-Pointed Stars:**
+     - Dynamic floating amber crystals and triangular embers drifting with `shardFloat` animation.
+     - 4-pointed radiant sparkle stars with glowing drop shadows and twinkling glint.
+   - **Zero GD Wave / Arrow Sprites:**
+     - 100% pure level decoration without player wave trails or GD ship sprites, strictly fulfilling user instructions.
+
+### Version 1.0275 UI & Labeling Updates
+- Version: **`1.0275`**
+- Tagline: **`graphics improve`**
+- Top-left header pill: `Update 1.0275` (title: "View Version 1.0275 Release Notes")
+- Main menu news banner: `UPDATE 1.0275` &bull; `1.0275 • graphics improve • Solar Flare Deep Obsidian & Magma Background Overhaul`
+- Update log modal:
+  - Header: `v1.0275` &bull; `1.0275 - graphics improve`
+  - New current release section: `v1.0275 CURRENT` detailing the background overhaul.
+  - Previous releases cleanly archived: `v1.025 ARCHIVED`, `v1.02 ARCHIVED`, `v1.015 ARCHIVED`, `v1.01 ARCHIVED`.
+

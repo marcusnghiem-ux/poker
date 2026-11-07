@@ -5,9 +5,9 @@
    ========================================================================== */
 
 :root {
-  --bg-dark: #04080c;
-  --bg-panel: rgba(12, 18, 30, 0.92);
-  --bg-card: rgba(18, 26, 42, 0.82);
+  --bg-dark: #060201;
+  --bg-panel: rgba(18, 9, 4, 0.94);
+  --bg-card: rgba(26, 12, 5, 0.88);
   --felt-green: #0a4024;
   --felt-green-light: #115330;
   --felt-border: #331e0f;
@@ -73,40 +73,30 @@ body {
   pointer-events: none;
   z-index: 0;
   overflow: hidden;
-  background: #03050a;
+  background: #060201;
 }
 
-/* Solar Flare Subtle Core & Deep Obsidian Cosmic Gradient */
-.bg-art-deco-lattice {
+/* Solar Flare Authentic Magma & Obsidian Ambient Atmosphere */
+.bg-solar-flare-plasma {
   position: absolute;
   inset: 0;
+  pointer-events: none;
   background: 
-    radial-gradient(ellipse 70% 45% at 50% 0%, rgba(245, 158, 11, 0.13) 0%, rgba(180, 83, 9, 0.05) 45%, transparent 75%),
-    radial-gradient(circle at 50% 50%, rgba(8, 14, 28, 0.85) 0%, #03050a 100%);
-  opacity: 0.95;
+    radial-gradient(ellipse 90% 65% at 50% 50%, rgba(234, 88, 12, 0.22) 0%, rgba(154, 52, 18, 0.14) 40%, rgba(10, 3, 1, 0.95) 85%, #060201 100%),
+    radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.26) 0%, rgba(234, 88, 12, 0.12) 42%, transparent 68%),
+    radial-gradient(circle at 50% 100%, rgba(245, 158, 11, 0.22) 0%, rgba(234, 88, 12, 0.1) 42%, transparent 68%),
+    radial-gradient(circle at 12% 50%, rgba(245, 158, 11, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 88% 50%, rgba(234, 88, 12, 0.15) 0%, transparent 40%);
+  opacity: 1;
+  z-index: 0;
 }
 
-.bg-light-beams {
+.bg-solar-vignette {
   position: absolute;
-  top: -15%;
-  left: 20%;
-  width: 60%;
-  height: 100%;
-  background: radial-gradient(ellipse at 50% 0%, rgba(251, 191, 36, 0.04) 0%, transparent 60%);
-  filter: blur(24px);
+  inset: 0;
+  box-shadow: inset 0 0 160px rgba(0, 0, 0, 0.92), inset 0 0 50px rgba(6, 2, 1, 0.98);
   pointer-events: none;
-}
-
-.bg-spotlight {
-  position: absolute;
-  top: -80px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 900px;
-  height: 550px;
-  background: radial-gradient(ellipse at center, rgba(254, 240, 138, 0.06) 0%, rgba(245, 158, 11, 0.02) 40%, transparent 70%);
-  filter: blur(16px);
-  pointer-events: none;
+  z-index: 3;
 }
 
 /* Subtle Low-Contrast Constellations */
@@ -6938,7 +6928,7 @@ body {
 }
 
 /* ==========================================================================
-   v1.02: LAYER 0 STARFIELD & CELESTIAL DECO (Images 1 & 2 Motif)
+   v1.0275: LAYER 0 STARFIELD & CELESTIAL DECO (Solar Flare Deco Overhaul)
    ========================================================================== */
 .layer0-cosmic-grid {
   position: absolute;
@@ -6947,11 +6937,11 @@ body {
   height: 100%;
   pointer-events: none;
   background-image: 
-    linear-gradient(rgba(245, 158, 11, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(245, 158, 11, 0.06) 1px, transparent 1px);
-  background-size: 48px 48px;
-  opacity: 0.65;
-  z-index: 0;
+    linear-gradient(rgba(245, 158, 11, 0.11) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245, 158, 11, 0.11) 1px, transparent 1px);
+  background-size: 54px 54px;
+  opacity: 0.85;
+  z-index: 1;
 }
 
 .layer0-starfield-container {
@@ -6961,26 +6951,34 @@ body {
   height: 100%;
   pointer-events: none;
   overflow: hidden;
-  z-index: 0;
+  z-index: 2;
+}
+
+.solar-diamond-structure {
+  filter: drop-shadow(0 0 25px rgba(245, 158, 11, 0.25));
+}
+
+.solar-arch-top, .solar-arch-bottom {
+  filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.25));
 }
 
 .solar-lunar-orb {
-  animation: orbGlowPulse 6s ease-in-out infinite alternate;
+  animation: orbGlowPulse 5s ease-in-out infinite alternate;
 }
 
 @keyframes orbGlowPulse {
-  0% { transform: scale(0.96); filter: drop-shadow(0 0 15px rgba(245, 158, 11, 0.4)); }
-  100% { transform: scale(1.04); filter: drop-shadow(0 0 35px rgba(245, 158, 11, 0.75)); }
+  0% { filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.5)); transform: scale(0.97); }
+  100% { filter: drop-shadow(0 0 50px rgba(234, 88, 12, 0.85)); transform: scale(1.03); }
 }
 
 .star-group-1 path {
-  animation: starGlint 3.5s ease-in-out infinite alternate;
+  animation: starGlint 3s ease-in-out infinite alternate;
 }
 
 @keyframes starGlint {
-  0% { opacity: 0.55; transform: scale(0.85); }
-  50% { opacity: 1; transform: scale(1.15); filter: drop-shadow(0 0 8px #ffffff); }
-  100% { opacity: 0.55; transform: scale(0.85); }
+  0% { opacity: 0.6; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.2); filter: drop-shadow(0 0 10px #ffffff); }
+  100% { opacity: 0.6; transform: scale(0.85); }
 }
 
 .floating-shards-group polygon {
@@ -6989,20 +6987,19 @@ body {
 
 @keyframes shardFloat {
   0% { transform: translateY(0); }
-  100% { transform: translateY(-8px); filter: drop-shadow(0 0 6px #f59e0b); }
+  100% { transform: translateY(-12px); filter: drop-shadow(0 0 8px #f59e0b); }
 }
-
 
 .cog-spin-cw {
   transform-box: fill-box;
   transform-origin: center;
-  animation: cogSpinClockwise 36s linear infinite;
+  animation: cogSpinClockwise 32s linear infinite;
 }
 
 .cog-spin-ccw {
   transform-box: fill-box;
   transform-origin: center;
-  animation: cogSpinCounterClockwise 45s linear infinite;
+  animation: cogSpinCounterClockwise 38s linear infinite;
 }
 
 @keyframes cogSpinClockwise {
@@ -7015,21 +7012,16 @@ body {
   to { transform: rotate(-360deg); }
 }
 
-.solar-wave-trail-group {
-  animation: waveNeonPulse 4s ease-in-out infinite alternate;
-}
-
-@keyframes waveNeonPulse {
-  0% { opacity: 0.65; filter: drop-shadow(0 0 4px #38bdf8); }
-  100% { opacity: 0.95; filter: drop-shadow(0 0 12px #38bdf8); }
-}
-
 .celestial-portal-group {
-  animation: portalCelestialPulse 8s ease-in-out infinite alternate;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: celestialPortalBreath 7s ease-in-out infinite alternate;
 }
 
-@keyframes portalCelestialPulse {
-  0% { transform: translate(380px, 500px) scale(0.98); opacity: 0.85; }
+@keyframes celestialPortalBreath {
+  0% { opacity: 0.88; filter: drop-shadow(0 0 18px rgba(56, 189, 248, 0.35)); }
+  100% { opacity: 1; filter: drop-shadow(0 0 40px rgba(56, 189, 248, 0.7)); }
+}
   100% { transform: translate(380px, 500px) scale(1.02); opacity: 1; }
 }
 
