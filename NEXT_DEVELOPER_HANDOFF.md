@@ -369,3 +369,19 @@ equirePlayerName() when player was already registered, permanently fixing slot b
    - Plays real hands (dealing 52-card decks, posting blinds with escalation schedules, multi-round AI betting, flop/turn/river community cards, best 5-of-7 showdown evaluations, and pot accounting).
    - Played 10 complete games with Hero accumulating chips until hitting >= $2,000 in each game ($22,440 total chips cashed out).
    - All 10 runs passed with full verification!
+## 26. RELEASE 1.025 CLICK HANDLERS & CASINO GAME LAUNCH HOTFIX
+
+### Issues Resolved
+1. **Unblocked `requirePlayerName` Callback Execution:**
+   - Previous recursion hotfix had `if (name) return true;` which inadvertently omitted calling `onSuccess(name)`.
+   - Consequently, all click actions guarded by `requirePlayerName` (Texas Hold'em save slots, Continue Run, Casino Resort cards, Craps bets) silently failed to execute their callbacks.
+   - **Fix:** Properly restored `if (typeof onSuccess === 'function') onSuccess(name);` when name exists.
+2. **Prevented Self-Recursion in Game Launchers:**
+   - In `spinSlotMachine`, `placeRouletteBet`, and `rollCrapsDice`, replaced recursive callback guards with direct `const name = this.getPlayerName(); if (!name) { this.openPlayerNameModal(...); return; }`.
+3. **Showcase Card SVG Click-Through:**
+   - Added `pointer-events: none` to `.showcase-preview-frame` and `.showcase-preview-svg` in `style.css` so child vector illustrations never swallow click events intended for the card.
+   - Added direct button click handlers for `.btn-roulette-enter`, `.btn-slots-enter`, and `.btn-craps-enter` with `stopPropagation()`.
+   - Added fallback inline `onclick` attributes in `index.html`.
+4. **All Tests Verified:**
+   - 10 complete tournament games to >= $2,000 (`simulate_10_full_games_to_2000.py`) passing 100%.
+   - 0 tag errors, 0 missing IDs, 0 system emojis.

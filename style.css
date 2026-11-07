@@ -7182,6 +7182,11 @@ body {
   align-items: center;
   justify-content: center;
   transition: transform 0.4s ease;
+  pointer-events: none;
+}
+
+.showcase-preview-svg {
+  pointer-events: none;
 }
 
 .showcase-game-card:hover .showcase-preview-frame {

@@ -1902,6 +1902,9 @@ class PokerApp {
   requirePlayerName(onSuccess) {
     const name = this.getPlayerName();
     if (name) {
+      if (typeof onSuccess === 'function') {
+        onSuccess(name);
+      }
       return true;
     }
     this.openPlayerNameModal(onSuccess);
@@ -2186,6 +2189,26 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
         this.requirePlayerName(() => this.showCasinoSoloGame('craps'));
       });
     }
+
+    // Direct button click listeners for showcase cards
+    document.querySelectorAll('.btn-roulette-enter').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.requirePlayerName(() => this.showCasinoSoloGame('roulette'));
+      });
+    });
+    document.querySelectorAll('.btn-slots-enter').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.requirePlayerName(() => this.showCasinoSoloGame('slots'));
+      });
+    });
+    document.querySelectorAll('.btn-craps-enter').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.requirePlayerName(() => this.showCasinoSoloGame('craps'));
+      });
+    });
 
     // v1.025: Solo HUD Nav Buttons
     const btnSoloBackHub = document.getElementById('btn-solo-back-hub');
@@ -5535,7 +5558,11 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
 
   placeRouletteBet(type, val, targetEl) {
     if (this.rouletteSpinning) return;
-    if (!this.requirePlayerName(() => this.placeRouletteBet(type, val, targetEl))) return;
+    const name = this.getPlayerName();
+    if (!name) {
+      this.openPlayerNameModal(() => this.placeRouletteBet(type, val, targetEl));
+      return;
+    }
 
     const chipAmt = this.selectedRouletteChip || 10;
     const wallet = EconomyManager.getMiniGameWallet();
@@ -6332,7 +6359,11 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
 
   spinSlotMachine() {
     if (this.slotSpinning) return;
-    if (!this.requirePlayerName(() => this.spinSlotMachine())) return;
+    const name = this.getPlayerName();
+    if (!name) {
+      this.openPlayerNameModal(() => this.spinSlotMachine());
+      return;
+    }
 
     const wallet = EconomyManager.getMiniGameWallet();
     if (wallet.balance < this.slotWager) {

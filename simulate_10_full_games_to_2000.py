@@ -395,3 +395,4 @@ def run_10_full_games():
 
 if __name__ == '__main__':
     run_10_full_games()
+
