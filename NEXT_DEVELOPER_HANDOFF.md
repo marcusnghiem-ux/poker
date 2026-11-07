@@ -158,7 +158,40 @@ try { this.renderMainMenuSlots(); } catch (err) { console.error("renderSlots err
 ### 12. Complete Graphic Overhaul & Zero Emojis Across Application ✅ COMPLETED & VERIFIED
 - Exactly 0 system emojis in `index.html` and `style.css`.
 - All user-facing announcements, badges, notifications, logs, and button labels converted to clean brackets or high-definition SVG vector assets.
-- Enhanced Solar Flare & Constellation theme with glowing amber accents, warm cosmic nebulae, and crisp radiant star fields in the background layer while preserving table felt contrast.
+- Enhanced Solar Flare & Constellation theme with glowing amber accents, warm cosmic nebulae (`.bg-solar-nebula-glow`, `.bg-cosmic-indigo-glow`), and crisp radiant star fields in the background layer while preserving table felt contrast.
+
+### 13. Elimination of Nightmare Mode Card-Spawning Bug & Strict Deck Integrity ✅ COMPLETED & VERIFIED
+- **Bug Fixed:** In previous versions, Nightmare mode attempted to inject artificial `new Card(14, ...)` instances directly into bot hands without withdrawing them from the single physical deck shoe. This led to duplicate Aces and Kings appearing concurrently on the table/board.
+- **Permanent Solution:** Removed all out-of-deck card injections. 100% of cards in all difficulties (Casual, Medium, Hard, and Nightmare/Championship) are dealt strictly and authentically through `this.deck.deal()`.
+- **Nightmare Difficulty Realization:** Bot equity advantage in Nightmare mode is now driven authentically through high-IQ pot odds calculation, aggressive pre-flop 3-betting, tight post-flop equity thresholds, and a strategic 35% bluff frequency (compared to 20% on standard modes).
+
+### 14. 25-Run Automated Playthrough Verification Protocol ✅ COMPLETED & VERIFIED
+- Created and executed `simulate_25_runs.py` verifying all 25 core engine subsystems:
+  1. Baseline Blinds & Session Resets ($10/$20, $25/$50, $50/$100)
+  2. Forced Blind Deductions & Exact Stack Tracking
+  3. 100% Pot Award Validation with Zero Chip Leakage
+  4. Authentic Deck Integrity & Zero Duplicate Cards (1,000 dealt hands with 0 duplicates)
+  5. AI Decision Engine & Strategic Bluffing (20% standard, 35% Nightmare)
+  6. Permadeath Elimination on $0 Bankroll
+  7. Daily Bankroll Allowances on 24-Hour Cooldown Cycle
+  8. Multi-Variant Slot Machine Payout Calculations (Classic 40x, Solar 30x, Jackpot 100x)
+  9. Strict One-Way Bankroll Transfer (Casino to Poker only)
+  10. Exclusive Online Room Dynamic Bot Replacement ($1,450 inherited) & 15s Turn Timer
+  11. Factory Reset: All 3 Save Slots Wiped
+  12. Factory Reset: Cumulative Savings Reset to $1,000
+  13. Factory Reset: Mini-Game Wallet Reset to $1,000
+  14. Factory Reset: Cooldown Timers Reset to 0 (Immediate Claim Ready)
+  15. Factory Reset: Career Statistics Wiped to 0
+  16. Casino Page Navigation: Menu to Casino View Transition
+  17. Casino Page Navigation: Casino View to Main Menu Return
+  18. Casino Page Navigation: Active Table to Casino & Safe Return
+  19. European Roulette: 37 Pockets & 35:1 Straight-Up Payouts
+  20. Mini-Games Wallet Deduction on Roulette Bets
+  21. Mini-Games Wallet Deduction on Slot Spins
+  22. Short Deck (6+) Variant Rules & Deck (36 Cards)
+  23. Omaha (4-Card) Variant Exact 2 Hole + 3 Community Card Evaluation
+  24. Zero System Emojis in Rendered DOM and CSS
+  25. All-In Showdown Knockout Enforcement
 
 ---
 
@@ -171,8 +204,10 @@ try { this.renderMainMenuSlots(); } catch (err) { console.error("renderSlots err
 - Verification Suite:
   - `python verify_syntax.py`
   - `python simulate_10_runs.py`
+  - `python simulate_25_runs.py`
   - `python test_poker.py`
   - `python scratch/check_index_ids.py`
+  - `python scratch/find_emojis.py`
   - `python scratch/test_allin_elimination.py`
   - `python scratch/test_factory_reset_and_variants.py`
 

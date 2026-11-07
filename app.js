@@ -1417,6 +1417,11 @@ class PokerApp {
     try { this.updateDualWalletUI(); } catch (err) { console.error("updateDualWalletUI error:", err); }
     try { this.renderMainMenuSlots(); } catch (err) { console.error("renderSlots error:", err); }
 
+    window.pokerApp = this;
+    window.pokerGame = this;
+    window.app = this;
+    window.handleFactoryReset = () => this.handleFactoryReset();
+
     // Check if URL has ?room=join or ?room=private
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('room') === 'join' || urlParams.get('room') === 'private') {
@@ -1583,6 +1588,272 @@ class PokerApp {
   // ==========================================================================
   // DEDICATED CASINO LOUNGE HUB (Dual-View Slots & European Roulette)
   // ==========================================================================
+
+  // ==========================================================================
+  // DEDICATED CASINO RESORT PAGE & TRANSITIONS
+  // ==========================================================================
+  initCasinoPortal() {
+    this.btnEnterCasinoPortal = document.getElementById('btn-enter-casino-portal');
+    this.btnCasinoBackPoker = document.getElementById('btn-casino-back-poker');
+    this.btnCasinoClaimDaily = document.getElementById('btn-casino-claim-daily');
+    this.btnCasinoTransferBtn = document.getElementById('btn-casino-transfer-btn');
+
+    if (this.btnEnterCasinoPortal) {
+      this.btnEnterCasinoPortal.addEventListener('click', () => this.showCasinoView());
+    }
+    if (this.btnCasinoBackPoker) {
+      this.btnCasinoBackPoker.addEventListener('click', () => this.hideCasinoView());
+    }
+    if (this.btnCasinoClaimDaily) {
+      this.btnCasinoClaimDaily.addEventListener('click', () => {
+        const res = EconomyManager.claimMiniGameDaily();
+        if (res.success) {
+          sounds.playWin();
+          this.updateDualWalletUI();
+          this.updateEconomyDashboard();
+          this.updateRouletteUI();
+          this.updateSlotsUI();
+          this.setAnnouncement(`[CLAIMED] Claimed $500 Daily Mini-Game Allowance! New balance: $${res.balance.toLocaleString()}`);
+        } else {
+          sounds.playCheck();
+          this.setAnnouncement(`[NOTICE] ${res.message}`);
+        }
+      });
+    }
+    if (this.btnCasinoTransferBtn) {
+      this.btnCasinoTransferBtn.addEventListener('click', () => {
+        this.openTransferModal();
+      });
+    }
+
+    // Redirect legacy casino buttons to dedicated view
+    const legacyCasinoLounge = document.getElementById('btn-open-casino-lounge');
+    if (legacyCasinoLounge) {
+      legacyCasinoLounge.addEventListener('click', () => this.showCasinoView());
+    }
+    const legacySlotsBtn = document.getElementById('btn-open-slots');
+    if (legacySlotsBtn) {
+      legacySlotsBtn.addEventListener('click', () => this.showCasinoView('slots'));
+    }
+    const legacyRouletteBtn = document.getElementById('btn-open-roulette');
+    if (legacyRouletteBtn) {
+      legacyRouletteBtn.addEventListener('click', () => this.showCasinoView('roulette'));
+    }
+  }
+
+  showCasinoView(focus = 'all') {
+    this.casinoPreviousView = (this.gameView && !this.gameView.classList.contains('hidden')) ? 'game' : 'menu';
+    this.clearTurnTimer();
+    const mainMenu = document.getElementById('main-menu');
+    const gameView = document.getElementById('game-view');
+    const casinoView = document.getElementById('casino-view');
+    if (!casinoView) return;
+
+    if (mainMenu && !mainMenu.classList.contains('hidden')) {
+      mainMenu.classList.add('page-slide-left-out');
+      casinoView.classList.remove('hidden');
+      casinoView.classList.add('page-slide-left-in');
+
+      setTimeout(() => {
+        mainMenu.classList.add('hidden');
+        mainMenu.classList.remove('page-slide-left-out');
+        casinoView.classList.remove('page-slide-left-in');
+      }, 350);
+    } else {
+      if (mainMenu) mainMenu.classList.add('hidden');
+      if (gameView) gameView.classList.add('hidden');
+      casinoView.classList.remove('hidden');
+    }
+
+    if (this.btnCashoutExit) this.btnCashoutExit.classList.add('hidden');
+    if (this.btnTopCashout) this.btnTopCashout.classList.add('hidden');
+
+    this.updateRouletteUI();
+    this.updateSlotsUI();
+    this.updateDualWalletUI();
+    if (this.drawRouletteWheel) {
+      this.drawRouletteWheel(this.rouletteAngle || 0);
+    }
+
+    if (focus === 'slots') {
+      const slotCard = document.querySelector('.slots-arena-card');
+      if (slotCard) slotCard.scrollIntoView({ behavior: 'smooth' });
+    } else if (focus === 'roulette') {
+      const rCard = document.querySelector('.roulette-arena-card');
+      if (rCard) rCard.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  hideCasinoView() {
+    const mainMenu = document.getElementById('main-menu');
+    const casinoView = document.getElementById('casino-view');
+    if (!casinoView) return;
+
+    casinoView.classList.add('page-slide-right-out');
+
+    setTimeout(() => {
+      casinoView.classList.add('hidden');
+      casinoView.classList.remove('page-slide-right-out');
+    }, 350);
+
+    if (this.casinoPreviousView === 'game' && this.activeSlot !== null) {
+      this.showGameView();
+    } else {
+      if (mainMenu) {
+        mainMenu.classList.remove('hidden');
+        mainMenu.classList.add('page-slide-right-in');
+        setTimeout(() => {
+          mainMenu.classList.remove('page-slide-right-in');
+        }, 350);
+      }
+      this.updateEconomyDashboard();
+      this.renderMainMenuSlots();
+      this.updateDualWalletUI();
+    }
+  }
+
+  handleFactoryReset(skipConfirm = false) {
+    if (!skipConfirm) {
+      const confirmed = window.confirm(
+        "⚠️ CRITICAL SYSTEM ACTION: COMPLETE FACTORY RESET\n\n" +
+        "This will immediately and permanently erase:\n" +
+        "• All 3 Save Slots & active poker runs\n" +
+        "• Cumulative Poker Savings Vault\n" +
+        "• Dedicated Mini-Games Wallet balance\n" +
+        "• Career Statistics & Records\n" +
+        "• Reset all 24-hour daily allowance cooldowns to 0 (so allowances can be claimed fresh)\n\n" +
+        "Are you absolutely sure you want to perform a complete factory data wipe?"
+      );
+      if (!confirmed) return;
+    }
+
+    try {
+      // 1. Wipe all localStorage items
+      const knownKeys = [
+        SaveManager.STORAGE_KEY,
+        SaveManager.GLOBAL_KEY,
+        EconomyManager.CUMULATIVE_SAVINGS_KEY,
+        EconomyManager.MINIGAME_STORAGE_KEY,
+        EconomyManager.POKER_ALLOWANCE_KEY,
+        EconomyManager.GLOBAL_POKER_CLAIM_KEY,
+        'royal_poker_device_saves_v4',
+        'royal_poker_device_stats_v4',
+        'royal_poker_cumulative_savings_v1',
+        'royal_poker_minigame_wallet_v2',
+        'royal_poker_daily_allowance_v2',
+        'royal_poker_global_poker_claim_v1',
+        'royal_poker_active_variant',
+        'royal_poker_feature_flags_v1',
+        'royal_poker_quality',
+        'royal_poker_sound_muted',
+        'royal_poker_username',
+        'royal_poker_volume'
+      ];
+      knownKeys.forEach(k => {
+        try { localStorage.removeItem(k); } catch (e) {}
+      });
+
+      // Purge any remaining royal_poker_* or royal_* keys
+      try {
+        Object.keys(localStorage).forEach(k => {
+          if (k.startsWith('royal_poker_') || k.startsWith('royal_')) {
+            localStorage.removeItem(k);
+          }
+        });
+      } catch (e) {}
+
+      // 2. Initialize pristine clean baselines
+      try {
+        localStorage.setItem(SaveManager.STORAGE_KEY, JSON.stringify({ slot_1: null, slot_2: null, slot_3: null }));
+      } catch (e) {}
+      
+      const cleanStats = {
+        totalHands: 0,
+        handsWon: 0,
+        biggestPot: 0,
+        currentStreak: 0,
+        bestStreak: 0,
+        bestHandDesc: 'High Card',
+        bestHandRank: 1,
+        onlineHandsPlayed: 0,
+        texasHands: 0,
+        shortDeckHands: 0,
+        omahaHands: 0,
+        exclusiveHands: 0,
+        slotsSpins: 0,
+        rouletteSpins: 0,
+        totalCashedOut: 0
+      };
+      try {
+        localStorage.setItem(SaveManager.GLOBAL_KEY, JSON.stringify(cleanStats));
+      } catch (e) {}
+
+      EconomyManager.saveCumulativeSavings(1000);
+      EconomyManager.saveMiniGameWallet({ balance: 1000, lastClaimTimestamp: 0 });
+      EconomyManager.savePokerAllowances({ slot_1: 0, slot_2: 0, slot_3: 0 });
+      try {
+        localStorage.setItem(EconomyManager.GLOBAL_POKER_CLAIM_KEY, '0');
+        localStorage.setItem('royal_poker_username', 'High Roller');
+      } catch (e) {}
+
+      // 3. Reset application state variables
+      this.activeSlot = null;
+      this.handInProgress = false;
+      this.stage = 1;
+      this.handNumber = 0;
+      this.difficulty = 'medium';
+      this.currentBet = 0;
+      this.communityCards = [];
+      this.clearTurnTimer();
+
+      // Reset players array to clean baseline
+      this.players = [
+        { id: 0, name: 'You', style: 'Hero', avatar: '👑', chips: 1000, currentBet: 0, totalBet: 0, cards: [], folded: false, allIn: false, knockedOut: false, isBot: false, isRemote: false },
+        { id: 1, name: 'Viper', style: 'Shark (TAG)', avatar: '🐍', chips: 1000, currentBet: 0, totalBet: 0, cards: [], folded: false, allIn: false, knockedOut: false, isBot: true, isRemote: false },
+        { id: 2, name: 'Atlas', style: 'Solid (TAG)', avatar: '🛡️', chips: 1000, currentBet: 0, totalBet: 0, cards: [], folded: false, allIn: false, knockedOut: false, isBot: true, isRemote: false },
+        { id: 3, name: 'Luna', style: 'Nit (Rock)', avatar: '🌙', chips: 1000, currentBet: 0, totalBet: 0, cards: [], folded: false, allIn: false, knockedOut: false, isBot: true, isRemote: false },
+        { id: 4, name: 'Duke', style: 'Maniac', avatar: '🦁', chips: 1000, currentBet: 0, totalBet: 0, cards: [], folded: false, allIn: false, knockedOut: false, isBot: true, isRemote: false }
+      ];
+
+      // 4. Close all views and return to Main Menu
+      const casinoView = document.getElementById('casino-view');
+      if (casinoView) casinoView.classList.add('hidden');
+      if (this.gameView) this.gameView.classList.add('hidden');
+      if (this.mainMenuView) this.mainMenuView.classList.remove('hidden');
+
+      // Close all modals
+      if (this.settingsModal) this.settingsModal.classList.add('hidden');
+      const statsModal = document.getElementById('stats-modal');
+      if (statsModal) statsModal.classList.add('hidden');
+      const cashoutModal = document.getElementById('cashout-modal');
+      if (cashoutModal) cashoutModal.classList.add('hidden');
+      const diffModal = document.getElementById('difficulty-modal');
+      if (diffModal) diffModal.classList.add('hidden');
+
+      // 5. Update UI displays
+      this.renderMainMenuSlots();
+      this.updateGlobalStatsUI();
+      this.updateEconomyDashboard();
+      this.updateRouletteUI();
+      this.updateSlotsUI();
+      this.updateDualWalletUI();
+
+      const usernameInput = document.getElementById('player-username-input');
+      if (usernameInput) usernameInput.value = 'High Roller';
+
+      // 6. Audio and announcement feedback
+      sounds.playWin();
+      this.setAnnouncement('[RESET] Complete Factory Reset executed. All save slots, wallets, stats, and daily cooldowns restored to baseline.');
+      alert('Factory Reset executed successfully!\n\nAll save slots, wallets, stats, and daily allowance cooldowns have been restored to clean defaults.');
+    } catch (err) {
+      console.error('Factory reset error:', err);
+    }
+  }
+
+  updateTopBarWallets() {
+    this.updateDualWalletUI();
+  }
+
   openCasinoLounge(view = 'split') {
     const modal = document.getElementById('casino-lounge-modal');
     if (!modal) return;
@@ -1636,7 +1907,7 @@ class PokerApp {
     if (this.drawerItemLounge) {
       this.drawerItemLounge.addEventListener('click', () => {
         this.toggleTransitDrawer(false);
-        this.openCasinoLounge('split');
+        this.showCasinoView('all');
       });
     }
     if (this.closeLoungeBtn && this.loungeModal) {
@@ -1912,19 +2183,11 @@ class PokerApp {
     } else if (dest === 'exclusive') {
       this.promptOnlineRoomPassword();
     } else if (dest === 'slots') {
-      if (!FeatureManager.isEnabled('slots')) {
-        alert('Slot Machine mini-game is disabled in Settings.');
-        return;
-      }
-      const slotModal = document.getElementById('slots-modal');
-      if (slotModal) slotModal.classList.remove('hidden');
-      this.updateSlotsUI();
+      this.showCasinoView('slots');
     } else if (dest === 'roulette') {
-      if (!FeatureManager.isEnabled('roulette')) {
-        alert('European Roulette is disabled in Settings.');
-        return;
-      }
-      this.openRouletteModal();
+      this.showCasinoView('roulette');
+    } else if (dest === 'casino' || dest === 'lounge') {
+      this.showCasinoView('all');
     } else if (dest === 'vault') {
       const trModal = document.getElementById('transfer-modal');
       if (trModal) trModal.classList.remove('hidden');
@@ -2412,6 +2675,8 @@ class PokerApp {
   // ==========================================================================
   showMenuView() {
     this.clearTurnTimer();
+    const casinoView = document.getElementById('casino-view');
+    if (casinoView) casinoView.classList.add('hidden');
     this.gameView.classList.add('hidden');
     this.mainMenuView.classList.remove('hidden');
     this.countdownOverlay.classList.add('hidden');
@@ -3630,39 +3895,16 @@ class PokerApp {
       });
     }
 
-    // DIFFICULTY & AI ENGINE: NIGHTMARE MODE ADVANTAGE
-    // In Nightmare Mode, subtly bias the card distribution so bots receive slightly favored card deals (~55–60% equity edge)
-    if (!this.isOnlineRoom && this.difficulty === 'nightmare' && !this.players[0].folded) {
+    // STRICT DECK INTEGRITY (ZERO DUPLICATE CARDS):
+    // All cards are dealt exclusively from a single authentic deck (52 cards standard, 36 cards short deck).
+    // No artificial card spawning or out-of-deck injections. Nightmare mode difficulty is driven purely
+    // by advanced pot odds, aggressive pre-flop 3-betting, and 35% strategic bluff frequency.
+    if (!this.isOnlineRoom && this.difficulty === 'nightmare') {
       const activeBots = [1, 2, 3, 4].filter(i => !this.players[i].knockedOut && !this.players[i].folded);
-      if (activeBots.length > 0 && Math.random() < 0.58) {
-        const rivalIdx = activeBots[Math.floor(Math.random() * activeBots.length)];
-        const suits = [SUITS[0], SUITS[1], SUITS[2], SUITS[3]];
-        const premiumCombos = [
-          [new Card(14, suits[0]), new Card(14, suits[1])], // AA
-          [new Card(13, suits[0]), new Card(13, suits[1])], // KK
-          [new Card(12, suits[0]), new Card(12, suits[1])], // QQ
-          [new Card(14, suits[2]), new Card(13, suits[2])], // AKs
-          [new Card(14, suits[3]), new Card(12, suits[3])]  // AQs
-        ];
-        this.players[rivalIdx].cards = premiumCombos[Math.floor(Math.random() * premiumCombos.length)];
+      if (activeBots.length > 0) {
+        const rivalIdx = activeBots[0];
         const rSeat = document.getElementById(`seat-${rivalIdx}`);
         if (rSeat) rSeat.classList.add('adrenaline-threat');
-      }
-    } else if (!this.isOnlineRoom && !this.players[0].folded) {
-      // Standard drama mechanic on Easy/Medium/Hard
-      const heroTier = evaluatePreflopTier(this.players[0].cards);
-      if (heroTier <= 2) {
-        const botIndices = [1, 2, 3, 4].filter(i => !this.players[i].knockedOut && !this.players[i].folded);
-        if (botIndices.length > 0) {
-          const rivalIdx = botIndices[Math.floor(Math.random() * botIndices.length)];
-          if (Math.random() < 0.25) {
-            this.players[rivalIdx].cards = [new Card(14, SUITS[1]), new Card(14, SUITS[2])]; // AA
-          } else {
-            this.players[rivalIdx].cards = [new Card(13, SUITS[0]), new Card(13, SUITS[3])]; // KK
-          }
-          const rSeat = document.getElementById(`seat-${rivalIdx}`);
-          if (rSeat) rSeat.classList.add('adrenaline-threat');
-        }
       }
     }
 
@@ -5373,6 +5615,10 @@ class PokerApp {
       }
       if (miniBtn) {
         miniBtn.disabled = !miniStatus.canClaim;
+      }
+      const casinoClaimBtn = document.getElementById('btn-casino-claim-daily');
+      if (casinoClaimBtn) {
+        casinoClaimBtn.disabled = !miniStatus.canClaim;
       }
 
       const pokerStatus = EconomyManager.getGlobalPokerClaimStatus();

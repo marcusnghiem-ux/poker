@@ -5368,3 +5368,40 @@ body {
   box-shadow: 0 6px 20px rgba(239, 68, 68, 0.5);
   transform: translateY(-1px);
 }
+
+/* Vibrant Solar Aesthetics & Cosmic Nebulae Enhancement */
+.bg-solar-nebula-glow {
+  position: absolute;
+  top: 15%;
+  right: 10%;
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.08) 0%, rgba(217, 119, 6, 0.04) 40%, transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+  animation: nebulaDrift 30s ease-in-out infinite alternate;
+  z-index: 0;
+}
+
+.bg-cosmic-indigo-glow {
+  position: absolute;
+  bottom: 10%;
+  left: 5%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(79, 70, 229, 0.07) 0%, rgba(30, 27, 75, 0.03) 50%, transparent 75%);
+  filter: blur(45px);
+  pointer-events: none;
+  animation: nebulaDriftReverse 35s ease-in-out infinite alternate;
+  z-index: 0;
+}
+
+@keyframes nebulaDrift {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-30px, 20px) scale(1.1); }
+}
+
+@keyframes nebulaDriftReverse {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(25px, -20px) scale(1.08); }
+}

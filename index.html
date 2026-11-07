@@ -21,6 +21,9 @@
     <div class="bg-art-deco-lattice"></div>
     <div class="bg-light-beams"></div>
     <div class="bg-spotlight"></div>
+    <div class="bg-solar-nebula-glow"></div>
+    <div class="bg-cosmic-indigo-glow"></div>
+
     <div class="bg-bokeh bg-bokeh-1"></div>
     <div class="bg-bokeh bg-bokeh-2"></div>
     <div class="bg-bokeh bg-bokeh-3"></div>
@@ -432,7 +435,7 @@
 
         <!-- RIGHT COLUMN: Prominent Grand Casino Action Portal -->
         <div class="dashboard-right-col">
-          <div class="casino-portal-card" id="btn-enter-casino-portal" role="button" tabindex="0" title="Step Onto The High Roller Casino Floor">
+          <div class="casino-portal-card" id="btn-enter-casino-portal" role="button" tabindex="0" title="Step Onto The High Roller Casino Floor" onclick="if(window.pokerGame){window.pokerGame.showCasinoView()}">
             <div class="portal-card-glow"></div>
             <div class="portal-badge-row">
               <span class="portal-live-badge">CASINO RESORT OPEN</span>
@@ -515,7 +518,7 @@
       <!-- Top Navigation & Return Header -->
       <header class="casino-view-header">
         <div class="cv-header-left">
-          <button id="btn-casino-back-poker" class="btn-casino-back" title="Return to Texas Hold'em Main Menu">
+          <button id="btn-casino-back-poker" class="btn-casino-back" title="Return to Texas Hold'em Main Menu" onclick="if(window.pokerGame){window.pokerGame.hideCasinoView()}">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
               <path d="M19 12H5M12 19l-7-7 7-7" stroke="#ffd700" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
@@ -1974,7 +1977,7 @@
           <div class="settings-group danger-zone-group">
             <h3 class="danger-title">Danger Zone &bull; Full System Reset</h3>
             <p class="setting-desc danger-desc">Permanently erase all 3 save slots, active runs, career stats, cumulative savings vault, and mini-game wallet, resetting daily 24h cooldowns to zero so allowances can be claimed fresh.</p>
-            <button id="btn-factory-reset" class="btn-danger-reset" type="button">
+            <button id="btn-factory-reset" class="btn-danger-reset" type="button" onclick="if(window.pokerGame){window.pokerGame.handleFactoryReset()}else if(window.app){window.app.handleFactoryReset()}">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:6px">
                 <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
               </svg>
