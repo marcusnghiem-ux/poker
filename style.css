@@ -33,7 +33,13 @@
   -webkit-user-select: none;
   -webkit-touch-callout: none;
   -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
+}
+
+html {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 body {
@@ -43,8 +49,19 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
   position: relative;
+  pointer-events: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+#app-container {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  min-height: 100vh;
+  pointer-events: auto !important;
 }
 
 /* ==========================================================================
