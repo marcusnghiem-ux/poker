@@ -24,7 +24,7 @@
     <!-- Solar Flare Geometry High-Energy Vector Artwork (Geometry Dash Solar Flare Inspired) -->
     <div class="solar-geometry-layer">
       <!-- Top Molten Sawblade Teeth Frame -->
-      <svg class="solar-sawblade-svg top-sawblade" viewBox="0 0 1400 90" preserveAspectRatio="none" fill="none">
+      <svg class="solar-sawblade-svg top-sawblade" viewBox="0 0 1400 50" preserveAspectRatio="none" fill="none">
         <polygon points="0,0 70,60 140,15 210,75 280,20 350,85 420,20 490,70 560,25 630,90 700,30 770,90 840,25 910,70 980,20 1050,85 1120,20 1190,75 1260,15 1330,60 1400,0" fill="url(#moltenSawbladeGrad)" stroke="#fde047" stroke-width="2"/>
         <defs>
           <linearGradient id="moltenSawbladeGrad" x1="0" y1="0" x2="0" y2="1">
@@ -37,7 +37,7 @@
       </svg>
 
       <!-- Bottom Molten Sawblade Teeth Frame -->
-      <svg class="solar-sawblade-svg bottom-sawblade" viewBox="0 0 1400 90" preserveAspectRatio="none" fill="none">
+      <svg class="solar-sawblade-svg bottom-sawblade" viewBox="0 0 1400 50" preserveAspectRatio="none" fill="none">
         <polygon points="0,90 70,30 140,75 210,15 280,70 350,5 420,70 490,20 560,65 630,0 700,60 770,0 840,65 910,20 980,70 1050,5 1120,70 1190,15 1260,75 1330,30 1400,90" fill="url(#moltenSawbladeGradRev)" stroke="#fde047" stroke-width="2"/>
         <defs>
           <linearGradient id="moltenSawbladeGradRev" x1="0" y1="1" x2="0" y2="0">
@@ -531,7 +531,7 @@
             <div class="economy-card poker-allowance-card">
               <div class="eco-header">
                 <span class="eco-badge gold-badge">POKER RUN STIPEND</span>
-                <span class="eco-daily-timer" id="poker-claim-timer">24h Cycle Active</span>
+                <span class="eco-daily-timer" id="poker-claim-timer">3h Cycle Active</span>
               </div>
               <div class="eco-balance-row">
                 <div class="eco-bal-wrap">
@@ -543,7 +543,7 @@
                 </button>
               </div>
               <div class="eco-footer">
-                <span>Each of your 3 save slots receives $5,000 every 24 hours</span>
+                <span>Each of your 3 save slots receives $5,000 every 3 hours</span>
               </div>
             </div>
 
@@ -558,8 +558,8 @@
                   <span class="eco-bal-lbl">Balance:</span>
                   <span class="eco-val" id="minigame-wallet-balance">$1,000</span>
                 </div>
-                <button id="btn-claim-minigame-daily" class="mini-claim-btn" title="Claim $500 Daily Mini-Game Allowance">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:4px"><rect x="3" y="8" width="18" height="13" rx="2" stroke="#34d399" stroke-width="2"/><path d="M12 8v13M3 12h18M12 8a3 3 0 0 0-3-3c-1.5 0-3 1.5-1.5 3h4.5zM12 8a3 3 0 0 1 3-3c1.5 0 3 1.5 1.5 3h-4.5z" stroke="#34d399" stroke-width="1.5"/></svg> Claim $500
+                <button id="btn-claim-minigame-daily" class="mini-claim-btn" title="Claim $1,000 Mini-Game Allowance (Every 3h)">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:4px"><rect x="3" y="8" width="18" height="13" rx="2" stroke="#34d399" stroke-width="2"/><path d="M12 8v13M3 12h18M12 8a3 3 0 0 0-3-3c-1.5 0-3 1.5-1.5 3h4.5zM12 8a3 3 0 0 1 3-3c1.5 0 3 1.5 1.5 3h-4.5z" stroke="#34d399" stroke-width="1.5"/></svg> Claim $1,000
                 </button>
               </div>
               <div class="eco-footer">
@@ -723,9 +723,9 @@
             <span class="cv-wallet-lbl">CASINO WALLET:</span>
             <strong class="cv-wallet-val emerald" id="casino-page-wallet-val">$1,000</strong>
           </div>
-          <button id="btn-casino-claim-daily" class="cv-claim-btn" title="Claim $500 Daily Mini-Game Allowance">
+          <button id="btn-casino-claim-daily" class="cv-claim-btn" title="Claim $1,000 Mini-Game Allowance (Every 3h)">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="3" y="8" width="18" height="13" rx="2" stroke="#34d399" stroke-width="2"/><path d="M12 8v13M3 12h18" stroke="#34d399" stroke-width="1.5"/></svg>
-            <span>+ $500 Daily</span>
+            <span>+ $1,000 (3h)</span>
           </button>
           <button id="btn-casino-transfer-btn" class="cv-transfer-btn" title="Transfer Casino Winnings to Poker Campaign">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M17 9l4 4m0 0l-4 4m4-4H7m6 5v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" stroke="#ffd700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -743,7 +743,7 @@
           <span class="ticker-item yellow">SOLAR FLARE 30X WILD BOOST</span>
           <span class="ticker-item emerald">INSTANT POKER SAVINGS VAULT TRANSFERS</span>
           <span class="ticker-item gold">[ZERO HOUSE COMMISSION &bull; 100% PLAYER RETURN]</span>
-          <span class="ticker-item yellow">CLAIM +$500 DAILY SOLAR STIPEND</span>
+          <span class="ticker-item yellow">CLAIM +$1,000 SOLAR STIPEND EVERY 3 HOURS</span>
           <span class="ticker-item gold">[SOLAR FLARE CASINO RESORT]</span>
           <span class="ticker-item yellow">HELIOS SINGLE-ZERO EUROPEAN ROULETTE (35:1)</span>
           <span class="ticker-item orange">SOLAR CORONA 100X HIGH-STAKES SLOTS</span>
@@ -1018,6 +1018,149 @@
           <div class="arena-footer-info">
             <span>Mini-Game Balance:</span> <strong id="slots-wallet-balance">$1,000</strong> &bull;
             <span>Winnings can be transferred to Solo Poker Campaigns anytime</span>
+          </div>
+        </div>
+        <!-- WING 3: Royal Solar Vegas Craps Arena -->
+        <div class="casino-arena-card craps-arena-card" id="craps-arena-card">
+          <div class="arena-card-header">
+            <div class="arena-title-wrap">
+              <span class="arena-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <rect x="2" y="2" width="9" height="9" rx="2" stroke="#f59e0b" stroke-width="1.8" fill="#1e1b4b"/>
+                  <circle cx="6.5" cy="6.5" r="1.2" fill="#ef4444"/>
+                  <rect x="13" y="13" width="9" height="9" rx="2" stroke="#f59e0b" stroke-width="1.8" fill="#1e1b4b"/>
+                  <circle cx="15.5" cy="15.5" r="1" fill="#ef4444"/>
+                  <circle cx="19.5" cy="19.5" r="1" fill="#ef4444"/>
+                </svg>
+              </span>
+              <div>
+                <h2 class="arena-title">SOLAR VEGAS CRAPS TABLE</h2>
+                <span class="arena-sub">Las Vegas High-Roller Dice &bull; Pass Line &bull; Field &bull; Any 7 &bull; Craps (7:1)</span>
+              </div>
+            </div>
+            <div class="craps-header-stats">
+              <div class="arena-stat-pill">
+                <span>Point:</span> <strong id="craps-point-display" class="gold">OFF</strong>
+              </div>
+              <div class="arena-stat-pill">
+                <span>Total Bet:</span> <strong id="craps-total-bet" class="gold">$0</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Craps 3D Dice Pit & Rolling Stage -->
+          <div class="craps-stage-box">
+            <div class="craps-dice-pit">
+              <div class="craps-dice-pair">
+                <div class="craps-die-slot" id="craps-die-1">
+                  <svg width="48" height="48" viewBox="0 0 50 50" class="craps-die-svg">
+                    <rect width="50" height="50" rx="8" fill="#090d16" stroke="#ffd700" stroke-width="2"/>
+                    <rect x="3" y="3" width="44" height="44" rx="6" fill="#131c31" stroke="rgba(255,215,0,0.3)" stroke-width="1"/>
+                    <circle cx="25" cy="25" r="4" fill="#ef4444" stroke="#fca5a5" stroke-width="0.8"/>
+                  </svg>
+                </div>
+                <div class="craps-die-slot" id="craps-die-2">
+                  <svg width="48" height="48" viewBox="0 0 50 50" class="craps-die-svg">
+                    <rect width="50" height="50" rx="8" fill="#090d16" stroke="#ffd700" stroke-width="2"/>
+                    <rect x="3" y="3" width="44" height="44" rx="6" fill="#131c31" stroke="rgba(255,215,0,0.3)" stroke-width="1"/>
+                    <circle cx="14" cy="14" r="4" fill="#ef4444" stroke="#fca5a5" stroke-width="0.8"/>
+                    <circle cx="36" cy="36" r="4" fill="#ef4444" stroke="#fca5a5" stroke-width="0.8"/>
+                  </svg>
+                </div>
+              </div>
+              <div id="craps-result-banner" class="craps-result-banner">
+                Come-Out Roll: Place your wagers on Pass Line or Field and roll!
+              </div>
+            </div>
+
+            <!-- Authentic Craps Felt Table Grid -->
+            <div class="craps-felt-layout">
+              <!-- Main Contract Line Bets -->
+              <div class="craps-line-row">
+                <div class="craps-bet-spot" id="craps-bet-pass" data-bet="pass" role="button" tabindex="0">
+                  <div class="spot-title">PASS LINE</div>
+                  <div class="spot-odds">1:1 Payout</div>
+                  <div class="spot-desc">Win 7,11 | Lose 2,3,12</div>
+                  <div class="craps-chip-badge hidden" id="chip-badge-pass">$0</div>
+                </div>
+                <div class="craps-bet-spot" id="craps-bet-dontpass" data-bet="dontpass" role="button" tabindex="0">
+                  <div class="spot-title">DON'T PASS</div>
+                  <div class="spot-odds">1:1 Payout</div>
+                  <div class="spot-desc">Win 2,3 (12 push) | Lose 7,11</div>
+                  <div class="craps-chip-badge hidden" id="chip-badge-dontpass">$0</div>
+                </div>
+              </div>
+
+              <!-- High-Action Single-Roll Field Bet -->
+              <div class="craps-field-row">
+                <div class="craps-bet-spot field-spot" id="craps-bet-field" data-bet="field" role="button" tabindex="0">
+                  <div class="field-title">F I E L D</div>
+                  <div class="field-numbers">
+                    <span class="field-highlight">2 (2:1)</span>
+                    <span>3</span>
+                    <span>4</span>
+                    <span>9</span>
+                    <span>10</span>
+                    <span>11</span>
+                    <span class="field-highlight">12 (3:1)</span>
+                  </div>
+                  <div class="craps-chip-badge hidden" id="chip-badge-field">$0</div>
+                </div>
+              </div>
+
+              <!-- One-Roll Propositions & Hardways -->
+              <div class="craps-props-grid">
+                <div class="craps-bet-spot prop-spot" id="craps-bet-seven" data-bet="seven" role="button" tabindex="0">
+                  <div class="spot-title">ANY 7</div>
+                  <div class="spot-odds gold">4:1</div>
+                  <div class="spot-desc">Next roll total = 7</div>
+                  <div class="craps-chip-badge hidden" id="chip-badge-seven">$0</div>
+                </div>
+                <div class="craps-bet-spot prop-spot" id="craps-bet-anycraps" data-bet="anycraps" role="button" tabindex="0">
+                  <div class="spot-title">ANY CRAPS</div>
+                  <div class="spot-odds gold">7:1</div>
+                  <div class="spot-desc">Next roll 2, 3, or 12</div>
+                  <div class="craps-chip-badge hidden" id="chip-badge-anycraps">$0</div>
+                </div>
+                <div class="craps-bet-spot prop-spot" id="craps-bet-hard6" data-bet="hard6" role="button" tabindex="0">
+                  <div class="spot-title">HARD 6</div>
+                  <div class="spot-odds yellow">9:1</div>
+                  <div class="spot-desc">Pair 3-3 before 7</div>
+                  <div class="craps-chip-badge hidden" id="chip-badge-hard6">$0</div>
+                </div>
+                <div class="craps-bet-spot prop-spot" id="craps-bet-hard8" data-bet="hard8" role="button" tabindex="0">
+                  <div class="spot-title">HARD 8</div>
+                  <div class="spot-odds yellow">9:1</div>
+                  <div class="spot-desc">Pair 4-4 before 7</div>
+                  <div class="craps-chip-badge hidden" id="chip-badge-hard8">$0</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Wager Presets & Action Controls -->
+          <div class="slots-wager-controls craps-wager-controls">
+            <div class="wager-left">
+              <span class="control-lbl">Chip Bet:</span>
+              <div class="preset-chip-group">
+                <button class="craps-preset-btn active" data-wager="10" type="button">$10</button>
+                <button class="craps-preset-btn" data-wager="50" type="button">$50</button>
+                <button class="craps-preset-btn" data-wager="100" type="button">$100</button>
+                <button class="craps-preset-btn" data-wager="1000" type="button">$1,000</button>
+                <button class="craps-preset-btn custom-preset-btn" data-wager="custom" type="button">Custom</button>
+              </div>
+            </div>
+            <div class="wager-right">
+              <button id="btn-craps-clear" class="btn btn-secondary" type="button">Clear Bets</button>
+              <button id="btn-craps-roll" class="btn btn-primary craps-roll-btn gold-glow-btn" type="button">
+                <span>ROLL DICE</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="arena-footer-info">
+            <span>Mini-Game Balance:</span> <strong id="craps-wallet-balance">$1,000</strong> &bull;
+            <span>Come-out: 7/11 natural win, 2/3/12 craps. 4-10 sets Point!</span>
           </div>
         </div>
       </div>
@@ -1437,12 +1580,49 @@
       <div class="modal-card update-log-card">
         <div class="modal-header">
           <div class="update-log-header-left">
-            <span class="update-log-ver-badge">v1.01</span>
-            <h2>1.01 - Solar Flare Graphics &amp; Visual Overhaul</h2>
+            <span class="update-log-ver-badge">v1.015</span>
+            <h2>1.015 - Solar Craps, 3-Hour Stipends &amp; Visual Polish</h2>
           </div>
           <button id="close-update-log-btn" class="close-btn" type="button">&times;</button>
         </div>
-        <div class="modal-body update-log-body">
+                <div class="modal-body update-log-body">
+          <!-- ==================== v1.015 LATEST RELEASE ==================== -->
+          <div class="update-log-section current-release-section">
+            <div class="update-sec-badge-row">
+              <span class="update-log-ver-badge">v1.015 CURRENT</span>
+              <span class="update-sec-date">Latest Release</span>
+            </div>
+            <h3 class="update-sec-title">Royal Solar Craps Table (Casino Resort)</h3>
+            <ul class="update-sec-list">
+              <li><strong>Las Vegas Craps Arena:</strong> Added Craps as a third premier casino game to the Solar Flare Casino Resort alongside European Roulette and 100x Slots!</li>
+              <li><strong>Authentic Table Betting:</strong> Bet on Pass Line (1:1), Don't Pass (1:1), Field (2:1 on 2, 3:1 on 12, 1:1 on 3,4,9,10,11), Any 7 (4:1), Any Craps (7:1 on 2,3,12), and Hardways (9:1 on Hard 6 &amp; 8).</li>
+              <li><strong>Dynamic Come-Out &amp; Point Phases:</strong> Automatic point tracking with ON/OFF puck indicator and 3D animated dice tumble physics.</li>
+              <li><strong>Standardized Wagering:</strong> Features instant $10, $50, $100, $1,000 presets and custom wagering support.</li>
+            </ul>
+          </div>
+
+          <div class="update-log-section current-release-section">
+            <h3 class="update-sec-title">Accelerated 3-Hour Allowance Cycle</h3>
+            <ul class="update-sec-list">
+              <li><strong>3-Hour Cooldown:</strong> Cooldown timers reduced from 24 hours down to every 3 hours! Claim poker and casino stipends up to 8 times daily.</li>
+              <li><strong>$1,000 Mini-Game Stipend:</strong> Doubled Casino Mini-Game allowance from $500 to $1,000 every claim cycle.</li>
+              <li><strong>Automated Timer Sync:</strong> Real-time countdowns track your next available claim across all casino wings and poker vaults.</li>
+            </ul>
+          </div>
+
+          <div class="update-log-section current-release-section">
+            <h3 class="update-sec-title">Refined Solar Flare Geometry (Scaled for Clarity)</h3>
+            <ul class="update-sec-list">
+              <li><strong>Uncluttered Background Architecture:</strong> Molten sawblade teeth frames rescaled to 36px border trims, keeping gameplay zones crisp, high-visibility, and balanced.</li>
+              <li><strong>Reference Photo Accuracy:</strong> Introduced Photo 1's central solar diamond with core matrix dots, orbiting satellite orbs, and Photo 2's glowing triple neon chevrons.</li>
+            </ul>
+          </div>
+
+          <!-- ==================== PREVIOUS RELEASES ARCHIVE ==================== -->
+          <div class="update-log-archive-divider">
+            <span>PREVIOUS RELEASE NOTES (v1.01)</span>
+          </div>
+
           <div class="update-log-section">
             <h3 class="update-sec-title">Solar Flare Geometric Artwork Overhaul</h3>
             <ul class="update-sec-list">
@@ -1767,8 +1947,8 @@
             <div class="lounge-wallet-pill" title="Shared Dedicated Mini-Games Wallet">
               <span class="lounge-wallet-lbl">Mini-Game Wallet:</span>
               <strong class="lounge-wallet-val emerald" id="lounge-wallet-balance">$1,000</strong>
-              <button id="btn-lounge-claim" class="lounge-claim-btn" title="Claim $500 Daily Mini-Game Allowance">
-                + $500 Daily
+              <button id="btn-lounge-claim" class="lounge-claim-btn" title="Claim $1,000 Mini-Game Allowance (Every 3h)">
+                + $1,000 (3h)
               </button>
             </div>
             <div class="lounge-view-selector">

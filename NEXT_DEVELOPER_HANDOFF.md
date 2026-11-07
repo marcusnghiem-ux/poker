@@ -253,6 +253,34 @@ try { this.renderMainMenuSlots(); } catch (err) { console.error("renderSlots err
   - Clicking `Custom` opens `#custom-wager-modal` with numeric validation ($\ge \$10$ and $\le$ wallet balance).
 - **Zero Emojis:** Strictly 0 emojis in rendered HTML and CSS.
 - **75 Simulation Runs:** 25 Engine Performance + 25 Graphics/Alerts + 25 Gameplay Simulation runs all passing 100%.
+### 22. v1.015 Release: Royal Solar Craps, 3-Hour Allowances & Scaled Background Geometry ✅ COMPLETED & VERIFIED
+- **Production Target:** `https://solarflare-hub-iota.vercel.app/`
+- **Update Log Hierarchy:**
+  - Header & Trigger pill updated to **v1.015**.
+  - Latest notes for 1.015 placed **first** at top of `#update-log-modal`.
+  - All existing 1.01 release notes pushed down cleanly under an archive divider.
+- **Royal Solar Craps Table (`#craps-arena-card`):**
+  - Added Craps as a third premier game to the Solar Flare Casino Resort alongside European Roulette and 100x Slots.
+  - Implements authentic Las Vegas Craps rules:
+    - Pass Line (1:1 payout, wins 7/11, loses 2/3/12 on come-out).
+    - Don't Pass (1:1 payout, wins 2/3, pushes 12, loses 7/11 on come-out).
+    - Point Phase: Tracks ON/OFF puck indicator (`#craps-point-display`), hit point wins Pass Line, 7-out wins Don't Pass.
+    - Single-Roll Field Bet: 2 pays 2:1, 12 pays 3:1, 3/4/9/10/11 pay 1:1, 5/6/7/8 lose.
+    - One-Roll Props: Any 7 (4:1 payout), Any Craps 2/3/12 (7:1 payout).
+    - Hardways: Hard 6 (9:1) and Hard 8 (9:1).
+  - Authentic 3D tumbling dice physics (`@keyframes diceTumble`) and pure SVG dice graphics (`renderCrapsDieSVG()`, strictly zero emojis).
+  - Standardized wager controls: `$10`, `$50`, `$100`, `$1,000`, and `Custom` presets.
+- **Accelerated 3-Hour Allowance Cycle:**
+  - Reduced `EconomyManager.CYCLE_MS` from 24 hours to **3 hours** (`3 * 60 * 60 * 1000 = 10,800,000ms`).
+  - Increased Mini-Game allowance from $500 to **$1,000** each claim/cashout.
+  - Real-time countdown timers synchronized across all UI headers, casino floors, and economy dashboards.
+- **Refined Background Geometry (Slightly Smaller, Clean & Uncluttered):**
+  - Rescaled molten sawblade trims to 36px height (`.solar-sawblade-svg`) with 0.42 opacity.
+  - Added Central Solar Diamond Core with glowing inner 3x3 dot matrix (Photo 1 motif).
+  - Added Triple Glowing Neon Chevrons `>>>` on right edge (Photo 2 motif).
+  - Rescaled laser wave arrows (`scale(0.68)`) and cosmic portal disc (`scale(0.72)`) for high-contrast gameplay visibility.
+- **75 Simulation Runs:** 25 Engine Performance + 25 Graphics/Alerts + 25 Gameplay Simulation runs all passing 100%.
+
 - Verification Suite:
   - `python verify_syntax.py`
   - `python simulate_10_runs.py`

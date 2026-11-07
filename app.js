@@ -842,7 +842,7 @@ class EconomyManager {
   static POKER_ALLOWANCE_KEY = 'royal_poker_daily_allowance_v2';
   static CUMULATIVE_SAVINGS_KEY = 'royal_poker_cumulative_savings_v1';
   static GLOBAL_POKER_CLAIM_KEY = 'royal_poker_global_poker_claim_v1';
-  static CYCLE_MS = 24 * 60 * 60 * 1000; // Persistent 24-hour cycle
+  static CYCLE_MS = 3 * 60 * 60 * 1000; // 3-hour allowance cycle
 
   static getGlobalPokerClaimStatus() {
     let lastClaim = 0;
@@ -871,7 +871,7 @@ class EconomyManager {
   static claimGlobalPokerDaily() {
     const status = EconomyManager.getGlobalPokerClaimStatus();
     if (!status.canClaim) {
-      return { success: false, message: `24h cycle active! Next claim in ${status.text}` };
+      return { success: false, message: `3h cycle active! Next claim in ${status.text}` };
     }
     const newSavings = EconomyManager.addCumulativeSavings(5000);
     try {
@@ -972,10 +972,10 @@ class EconomyManager {
   static claimMiniGameDaily() {
     const status = EconomyManager.getMiniGameClaimStatus();
     if (!status.canClaim) {
-      return { success: false, message: `24h cycle active! Next claim in ${status.text}` };
+      return { success: false, message: `3h cycle active! Next claim in ${status.text}` };
     }
     const wallet = EconomyManager.getMiniGameWallet();
-    wallet.balance += 500;
+    wallet.balance += 1000;
     wallet.lastClaimTimestamp = Date.now();
     EconomyManager.saveMiniGameWallet(wallet);
     return { success: true, balance: wallet.balance };
@@ -1388,6 +1388,12 @@ class PokerApp {
     this.rouletteSpinning = false;
     this.rouletteAngle = 0;
 
+    // Craps Mini-Game State
+    this.crapsBets = {};
+    this.crapsPoint = null;
+    this.selectedCrapsChip = 10;
+    this.crapsRolling = false;
+
     // Multiplayer Online State
     this.isOnlineRoom = false;
     this.isHost = false;
@@ -1429,6 +1435,7 @@ class PokerApp {
     try { this.renderMainMenuSlots(); } catch (err) { console.error("renderSlots error:", err); }
     try { this.initUpdateLogModal(); } catch (err) { console.error("initUpdateLogModal error:", err); }
     try { this.initCustomWagerModal(); } catch (err) { console.error("initCustomWagerModal error:", err); }
+    try { this.initCraps(); } catch (err) { console.error("initCraps error:", err); }
 
     window.pokerApp = this;
     window.pokerGame = this;
@@ -1504,6 +1511,10 @@ class PokerApp {
           const customBtn = document.querySelector('.slots-preset-btn[data-wager="custom"]');
           if (customBtn) customBtn.textContent = `$${val.toLocaleString()}`;
           this.updateSlotsUI();
+        } else if (this.customWagerTargetGame === 'craps') {
+          this.selectedCrapsChip = val;
+          const customBtn = document.querySelector('.craps-preset-btn[data-wager="custom"]');
+          if (customBtn) customBtn.textContent = `$${val.toLocaleString()}`;
         }
 
         sounds.playChip();
@@ -1521,10 +1532,14 @@ class PokerApp {
     const descEl = document.getElementById('custom-wager-modal-desc');
     const wallet = EconomyManager.getMiniGameWallet();
 
-    if (titleEl) titleEl.textContent = gameType === 'roulette' ? 'Custom Roulette Wager' : 'Custom Slot Machine Bet';
+    if (titleEl) {
+      if (gameType === 'roulette') titleEl.textContent = 'Custom Roulette Wager';
+      else if (gameType === 'slots') titleEl.textContent = 'Custom Slot Machine Bet';
+      else if (gameType === 'craps') titleEl.textContent = 'Custom Craps Wager';
+    }
     if (descEl) descEl.textContent = `Set your custom bet amount from your Mini-Game Wallet (Available: $${wallet.balance.toLocaleString()}).`;
 
-    const currentWager = gameType === 'roulette' ? this.selectedRouletteChip : this.slotWager;
+    const currentWager = gameType === 'roulette' ? this.selectedRouletteChip : (gameType === 'craps' ? this.selectedCrapsChip : this.slotWager);
     if (inputEl) {
       inputEl.value = Math.max(10, currentWager || 50);
       inputEl.max = wallet.balance;
@@ -2127,7 +2142,7 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
           this.updateEconomyDashboard();
           this.updateRouletteUI();
           this.updateSlotsUI();
-          this.setAnnouncement(`[CLAIMED] Claimed $500 Daily Mini-Game Allowance! New balance: $${res.balance.toLocaleString()}`);
+          this.setAnnouncement(`[CLAIMED] Claimed $1,000 Mini-Game Allowance! (3-Hour Cooldown) New balance: $${res.balance.toLocaleString()}`);
         } else {
           sounds.playCheck();
           this.setAnnouncement(`[NOTICE] ${res.message}`);
@@ -2452,7 +2467,7 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
           sounds.playWin();
           this.updateDualWalletUI();
           this.updateEconomyDashboard();
-          this.setAnnouncement(`[CLAIMED] Claimed $500 Daily Mini-Game Allowance! New balance: $${res.balance.toLocaleString()}`);
+          this.setAnnouncement(`[CLAIMED] Claimed $1,000 Mini-Game Allowance! (3-Hour Cooldown) New balance: $${res.balance.toLocaleString()}`);
         } else {
           sounds.playCheck();
           this.setAnnouncement(`[NOTICE] ${res.message}`);
@@ -5547,6 +5562,333 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
     requestAnimationFrame(animateWheel);
   }
 
+  // ==========================================================================
+  // v1.015: ROYAL SOLAR CRAPS ENGINE
+  // ==========================================================================
+  renderCrapsDieSVG(val) {
+    const pips = {
+      1: [[25, 25]],
+      2: [[14, 14], [36, 36]],
+      3: [[14, 14], [25, 25], [36, 36]],
+      4: [[14, 14], [36, 14], [14, 36], [36, 36]],
+      5: [[14, 14], [36, 14], [25, 25], [14, 36], [36, 36]],
+      6: [[14, 14], [36, 14], [14, 25], [36, 25], [14, 36], [36, 36]]
+    };
+    const dots = (pips[val] || pips[1]).map(([x, y]) =>
+      `<circle cx="${x}" cy="${y}" r="4" fill="#ef4444" stroke="#fca5a5" stroke-width="0.8" filter="drop-shadow(0 0 3px #ef4444)"/>`
+    ).join('');
+    return `<svg width="48" height="48" viewBox="0 0 50 50" class="craps-die-svg">
+      <rect width="50" height="50" rx="8" fill="#090d16" stroke="#ffd700" stroke-width="2"/>
+      <rect x="3" y="3" width="44" height="44" rx="6" fill="#131c31" stroke="rgba(255,215,0,0.3)" stroke-width="1"/>
+      ${dots}
+    </svg>`;
+  }
+
+  initCraps() {
+    this.crapsBets = {};
+    this.crapsPoint = null;
+    this.selectedCrapsChip = 10;
+    this.crapsRolling = false;
+
+    // Preset chip selectors ($10, $50, $100, $1,000, Custom)
+    document.querySelectorAll('.craps-preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.craps-preset-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const wagerType = btn.dataset.wager;
+        if (wagerType === 'custom') {
+          this.openCustomWagerModal('craps');
+        } else {
+          this.selectedCrapsChip = Number(wagerType) || 10;
+        }
+        sounds.playChip();
+      });
+    });
+
+    // Betting spots click handler
+    document.querySelectorAll('.craps-bet-spot').forEach(spot => {
+      spot.addEventListener('click', () => {
+        this.requirePlayerName(() => {
+          const betType = spot.dataset.bet;
+          if (!betType) return;
+          const chipAmt = this.selectedCrapsChip || 10;
+          const wallet = EconomyManager.getMiniGameWallet();
+          const currentTotal = Object.values(this.crapsBets).reduce((a, b) => a + b, 0);
+
+          if (currentTotal + chipAmt > wallet.balance) {
+            sounds.playCheck();
+            this.showInGameAlert({
+              title: 'INSUFFICIENT CASINO FUNDS',
+              message: `Your Casino Wallet balance is too low for this bet. Available: $${wallet.balance.toLocaleString()}. Claim your +$1,000 allowance or transfer funds from savings!`,
+              type: 'warning'
+            });
+            return;
+          }
+
+          this.crapsBets[betType] = (this.crapsBets[betType] || 0) + chipAmt;
+          sounds.playChip();
+          this.updateCrapsUI();
+        });
+      });
+    });
+
+    // Roll Dice button
+    const rollBtn = document.getElementById('btn-craps-roll');
+    if (rollBtn) {
+      rollBtn.addEventListener('click', () => {
+        this.requirePlayerName(() => this.rollCrapsDice());
+      });
+    }
+
+    // Clear Bets button
+    const clearBtn = document.getElementById('btn-craps-clear');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        this.crapsBets = {};
+        sounds.playChip();
+        this.updateCrapsUI();
+      });
+    }
+
+    this.updateCrapsUI();
+  }
+
+  updateCrapsUI() {
+    const totalBet = Object.values(this.crapsBets).reduce((a, b) => a + b, 0);
+    const totalEl = document.getElementById('craps-total-bet');
+    if (totalEl) totalEl.textContent = `$${totalBet.toLocaleString()}`;
+
+    const pointEl = document.getElementById('craps-point-display');
+    if (pointEl) {
+      if (this.crapsPoint) {
+        pointEl.textContent = `ON: ${this.crapsPoint}`;
+        pointEl.className = 'gold';
+      } else {
+        pointEl.textContent = 'OFF';
+        pointEl.className = 'gold';
+      }
+    }
+
+    const betTypes = ['pass', 'dontpass', 'field', 'seven', 'anycraps', 'hard6', 'hard8'];
+    betTypes.forEach(bt => {
+      const badge = document.getElementById(`chip-badge-${bt}`);
+      const spot = document.getElementById(`craps-bet-${bt}`);
+      const amt = this.crapsBets[bt] || 0;
+      if (badge) {
+        if (amt > 0) {
+          badge.textContent = `$${amt.toLocaleString()}`;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+      }
+      if (spot) {
+        spot.classList.toggle('active', amt > 0);
+      }
+    });
+
+    const wallet = EconomyManager.getMiniGameWallet();
+    const crapsBal = document.getElementById('craps-wallet-balance');
+    if (crapsBal) crapsBal.textContent = `$${wallet.balance.toLocaleString()}`;
+  }
+
+  rollCrapsDice() {
+    if (this.crapsRolling) return;
+    const totalBet = Object.values(this.crapsBets).reduce((a, b) => a + b, 0);
+
+    if (totalBet <= 0) {
+      sounds.playCheck();
+      this.showInGameAlert({
+        title: 'NO BETS PLACED',
+        message: 'Place at least one wager on the Craps table (Pass Line, Don\'t Pass, Field, or Props) before rolling!',
+        type: 'info'
+      });
+      return;
+    }
+
+    const wallet = EconomyManager.getMiniGameWallet();
+    if (wallet.balance < totalBet) {
+      sounds.playCheck();
+      this.showInGameAlert({
+        title: 'INSUFFICIENT CASINO FUNDS',
+        message: `Your Casino Wallet balance is $${wallet.balance.toLocaleString()}, which cannot cover your $${totalBet.toLocaleString()} wager.`,
+        type: 'warning'
+      });
+      return;
+    }
+
+    // Deduct total bet from wallet upfront
+    wallet.balance -= totalBet;
+    EconomyManager.saveMiniGameWallet(wallet);
+    this.updateDualWalletUI();
+    this.updateEconomyDashboard();
+    this.updateCrapsUI();
+
+    this.crapsRolling = true;
+    sounds.playShuffle();
+
+    const d1El = document.getElementById('craps-die-1');
+    const d2El = document.getElementById('craps-die-2');
+    const banner = document.getElementById('craps-result-banner');
+
+    if (d1El) d1El.classList.add('die-tumbling');
+    if (d2El) d2El.classList.add('die-tumbling');
+    if (banner) banner.textContent = 'Dice tumbling down the solar craps felt...';
+
+    setTimeout(() => {
+      if (d1El) d1El.classList.remove('die-tumbling');
+      if (d2El) d2El.classList.remove('die-tumbling');
+
+      const d1 = Math.floor(Math.random() * 6) + 1;
+      const d2 = Math.floor(Math.random() * 6) + 1;
+      const total = d1 + d2;
+
+      if (d1El) d1El.innerHTML = this.renderCrapsDieSVG(d1);
+      if (d2El) d2El.innerHTML = this.renderCrapsDieSVG(d2);
+
+      let totalReturn = 0;
+      const winMessages = [];
+
+      // 1. Resolve Contract Line Bets (Pass Line / Don't Pass)
+      const passBet = this.crapsBets['pass'] || 0;
+      const dontPassBet = this.crapsBets['dontpass'] || 0;
+
+      if (this.crapsPoint === null) {
+        // COME-OUT ROLL
+        if (total === 7 || total === 11) {
+          // Natural Win for Pass
+          if (passBet > 0) {
+            totalReturn += passBet * 2;
+            winMessages.push(`Pass Line wins $${(passBet * 2).toLocaleString()}!`);
+          }
+          delete this.crapsBets['pass'];
+          delete this.crapsBets['dontpass'];
+          if (banner) banner.textContent = `Natural ${total}! Pass Line wins! Come-out continues.`;
+        } else if (total === 2 || total === 3) {
+          // Craps for Pass, Win for Don't Pass
+          if (dontPassBet > 0) {
+            totalReturn += dontPassBet * 2;
+            winMessages.push(`Don't Pass wins $${(dontPassBet * 2).toLocaleString()}!`);
+          }
+          delete this.crapsBets['pass'];
+          delete this.crapsBets['dontpass'];
+          if (banner) banner.textContent = `Craps ${total}! Don't Pass wins!`;
+        } else if (total === 12) {
+          // Craps 12: Pass loses, Don't Pass pushes
+          if (dontPassBet > 0) {
+            totalReturn += dontPassBet; // Push returns bet
+            winMessages.push(`Don't Pass pushes $${dontPassBet.toLocaleString()}.`);
+          }
+          delete this.crapsBets['pass'];
+          delete this.crapsBets['dontpass'];
+          if (banner) banner.textContent = `Craps 12! Don't Pass pushes.`;
+        } else {
+          // 4, 5, 6, 8, 9, 10: Point established
+          this.crapsPoint = total;
+          if (banner) banner.textContent = `Point established at ${total}! Roll again to hit ${total} before a 7.`;
+        }
+      } else {
+        // POINT PHASE
+        if (total === this.crapsPoint) {
+          // Hit the Point!
+          if (passBet > 0) {
+            totalReturn += passBet * 2;
+            winMessages.push(`Hit Point ${total}! Pass Line wins $${(passBet * 2).toLocaleString()}!`);
+          }
+          delete this.crapsBets['pass'];
+          delete this.crapsBets['dontpass'];
+          this.crapsPoint = null;
+          if (banner) banner.textContent = `Rolled ${total}! Point hit! Pass Line wins!`;
+        } else if (total === 7) {
+          // Seven Out!
+          if (dontPassBet > 0) {
+            totalReturn += dontPassBet * 2;
+            winMessages.push(`Seven Out! Don't Pass wins $${(dontPassBet * 2).toLocaleString()}!`);
+          }
+          delete this.crapsBets['pass'];
+          delete this.crapsBets['dontpass'];
+          this.crapsPoint = null;
+          if (banner) banner.textContent = `Seven Out! Don't Pass wins. Point resets to OFF.`;
+        } else {
+          if (banner) banner.textContent = `Rolled ${total}. Point remains ${this.crapsPoint}. Keep shooting!`;
+        }
+      }
+
+      // 2. Resolve Single-Roll Field Bet
+      const fieldBet = this.crapsBets['field'] || 0;
+      if (fieldBet > 0) {
+        if (total === 2) {
+          totalReturn += fieldBet * 3; // 2:1 payout + original bet
+          winMessages.push(`Field Double (2) pays $${(fieldBet * 3).toLocaleString()}!`);
+        } else if (total === 12) {
+          totalReturn += fieldBet * 4; // 3:1 payout + original bet
+          winMessages.push(`Field Triple (12) pays $${(fieldBet * 4).toLocaleString()}!`);
+        } else if ([3, 4, 9, 10, 11].includes(total)) {
+          totalReturn += fieldBet * 2; // 1:1 payout + original bet
+          winMessages.push(`Field (${total}) pays $${(fieldBet * 2).toLocaleString()}!`);
+        }
+        delete this.crapsBets['field'];
+      }
+
+      // 3. Resolve Single-Roll Any 7 Bet (4:1)
+      const sevenBet = this.crapsBets['seven'] || 0;
+      if (sevenBet > 0) {
+        if (total === 7) {
+          totalReturn += sevenBet * 5; // 4:1 payout + original bet
+          winMessages.push(`Any 7 pays $${(sevenBet * 5).toLocaleString()}!`);
+        }
+        delete this.crapsBets['seven'];
+      }
+
+      // 4. Resolve Single-Roll Any Craps Bet (7:1)
+      const crapsBet = this.crapsBets['anycraps'] || 0;
+      if (crapsBet > 0) {
+        if ([2, 3, 12].includes(total)) {
+          totalReturn += crapsBet * 8; // 7:1 payout + original bet
+          winMessages.push(`Any Craps (${total}) pays $${(crapsBet * 8).toLocaleString()}!`);
+        }
+        delete this.crapsBets['anycraps'];
+      }
+
+      // 5. Resolve Hardway Bets (Hard 6 & Hard 8: 9:1)
+      const hard6Bet = this.crapsBets['hard6'] || 0;
+      if (hard6Bet > 0) {
+        if (d1 === 3 && d2 === 3) {
+          totalReturn += hard6Bet * 10;
+          winMessages.push(`Hard 6 (3-3) pays $${(hard6Bet * 10).toLocaleString()}!`);
+          delete this.crapsBets['hard6'];
+        } else if (total === 7 || total === 6) {
+          delete this.crapsBets['hard6'];
+        }
+      }
+
+      const hard8Bet = this.crapsBets['hard8'] || 0;
+      if (hard8Bet > 0) {
+        if (d1 === 4 && d2 === 4) {
+          totalReturn += hard8Bet * 10;
+          winMessages.push(`Hard 8 (4-4) pays $${(hard8Bet * 10).toLocaleString()}!`);
+          delete this.crapsBets['hard8'];
+        } else if (total === 7 || total === 8) {
+          delete this.crapsBets['hard8'];
+        }
+      }
+
+      // Credit total return to wallet if any wins
+      if (totalReturn > 0) {
+        sounds.playWin();
+        const curWallet = EconomyManager.getMiniGameWallet();
+        curWallet.balance += totalReturn;
+        EconomyManager.saveMiniGameWallet(curWallet);
+        this.setAnnouncement(`[CRAPS WIN] Rolled ${total} (${d1}+${d2})! Won $${totalReturn.toLocaleString()}!`);
+      }
+
+      this.updateDualWalletUI();
+      this.updateEconomyDashboard();
+      this.updateCrapsUI();
+      this.crapsRolling = false;
+    }, 650);
+  }
+
   resolveRouletteSpin(winningNumber) {
     const isRed = this.redNumbers.has(winningNumber);
     const isBlack = winningNumber > 0 && !isRed;
@@ -6146,7 +6488,7 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
         if (res.success) {
           sounds.playWin();
           this.updateEconomyDashboard();
-          this.setAnnouncement(`[CLAIMED] Claimed $500 Daily Mini-Game Allowance! New balance: $${res.balance.toLocaleString()}`);
+          this.setAnnouncement(`[CLAIMED] Claimed $1,000 Mini-Game Allowance! (3-Hour Cooldown) New balance: $${res.balance.toLocaleString()}`);
         } else {
           sounds.playCheck();
           this.setAnnouncement(`[NOTICE] ${res.message}`);
@@ -6181,6 +6523,9 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
 
     const rouletteBal = document.getElementById('roulette-bankroll');
     if (rouletteBal) rouletteBal.textContent = `$${wallet.balance.toLocaleString()}`;
+
+    const crapsBal = document.getElementById('craps-wallet-balance');
+    if (crapsBal) crapsBal.textContent = `$${wallet.balance.toLocaleString()}`;
 
     const transferBal = document.getElementById('transfer-avail-balance');
     if (transferBal) transferBal.textContent = `$${wallet.balance.toLocaleString()}`;

@@ -214,15 +214,15 @@ def run_performance_25_tests():
     print(f"  [PASS] Test 12: 2,000 Save State JSON serialize/deserialize cycles in {elapsed:.2f}ms (< 100ms).")
     results.append(f"Perf Test 12: JSON Serialization Throughput ({elapsed:.2f}ms)")
 
-    # 13. Cooldown Timestamp Delta Calculation Speed
+    # 13. Cooldown Timestamp Delta Calculation Speed (3-Hour Cycle)
     t0 = time.perf_counter()
-    CYCLE = 24 * 3600 * 1000
+    CYCLE = 3 * 3600 * 1000
     now = 1700000000000
     for _ in range(50000):
         can_claim = (now - 1699900000000) >= CYCLE
     elapsed = (time.perf_counter() - t0) * 1000
     assert elapsed < 30, f"Cooldown math too slow: {elapsed:.1f}ms"
-    print(f"  [PASS] Test 13: 50,000 24h Cooldown delta calculations completed in {elapsed:.2f}ms (< 30ms).")
+    print(f"  [PASS] Test 13: 50,000 3h Cooldown delta calculations completed in {elapsed:.2f}ms (< 30ms).")
     results.append(f"Perf Test 13: Cooldown Delta Calculation Speed ({elapsed:.2f}ms)")
 
     # 14. Dynamic Bot Replacement Memory Footprint

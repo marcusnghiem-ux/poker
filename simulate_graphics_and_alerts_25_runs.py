@@ -177,11 +177,15 @@ def run_graphics_and_alerts_25_tests():
     print("  [PASS] Test 22: High-roller scrolling neon ticker marquee verified in Casino Resort view.")
     results.append("Graphics Test 22: Neon Ticker Marquee & Slide Animation")
 
-    # 23. Vibrant Casino Resort Neon Ambiance
+    # 23. Vibrant Casino Resort Neon Ambiance & Craps Table Arena
     assert "rgba(236, 72, 153" in css # Electric magenta
     assert "rgba(6, 182, 212" in css   # Cyber cyan
-    print("  [PASS] Test 23: Vibrant multi-hue neon resort lighting (magenta, cyan, gold) verified in CSS.")
-    results.append("Graphics Test 23: Vibrant Casino Resort Neon Lighting")
+    assert 'id="craps-arena-card"' in html
+    assert 'id="btn-craps-roll"' in html
+    assert 'id="craps-point-display"' in html
+    assert "diceTumble" in css
+    print("  [PASS] Test 23: Vibrant neon resort lighting and Royal Solar Craps Arena verified in DOM & CSS.")
+    results.append("Graphics Test 23: Vibrant Casino Resort Lighting & Craps Arena")
 
     # 24. Expanded Celestial Constellations in Background
     assert "cc-pegasus" in html

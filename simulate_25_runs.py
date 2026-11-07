@@ -169,29 +169,29 @@ def simulate_25_runs():
     results.append("Run 6 PASS: Permadeath Elimination on $0 Bankroll & Quick Rebuy")
 
     # ------------------------------------------------------------------
-    # RUN 7: Daily Bankroll Allowances on 24-Hour Cooldown Cycle
+    # RUN 7: Accelerated Bankroll Allowances on 3-Hour Cooldown Cycle
     # ------------------------------------------------------------------
-    print("\n>>> RUN 7: Testing Daily Bankroll Allowances on 24h Cooldown...")
-    DAY_MS = 24 * 3600 * 1000
+    print("\n>>> RUN 7: Testing Accelerated Bankroll Allowances on 3h Cooldown...")
+    CYCLE_MS = 3 * 3600 * 1000 # 3-hour cycle
     now = 1700000000000
     wallet = {'balance': 1000, 'lastClaimTimestamp': 0}
     
     # Claim 1: Immediate claim allowed
-    can_claim = (now - wallet['lastClaimTimestamp']) >= DAY_MS
+    can_claim = (now - wallet['lastClaimTimestamp']) >= CYCLE_MS
     assert can_claim is True
-    wallet['balance'] += 500
+    wallet['balance'] += 1000
     wallet['lastClaimTimestamp'] = now
-    assert wallet['balance'] == 1500
-
-    # Claim 2: 12 hours later -> Rejected
-    assert (now + (12 * 3600 * 1000) - wallet['lastClaimTimestamp']) < DAY_MS
-
-    # Claim 3: 24.1 hours later -> Allowed
-    assert (now + DAY_MS + 3600000 - wallet['lastClaimTimestamp']) >= DAY_MS
-    wallet['balance'] += 500
     assert wallet['balance'] == 2000
-    print("  [PASS] Mini-Game daily allowance ($500/day) strictly enforces 24-hour persistent cooldown.")
-    results.append("Run 7 PASS: Daily Bankroll Allowances on 24-Hour Cooldown Cycle")
+
+    # Claim 2: 1.5 hours later -> Rejected
+    assert (now + (1.5 * 3600 * 1000) - wallet['lastClaimTimestamp']) < CYCLE_MS
+
+    # Claim 3: 3.1 hours later -> Allowed
+    assert (now + CYCLE_MS + 360000 - wallet['lastClaimTimestamp']) >= CYCLE_MS
+    wallet['balance'] += 1000
+    assert wallet['balance'] == 3000
+    print("  [PASS] Mini-Game daily allowance ($1,000 each) strictly enforces 3-hour persistent cooldown.")
+    results.append("Run 7 PASS: Accelerated Bankroll Allowances on 3-Hour Cooldown Cycle")
 
     # ------------------------------------------------------------------
     # RUN 8: Multi-Variant Slot Machine Payout Calculations
