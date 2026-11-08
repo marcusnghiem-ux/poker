@@ -611,3 +611,52 @@ In response to the v1.035 update request and reference screenshot (`media_179406
 - `simulate_10_full_games_to_2000.py`: 10/10 complete tournament runs reached >= $2,000 target with $21,198 total cashout.
 - Git & deployment: Pushed to `origin/main` and `texas-holdem/main`.
 
+
+---
+
+## 32. Release v1.1: Solar Blackjack Table, Slot Game Selector, Low-Detail Night Sky Mode & Overpowering Update Alert
+
+### Executive Summary
+Update 1.1 is a major platform milestone introducing **Solar Blackjack**, a dual-branch save slot initialization workflow, background theme customization in Settings, and a high-priority, full-screen first-time update alert overlay.
+
+### Key Changes
+1. **Save Slots Selection Flow Overhaul (`#slot-game-select-modal`):**
+   - Clicking any save slot card (new campaign or active profile) now triggers the game selection modal instead of jumping directly into Texas Hold'em difficulties.
+   - **Solar Texas Hold'em:** For new runs, opens the classic 4-difficulty tier selection modal (`#difficulty-modal` - Easy, Medium, Hard, Championship). For active runs, proceeds with continuation buy-in.
+   - **Solar Blackjack:** Directly opens the hand bet & bankroll prompt (`#blackjack-buyin-modal`). Blackjack does not require difficulty tiers, strictly adhering to authentic casino table mechanics.
+2. **Solar Blackjack Table Arena (`#blackjack-view`):**
+   - Full-screen green felt arena featuring authentic semicircle casino layout, dealer zone, player zone, chips pot spot, and real-time score badges with soft/hard Ace calculations (`calculateBjScore`).
+   - Standard 4-deck shoe (208 cards) shuffled with Fisher-Yates algorithm.
+   - **Casino Rules Implemented:**
+     - Natural Blackjack (Ace + 10-value card on deal) pays **3:2**.
+     - Dealer must stand on **17** (all 17s).
+     - **Hit:** Deals 1 card; checks for bust (> 21) or 21 auto-stand.
+     - **Stand:** Dealer reveals hole card and draws until score >= 17; settles hand (1:1 payout, push, or loss).
+     - **Double Down:** Doubles active bet, deals exactly 1 card, and immediately stands to dealer's turn.
+     - **Surrender:** Forfeits initial hand for a 50% refund on bet.
+   - Interactive chip betting tray (`$10`, `$25`, `$50`, `$100`, `$250`, `$500`), Clear Bet, 2x Bet, Deal, and Next Hand controls.
+   - Automatic Casino Credit reload ($500) if bankroll drops below minimum table bet.
+   - Full save slot persistence upon each hand settlement, menu return, and cashout.
+3. **Casino Transit Lounge Teleportation:**
+   - Added **Solar Blackjack** (`#drawer-item-blackjack`) under `POKER & CARD ARENAS` in `#transit-drawer` with custom green card SVG icons for instant teleportation.
+4. **Settings Low-Detail Background Theme (`body.low-detail-bg`):**
+   - In Settings, players can choose between two themes with SVG snapshot preview cards:
+     - **Solar Flare Ultra (High Detail):** Full dynamic geometry, rotating Bastions, plasma suns.
+     - **Night Sky Serenade (Low Detail):** Calm, deep night sky, gentle twinkling stars, and simple subtle constellations without visual overpowering.
+   - Persists state in `localStorage` under `solar_poker_bg_theme`.
+5. **First-Time Overpowering Update 1.1 Alert (`#update-announcement-modal`):**
+   - Prominent, high-z-index (`z-index: 100000`) modal automatically displayed on first visit of v1.1 (`solar_poker_seen_version !== '1.1'`).
+   - Scrollable card carousel highlighting Solar Blackjack, Save Slot Selector, Low-Detail Background, and Sound Fixes.
+   - Dismissing via "Start Playing Update 1.1" stores version in `localStorage` and smoothly unlocks gameplay.
+6. **Platform Branding & Update Logs:**
+   - Updated top nav pill to **Update 1.1**.
+   - Updated Main Menu hero banner to **BIG UPDATE 1.1 • Solar Blackjack Table, Low-Detail Night Sky & Transit Teleport**.
+   - Appended **v1.1 CURRENT** release notes to `#update-log-modal`.
+
+### Verification & Test Protocol
+- `verify_syntax.py`: 100% valid JavaScript AST, symbols, and bracket matching.
+- HTML tag check: 0 errors, unclosed remaining: 0.
+- Emoji check: 0 system emojis in HTML and CSS (pure SVG vector graphics).
+- `test_blackjack_engine.py`: 5/5 unit tests passed (natural 3:2 payouts, soft/hard Aces, dealer standing on 17, double down, surrender).
+- `simulate_performance_25_runs.py`: 25/25 performance benchmarks passed (0 regressions).
+- `simulate_10_full_games_to_2000.py`: 10/10 complete tournament runs reached >= $2,000 target with $21,646 total cashout.

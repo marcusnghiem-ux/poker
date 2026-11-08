@@ -579,10 +579,10 @@
           <span class="hamburger-bar"></span>
           <span class="hamburger-bar"></span>
         </button>
-        <!-- Top Left Update Log Trigger (v1.01) -->
-        <button id="btn-update-log-trigger" class="update-log-pill-btn" title="View Version 1.035 Release Notes" type="button">
+        <!-- Top Left Update Log Trigger (v1.1) -->
+        <button id="btn-update-log-trigger" class="update-log-pill-btn" title="View Version 1.1 Release Notes" type="button">
           <span class="update-pill-dot"></span>
-          <span class="update-pill-text">Update 1.035</span>
+          <span class="update-pill-text">Update 1.1</span>
         </button>
         <div class="nav-brand-wrap">
           <svg class="nav-crown-svg" width="22" height="18" viewBox="0 0 72 54" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -669,10 +669,10 @@
          ====================================================================== -->
     <section id="main-menu" class="main-menu-view">
       <div class="menu-hero">
-        <!-- Main Menu Update Banner v1.01 -->
-        <div class="menu-update-banner" id="menu-update-log-trigger" role="button" tabindex="0" title="Click to view v1.035 Release Notes">
-          <span class="update-badge-tag">UPDATE 1.035</span>
-          <span class="update-badge-ver">1.035 &bull; Transit Teleport &amp; Bank Transfer Update &bull; Solar Texas Hold'em</span>
+        <!-- Main Menu Update Banner v1.1 -->
+        <div class="menu-update-banner" id="menu-update-log-trigger" role="button" tabindex="0" title="Click to view v1.1 Release Notes">
+          <span class="update-badge-tag">BIG UPDATE 1.1</span>
+          <span class="update-badge-ver">1.1 &bull; Solar Blackjack Table, Low-Detail Night Sky &amp; Transit Teleport</span>
           <span class="update-badge-arrow">&rarr;</span>
         </div>
         <h1 class="menu-title">SOLAR TEXAS HOLD'EM</h1>
@@ -1703,6 +1703,133 @@
       </div><!-- end .casino-floor-wrapper -->
     </section>
 
+    <!-- ======================================================================
+         1B. SOLAR BLACKJACK ARENA VIEW (Full Screen Table Felt)
+         ====================================================================== -->
+    <section id="blackjack-view" class="blackjack-view-container hidden">
+      <!-- Blackjack Header Bar -->
+      <div class="bj-header-bar">
+        <div class="bj-header-left">
+          <button id="btn-bj-back-menu" class="nav-icon-btn bj-back-btn" title="Exit to Main Menu" type="button">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Exit Table</span>
+          </button>
+          <div class="bj-brand-wrap">
+            <span class="bj-brand-title">SOLAR BLACKJACK</span>
+            <span class="bj-brand-sub">DEALER STANDS ON 17 &bull; PAYS 3:2</span>
+          </div>
+        </div>
+
+        <div class="bj-header-right">
+          <div class="bj-stat-pill">
+            <span class="bj-stat-lbl">Bankroll:</span>
+            <strong class="bj-stat-val gold" id="bj-table-bankroll">$1,000</strong>
+          </div>
+          <div class="bj-stat-pill">
+            <span class="bj-stat-lbl">Current Bet:</span>
+            <strong class="bj-stat-val emerald" id="bj-table-current-bet">$50</strong>
+          </div>
+          <button id="btn-bj-cashout" class="bj-cashout-btn" title="Cash out winnings to Bank Account" type="button">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="3" stroke="#ffd700" stroke-width="2"/><circle cx="12" cy="12" r="3.5" stroke="#ffd700" stroke-width="1.8"/></svg>
+            <span>Cash Out</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Semicircular Blackjack Table Felt Stage -->
+      <div class="bj-table-stage">
+        <div class="bj-table-felt">
+          <!-- Table Inner Watermark & Arc Lines -->
+          <div class="bj-table-watermark">
+            <svg width="140" height="90" viewBox="0 0 72 54" fill="none" opacity="0.12"><path d="M14 38 Q36 22 58 38 L54 44 Q36 34 18 44 Z" fill="#ffd700"/><rect x="10" y="42" width="52" height="8" rx="2" fill="#ffd700"/><path d="M12 42 L8 22 L20 30 L36 12 L52 30 L64 22 L60 42 Z" fill="#ffd700"/></svg>
+            <div class="bj-table-rules-text">BLACKJACK PAYS 3 TO 2 &bull; DEALER MUST STAND ON 17 &bull; INSURANCE PAYS 2 TO 1</div>
+          </div>
+
+          <!-- DEALER ZONE -->
+          <div class="bj-dealer-zone">
+            <div class="bj-dealer-profile">
+              <div class="bj-avatar-wrap">
+                <svg class="avatar-svg" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="22" fill="#0f172a" stroke="#d4af37" stroke-width="2"/><circle cx="24" cy="16" r="8" fill="#fde047"/><path d="M8 40c0-8.8 7.2-16 16-16s16 7.2 16 16" fill="#1e293b"/></svg>
+              </div>
+              <div class="bj-dealer-info">
+                <span class="bj-dealer-name">Solar Dealer</span>
+                <span class="bj-score-tag" id="bj-dealer-score-tag">Dealer Score: ?</span>
+              </div>
+            </div>
+            <div class="bj-cards-container" id="bj-dealer-cards">
+              <!-- Dealer Cards rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- CENTRAL GAME STATUS BANNER -->
+          <div class="bj-status-banner-wrap">
+            <div class="bj-status-banner" id="bj-status-message">
+              Place your bet and press DEAL to start!
+            </div>
+          </div>
+
+          <!-- PLAYER ZONE -->
+          <div class="bj-player-zone">
+            <div class="bj-cards-container" id="bj-player-cards">
+              <!-- Player Cards rendered dynamically -->
+            </div>
+            <div class="bj-player-hud">
+              <div class="bj-score-tag hero-score" id="bj-player-score-tag">Your Score: 0</div>
+              <div class="bj-chips-pot-spot" id="bj-chips-pot-spot">
+                <span class="bj-pot-lbl">Active Bet</span>
+                <span class="bj-pot-amount" id="bj-active-bet-val">$50</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM CONTROL CONSOLE -->
+      <div class="bj-control-console">
+        <!-- Betting Phase Controls -->
+        <div class="bj-betting-controls" id="bj-betting-controls">
+          <div class="bj-chips-tray">
+            <button type="button" class="bj-chip-btn chip-10" data-chip="10">$10</button>
+            <button type="button" class="bj-chip-btn chip-25" data-chip="25">$25</button>
+            <button type="button" class="bj-chip-btn chip-50 active-chip" data-chip="50">$50</button>
+            <button type="button" class="bj-chip-btn chip-100" data-chip="100">$100</button>
+            <button type="button" class="bj-chip-btn chip-250" data-chip="250">$250</button>
+            <button type="button" class="bj-chip-btn chip-500" data-chip="500">$500</button>
+          </div>
+          <div class="bj-bet-actions">
+            <button type="button" class="btn btn-secondary bj-btn-action" id="btn-bj-clear-bet">Clear Bet</button>
+            <button type="button" class="btn btn-secondary bj-btn-action" id="btn-bj-double-bet">2x Bet</button>
+            <button type="button" class="btn btn-primary gold-action-btn bj-btn-deal" id="btn-bj-deal">DEAL CARDS ▶</button>
+          </div>
+        </div>
+
+        <!-- In-Play Actions (HIT, STAND, DOUBLE DOWN, SURRENDER) -->
+        <div class="bj-play-controls hidden" id="bj-play-controls">
+          <button type="button" class="btn bj-action-btn bj-btn-hit" id="btn-bj-hit">
+            <span class="btn-subtext">Take 1 Card</span>
+            <strong>HIT</strong>
+          </button>
+          <button type="button" class="btn bj-action-btn bj-btn-stand" id="btn-bj-stand">
+            <span class="btn-subtext">Hold Hand</span>
+            <strong>STAND</strong>
+          </button>
+          <button type="button" class="btn bj-action-btn bj-btn-double" id="btn-bj-double">
+            <span class="btn-subtext">Double Bet &bull; 1 Card</span>
+            <strong>DOUBLE DOWN</strong>
+          </button>
+          <button type="button" class="btn bj-action-btn bj-btn-surrender" id="btn-bj-surrender">
+            <span class="btn-subtext">Forfeit 50%</span>
+            <strong>SURRENDER</strong>
+          </button>
+        </div>
+
+        <!-- Post-Round Controls (Next Hand) -->
+        <div class="bj-post-controls hidden" id="bj-post-controls">
+          <button type="button" class="btn btn-primary gold-action-btn bj-btn-deal" id="btn-bj-new-hand">NEXT HAND ▶</button>
+        </div>
+      </div>
+    </section>
+
 
     <!-- ======================================================================
          2. POKER ARENA GAME SCREEN
@@ -2110,24 +2237,114 @@
       </div>
     </div>
 
-        <!-- ======================================================================
-         UPDATE LOG MODAL (v1.01 - Solar Flare Graphics & Visual Overhaul)
+    <!-- ======================================================================
+         FIRST-TIME OVERPOWERING UPDATE 1.1 ALERT MODAL
+         ====================================================================== -->
+    <div id="update-announcement-modal" class="modal-overlay update-alert-overlay hidden">
+      <div class="modal-card update-announcement-card">
+        <div class="modal-header update-announcement-header">
+          <div class="update-header-brand">
+            <span class="update-pulse-star">&#9733;</span>
+            <div class="update-header-titles">
+              <span class="update-header-kicker">MAJOR RELEASE &bull; VERSION 1.1</span>
+              <h2>THE GRAND BLACKJACK &amp; CELESTIAL SETTINGS UPDATE</h2>
+            </div>
+          </div>
+          <button id="close-update-announcement-btn" class="close-btn" type="button">&times;</button>
+        </div>
+
+        <div class="modal-body update-announcement-body">
+          <p class="update-hero-lead">Welcome to <strong>Solar Poker v1.1</strong>! We have rolled out a massive expansion featuring a brand-new Blackjack casino arena, interactive slot game selection, customizable background detail themes, and instant transit teleportation.</p>
+
+          <div class="update-feature-showcase-grid">
+            <!-- Feature 1: Blackjack Table -->
+            <div class="update-showcase-item">
+              <div class="usi-icon gold">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="10" height="15" rx="2" transform="rotate(-10 3 4)" fill="#064e3b" stroke="#34d399" stroke-width="1.8"/><rect x="10" y="4" width="10" height="15" rx="2" transform="rotate(10 10 4)" fill="#0f172a" stroke="#ffd700" stroke-width="1.8"/><text x="13" y="15" font-family="'Cinzel',serif" font-size="7" font-weight="900" fill="#fde047">21</text></svg>
+              </div>
+              <div class="usi-text">
+                <h4>All-New Solar Blackjack Arena</h4>
+                <p>Authentic Vegas 21 table action with natural 3:2 blackjack payouts, Double Down, Surrender, and Dealer stands on 17. Play directly with your save slots or quick launch from the transit lounge!</p>
+              </div>
+            </div>
+
+            <!-- Feature 2: Slot Game Selector -->
+            <div class="update-showcase-item">
+              <div class="usi-icon emerald">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9" stroke="#34d399" stroke-width="2" fill="rgba(52,211,153,0.2)"/></svg>
+              </div>
+              <div class="usi-text">
+                <h4>Dual Game Selection on Save Slots</h4>
+                <p>Clicking any save slot now lets you choose between Solar Texas Hold'em (with 4 bot difficulty tiers) or Solar Blackjack (with instant bet stake configuration)!</p>
+              </div>
+            </div>
+
+            <!-- Feature 3: Low Detail Night Sky -->
+            <div class="update-showcase-item">
+              <div class="usi-icon cyan">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#38bdf8" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="#38bdf8"/></svg>
+              </div>
+              <div class="usi-text">
+                <h4>Night Sky Serenade (Low-Detail Mode)</h4>
+                <p>Tired of high-intensity solar geometry? Switch to a peaceful, calming dark night sky with soft twinkling stars and elegant constellations in Settings, complete with live snapshot previews!</p>
+              </div>
+            </div>
+
+            <!-- Feature 4: Transit Teleportation & Bank Transfers -->
+            <div class="update-showcase-item">
+              <div class="usi-icon red">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="3" stroke="#ef4444" stroke-width="2"/><circle cx="12" cy="12" r="3.5" stroke="#ffd700" stroke-width="1.8"/></svg>
+              </div>
+              <div class="usi-text">
+                <h4>Casino Transit Teleportation &amp; Bank Transfers</h4>
+                <p>1-click teleportation to Texas Hold'em, Blackjack, Slots, Roulette, and Craps directly from the Transit Lounge drawer, plus permanent two-way bank transfers.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer update-announcement-footer">
+          <button id="btn-start-playing-v11" class="btn btn-primary gold-action-btn btn-explore-update" type="button">
+            <span>START PLAYING UPDATE 1.1</span> <span class="play-arrow">▶</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         UPDATE LOG MODAL (v1.1 - The Grand Blackjack & Celestial Settings Update)
          ====================================================================== -->
     <div id="update-log-modal" class="modal-overlay hidden">
       <div class="modal-card update-log-card">
         <div class="modal-header">
           <div class="update-log-header-left">
-            <span class="update-log-ver-badge">v1.035</span>
-            <h2>1.035 - Transit Teleport &amp; Bank Account Fund Transfer</h2>
+            <span class="update-log-ver-badge">v1.1</span>
+            <h2>1.1 - The Grand Blackjack &amp; Celestial Settings Update</h2>
           </div>
           <button id="close-update-log-btn" class="close-btn" type="button">&times;</button>
         </div>
-                        <div class="modal-body update-log-body">
-          <!-- ==================== v1.035 CURRENT RELEASE ==================== -->
+        <div class="modal-body update-log-body">
+          <!-- ==================== v1.1 CURRENT RELEASE ==================== -->
           <div class="update-log-section current-release-section">
             <div class="update-sec-badge-row">
-              <span class="update-log-ver-badge">v1.035 CURRENT</span>
-              <span class="update-sec-date">Latest Release</span>
+              <span class="update-log-ver-badge">v1.1 CURRENT</span>
+              <span class="update-sec-date">Latest Big Release</span>
+            </div>
+            <h3 class="update-sec-title">v1.1: The Grand Blackjack &amp; Celestial Settings Update &bull; Solar Texas Hold'em</h3>
+            <ul class="update-sec-list">
+              <li><strong>Brand-New Solar Blackjack Arena:</strong> Full authentic casino 21 card arena featuring 52-card shoe, natural 3:2 blackjack payouts, dealer stands on 17, and player choices including Hit, Stand, Double Down, and Surrender with synchronized card snap audio and tactile chips.</li>
+              <li><strong>Dual Game Choice on Save Slots:</strong> Clicking any save slot now prompts an intuitive game mode selector: choose between Solar Texas Hold'em (with 4 bot difficulty tiers) or Solar Blackjack (with instant default bet setup and no complicated difficulty barriers).</li>
+              <li><strong>Side Transit Lounge Blackjack Shortcut:</strong> Added Solar Blackjack with custom vector card art directly into the Casino Transit Lounge drawer for instant teleportation to 21 from anywhere.</li>
+              <li><strong>Night Sky Serenade (Low-Detail Background Mode):</strong> Added an in-depth background visual atmosphere selector in Settings with live snapshot preview cards. Players can toggle between the fiery dynamic Solar Flare Ultra theme and the calm, non-overpowering Night Sky Serenade theme.</li>
+              <li><strong>First-Time Overpowering Update Alert:</strong> Every new update now welcomes players with a full-screen, high-priority announcement modal highlighting all major features, complete with a quick scrollable breakdown and 1-click start playing launcher.</li>
+            </ul>
+          </div>
+
+          <!-- ==================== v1.035 ARCHIVED RELEASE ==================== -->
+          <div class="update-log-section current-release-section">
+            <div class="update-sec-badge-row">
+              <span class="update-log-ver-badge">v1.035 ARCHIVED</span>
+              <span class="update-sec-date">Previous Release</span>
             </div>
             <h3 class="update-sec-title">v1.035: Transit Teleport &amp; Bank Account Fund Transfer &bull; Solar Texas Hold'em</h3>
             <ul class="update-sec-list">
@@ -2347,6 +2564,104 @@
 
           <div class="modal-actions-row">
             <button id="btn-close-update-log" class="btn btn-primary gold-glow-btn" type="button">Close Release Notes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         4B. SAVE SLOT GAME SELECTOR MODAL (Texas Hold'em vs Blackjack)
+         ====================================================================== -->
+    <div id="slot-game-select-modal" class="modal-overlay hidden">
+      <div class="modal-card slot-game-modal-card">
+        <div class="modal-header">
+          <div class="t-modal-header-brand">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9" stroke="#ffd700" stroke-width="2" fill="rgba(253,224,71,0.2)"/></svg>
+            <h2>Choose Game &bull; <span id="game-select-slot-label">Slot 1</span></h2>
+          </div>
+          <button id="close-game-select-btn" class="close-btn" type="button">&times;</button>
+        </div>
+        <div class="modal-body slot-game-modal-body">
+          <p class="game-select-subtitle">Select which arena to launch with this save slot:</p>
+
+          <div class="game-select-grid">
+            <!-- Option 1: Solar Texas Hold'em -->
+            <div class="game-select-card" id="btn-select-texas" role="button" tabindex="0">
+              <div class="game-card-glow"></div>
+              <div class="game-card-icon-wrap">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M12 2C9 7 4 10 4 14.5a6 6 0 0 0 10.5 3.8L12 22h4l-1.5-3.7A6 6 0 0 0 20 14.5C20 10 15 7 12 2z" fill="#ffd700"/></svg>
+              </div>
+              <div class="game-card-badge gold">SOLAR POKER</div>
+              <h3 class="game-card-title">Solar Texas Hold'em</h3>
+              <p class="game-card-desc">Championship 5-card board poker against 4 AI opponents across 4 difficulty tiers.</p>
+              <ul class="game-card-features">
+                <li>&bull; 4 Bot Difficulties (Easy &rarr; Championship)</li>
+                <li>&bull; Multi-Street Bets, Blinds &amp; Side Pots</li>
+                <li>&bull; Solo Campaign Stages &amp; Permadeath Protection</li>
+              </ul>
+              <button class="btn btn-primary gold-action-btn game-card-action-btn" type="button">Play Texas Hold'em &rarr;</button>
+            </div>
+
+            <!-- Option 2: Solar Blackjack -->
+            <div class="game-select-card featured-game-card" id="btn-select-blackjack" role="button" tabindex="0">
+              <div class="game-card-glow emerald-glow"></div>
+              <div class="game-card-icon-wrap emerald-icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="10" height="15" rx="2" transform="rotate(-10 3 4)" fill="#064e3b" stroke="#34d399" stroke-width="1.8"/><rect x="10" y="4" width="10" height="15" rx="2" transform="rotate(10 10 4)" fill="#0f172a" stroke="#ffd700" stroke-width="1.8"/><text x="13" y="15" font-family="'Cinzel',serif" font-size="7" font-weight="900" fill="#fde047">21</text></svg>
+              </div>
+              <div class="game-card-badge emerald">NEW &bull; VEGAS 21</div>
+              <h3 class="game-card-title">Solar Blackjack</h3>
+              <p class="game-card-desc">Fast-paced casino 21. No difficulty barriers &mdash; choose your bet and play directly!</p>
+              <ul class="game-card-features">
+                <li>&bull; Natural Blackjack Pays 3:2</li>
+                <li>&bull; Dealer Stands on Hard 17</li>
+                <li>&bull; Double Down, Split &amp; Surrender Actions</li>
+              </ul>
+              <button class="btn btn-primary emerald-action-btn game-card-action-btn" type="button">Play Blackjack &rarr;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         4C. BLACKJACK BET / SETUP MODAL
+         ====================================================================== -->
+    <div id="blackjack-buyin-modal" class="modal-overlay hidden">
+      <div class="modal-card bj-buyin-modal-card">
+        <div class="modal-header">
+          <div class="t-modal-header-brand">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="3" stroke="#10b981" stroke-width="2"/><text x="7" y="16" font-family="'Cinzel',serif" font-size="10" font-weight="900" fill="#34d399">21</text></svg>
+            <h2>Blackjack Table Setup &bull; <span id="bj-modal-slot-title">Slot 1</span></h2>
+          </div>
+          <button id="close-bj-buyin-btn" class="close-btn" type="button">&times;</button>
+        </div>
+        <div class="modal-body bj-buyin-modal-body">
+          <div class="transfer-source-box">
+            <div class="transfer-avail-row">
+              <span>Available Table Bankroll:</span>
+              <strong class="emerald" id="bj-modal-avail-bankroll">$1,000</strong>
+            </div>
+            <p class="transfer-rule-alert" style="background:rgba(16,185,129,0.12);border-color:rgba(16,185,129,0.3);color:#6ee7b7">
+              <strong>Blackjack Table Rules:</strong> Dealer stands on 17. Blackjack pays 3:2. Choose your default bet per hand below!
+            </p>
+          </div>
+
+          <div class="input-group">
+            <label>Select Default Hand Bet ($):</label>
+            <div class="transfer-presets-row">
+              <button type="button" class="bj-bet-preset-btn" data-bet="25">$25</button>
+              <button type="button" class="bj-bet-preset-btn active" data-bet="50">$50</button>
+              <button type="button" class="bj-bet-preset-btn" data-bet="100">$100</button>
+              <button type="button" class="bj-bet-preset-btn" data-bet="250">$250</button>
+              <button type="button" class="bj-bet-preset-btn" data-bet="500">$500</button>
+            </div>
+            <input type="number" id="bj-hand-bet-input" class="modal-text-input" min="5" placeholder="Enter bet per hand" value="50">
+            <span id="bj-buyin-error-msg" class="auth-error hidden">Bet exceeds available bankroll!</span>
+          </div>
+
+          <div class="modal-actions-row">
+            <button id="btn-cancel-bj-buyin" class="btn btn-secondary" type="button">Cancel</button>
+            <button id="btn-confirm-bj-buyin" class="btn btn-primary emerald-action-btn" type="button">Enter Blackjack Table &gt;</button>
           </div>
         </div>
       </div>
@@ -3071,9 +3386,9 @@
           </div>
         </div>
 
-        <!-- Section: Poker Arenas & Variants -->
+        <!-- Section: Poker Arenas & Card Games -->
         <div class="drawer-section">
-          <div class="drawer-section-title">POKER ARENAS &amp; VARIANTS</div>
+          <div class="drawer-section-title">POKER &amp; CARD ARENAS</div>
           <div class="drawer-menu-list">
             <button class="drawer-item active" id="drawer-item-texas" data-dest="texas">
               <div class="d-item-icon">
@@ -3084,6 +3399,17 @@
                 <span class="d-item-sub">Classic 5-card board &bull; 2 private hole cards</span>
               </div>
               <span class="d-item-badge current" id="badge-texas">ACTIVE</span>
+            </button>
+
+            <button class="drawer-item" id="drawer-item-blackjack" data-dest="blackjack">
+              <div class="d-item-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="10" height="15" rx="2" transform="rotate(-10 3 4)" fill="#064e3b" stroke="#34d399" stroke-width="1.8"/><rect x="10" y="4" width="10" height="15" rx="2" transform="rotate(10 10 4)" fill="#0f172a" stroke="#ffd700" stroke-width="1.8"/><text x="13" y="15" font-family="'Cinzel',serif" font-size="7" font-weight="900" fill="#fde047">21</text></svg>
+              </div>
+              <div class="d-item-info">
+                <span class="d-item-title">Solar Blackjack</span>
+                <span class="d-item-sub">Classic 21 &bull; Dealer stands on 17 &bull; 3:2 payout</span>
+              </div>
+              <span class="d-item-badge gold">21</span>
             </button>
 
             <button class="drawer-item" id="drawer-item-exclusive" data-dest="exclusive">
@@ -3262,6 +3588,70 @@
                 <option value="medium">Medium (Balanced)</option>
                 <option value="low">Low (Performance Mode)</option>
               </select>
+            </div>
+
+            <!-- Background Theme Selection (with Snapshots) -->
+            <div class="setting-theme-selection">
+              <span class="setting-theme-heading">Background Visual Theme</span>
+              <p class="setting-desc">Choose between vibrant dynamic solar geometry or serene, non-overpowering night sky.</p>
+              
+              <div class="bg-theme-cards-grid">
+                <!-- Option 1: Solar Flare Ultra (High Detail) -->
+                <div class="bg-theme-card active" id="bg-card-high" role="button" tabindex="0">
+                  <div class="bg-theme-snapshot high-snap">
+                    <svg width="100%" height="80" viewBox="0 0 200 100" fill="none">
+                      <rect width="200" height="100" fill="#140602"/>
+                      <circle cx="100" cy="50" r="35" fill="url(#snapSolarGlow)"/>
+                      <line x1="20" y1="10" x2="180" y2="90" stroke="#f59e0b" stroke-width="1.2" opacity="0.6"/>
+                      <line x1="20" y1="90" x2="180" y2="10" stroke="#f59e0b" stroke-width="1.2" opacity="0.6"/>
+                      <circle cx="50" cy="50" r="16" stroke="#ffd700" stroke-width="1.5" stroke-dasharray="3 3"/>
+                      <circle cx="150" cy="50" r="16" stroke="#ffd700" stroke-width="1.5" stroke-dasharray="3 3"/>
+                      <polygon points="100,20 110,40 130,45 115,60 120,80 100,70 80,80 85,60 70,45 90,40" fill="rgba(253,224,71,0.4)" stroke="#ffd700" stroke-width="1"/>
+                      <defs>
+                        <radialGradient id="snapSolarGlow" cx="50%" cy="50%" r="50%">
+                          <stop offset="0%" stop-color="#fef08a"/>
+                          <stop offset="40%" stop-color="#ea580c"/>
+                          <stop offset="100%" stop-color="rgba(124,45,18,0)"/>
+                        </radialGradient>
+                      </defs>
+                    </svg>
+                    <span class="bg-snap-badge gold">SOLAR FLARE ULTRA</span>
+                  </div>
+                  <div class="bg-theme-info">
+                    <div class="bg-theme-title">Solar Flare (High Detail)</div>
+                    <div class="bg-theme-sub">Dynamic rotating Bastion gears, plasma suns &amp; full geometric architecture.</div>
+                  </div>
+                </div>
+
+                <!-- Option 2: Night Sky Serenade (Low Detail) -->
+                <div class="bg-theme-card" id="bg-card-low" role="button" tabindex="0">
+                  <div class="bg-theme-snapshot low-snap">
+                    <svg width="100%" height="80" viewBox="0 0 200 100" fill="none">
+                      <rect width="200" height="100" fill="#040714"/>
+                      <circle cx="30" cy="25" r="2.5" fill="#ffffff"/>
+                      <circle cx="70" cy="35" r="2" fill="#93c5fd"/>
+                      <circle cx="110" cy="20" r="2.5" fill="#fef08a"/>
+                      <circle cx="140" cy="45" r="2" fill="#ffffff"/>
+                      <circle cx="175" cy="30" r="2.5" fill="#67e8f9"/>
+                      <circle cx="90" cy="70" r="2" fill="#ffffff"/>
+                      <circle cx="130" cy="80" r="2" fill="#93c5fd"/>
+                      <circle cx="45" cy="75" r="2" fill="#fef08a"/>
+                      <line x1="30" y1="25" x2="70" y2="35" stroke="rgba(147,197,253,0.55)" stroke-width="1"/>
+                      <line x1="70" y1="35" x2="110" y2="20" stroke="rgba(147,197,253,0.55)" stroke-width="1"/>
+                      <line x1="110" y1="20" x2="140" y2="45" stroke="rgba(147,197,253,0.55)" stroke-width="1"/>
+                      <line x1="140" y1="45" x2="175" y2="30" stroke="rgba(147,197,253,0.55)" stroke-width="1"/>
+                      <line x1="70" y1="35" x2="90" y2="70" stroke="rgba(147,197,253,0.35)" stroke-width="0.8" stroke-dasharray="2 2"/>
+                      <line x1="90" y1="70" x2="130" y2="80" stroke="rgba(147,197,253,0.35)" stroke-width="0.8"/>
+                      <line x1="45" y1="75" x2="90" y2="70" stroke="rgba(147,197,253,0.35)" stroke-width="0.8"/>
+                    </svg>
+                    <span class="bg-snap-badge cyan">NIGHT SKY SERENADE</span>
+                  </div>
+                  <div class="bg-theme-info">
+                    <div class="bg-theme-title">Night Sky (Low Detail)</div>
+                    <div class="bg-theme-sub">Deep calming night sky, gentle twinkling stars &amp; subtle constellations. Not overpowering.</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 

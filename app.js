@@ -1874,6 +1874,18 @@ class PokerApp {
     this.casinoActiveSoloGame = null;
     this.casinoPreviousView = 'menu';
 
+    // Solar Blackjack Table Arena State (v1.1)
+    this.bjSlotId = 1;
+    this.bjBankroll = 1000;
+    this.bjCurrentBet = 50;
+    this.bjSelectedChip = 25;
+    this.bjDealerCards = [];
+    this.bjPlayerCards = [];
+    this.bjShoe = [];
+    this.bjHandActive = false;
+    this.bjHoleRevealed = false;
+    this.pendingSlotIsContinuation = false;
+
     // Multiplayer Online State
     this.isOnlineRoom = false;
     this.isHost = false;
@@ -1916,6 +1928,11 @@ class PokerApp {
     try { this.initUpdateLogModal(); } catch (err) { console.error("initUpdateLogModal error:", err); }
     try { this.initCustomWagerModal(); } catch (err) { console.error("initCustomWagerModal error:", err); }
     try { this.initCraps(); } catch (err) { console.error("initCraps error:", err); }
+    try { this.initBackgroundTheme(); } catch (err) { console.error("initBackgroundTheme error:", err); }
+    try { this.initUpdateAnnouncementModal(); } catch (err) { console.error("initUpdateAnnouncementModal error:", err); }
+    try { this.initSlotGameSelectModal(); } catch (err) { console.error("initSlotGameSelectModal error:", err); }
+    try { this.initBlackjackBuyInModal(); } catch (err) { console.error("initBlackjackBuyInModal error:", err); }
+    try { this.initBlackjack(); } catch (err) { console.error("initBlackjack error:", err); }
 
     window.pokerApp = this;
     window.pokerGame = this;
@@ -3411,7 +3428,9 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
   }
 
   handleTransitNavigation(dest) {
-    if (dest === 'texas') {
+    if (dest === 'blackjack') {
+      this.requirePlayerName(() => this.openBlackjackSetup(this.activeSlot || 1));
+    } else if (dest === 'texas') {
       this.teleportToTexasHoldem();
     } else if (dest === 'exclusive') {
       this.promptOnlineRoomPassword();
@@ -4639,8 +4658,7 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
         `;
         cardEl.onclick = () => {
           this.requirePlayerName(() => {
-            this.pendingSlotTarget = slotId;
-            this.diffModal.classList.remove('hidden');
+            this.openSlotGameSelect(slotId, false);
           });
         };
       } else {
@@ -4699,7 +4717,7 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
 
         const handleContinuationClick = (e) => {
           if (e) e.stopPropagation();
-          this.requirePlayerName(() => this.openBuyInModal(slotId, slotData.difficulty, true));
+          this.requirePlayerName(() => this.openSlotGameSelect(slotId, true));
         };
         cardEl.onclick = handleContinuationClick;
         cardEl.querySelector('.slot-btn-play').onclick = handleContinuationClick;
@@ -7435,7 +7453,719 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       list.appendChild(item);
     });
   }
+
+  // ==========================================================================
+  // v1.1: BACKGROUND THEME MODE CONTROLLER (SOLAR FLARE ULTRA & NIGHT SKY SERENADE)
+  // ==========================================================================
+  initBackgroundTheme() {
+    const bgCardHigh = document.getElementById('bg-card-high');
+    const bgCardLow = document.getElementById('bg-card-low');
+    const savedTheme = localStorage.getItem('solar_poker_bg_theme') || 'high';
+
+    const applyTheme = (theme) => {
+      if (theme === 'low') {
+        document.body.classList.add('low-detail-bg');
+        if (bgCardLow) bgCardLow.classList.add('active');
+        if (bgCardHigh) bgCardHigh.classList.remove('active');
+      } else {
+        document.body.classList.remove('low-detail-bg');
+        if (bgCardHigh) bgCardHigh.classList.add('active');
+        if (bgCardLow) bgCardLow.classList.remove('active');
+      }
+      localStorage.setItem('solar_poker_bg_theme', theme);
+    };
+
+    applyTheme(savedTheme);
+
+    if (bgCardHigh) {
+      bgCardHigh.addEventListener('click', () => {
+        applyTheme('high');
+        sounds.playToggleChime();
+      });
+    }
+    if (bgCardLow) {
+      bgCardLow.addEventListener('click', () => {
+        applyTheme('low');
+        sounds.playToggleChime();
+      });
+    }
+  }
+
+  // ==========================================================================
+  // v1.1: FIRST-TIME OVERPOWERING UPDATE 1.1 ANNOUNCEMENT MODAL
+  // ==========================================================================
+  initUpdateAnnouncementModal() {
+    const modal = document.getElementById('update-announcement-modal');
+    const closeBtn = document.getElementById('close-update-announcement-btn');
+    const startBtn = document.getElementById('btn-start-playing-v11');
+    const seenVersion = localStorage.getItem('solar_poker_seen_version');
+
+    const dismissModal = () => {
+      if (modal) modal.classList.add('hidden');
+      localStorage.setItem('solar_poker_seen_version', '1.1');
+      sounds.playClick();
+    };
+
+    if (closeBtn) closeBtn.addEventListener('click', dismissModal);
+    if (startBtn) startBtn.addEventListener('click', dismissModal);
+
+    // Initial first-time presentation
+    if (seenVersion !== '1.1' && modal) {
+      setTimeout(() => {
+        modal.classList.remove('hidden');
+        sounds.playAlert();
+      }, 400);
+    }
+  }
+
+  // ==========================================================================
+  // v1.1: SAVE SLOT GAME SELECTION MODAL (TEXAS HOLD'EM VS SOLAR BLACKJACK)
+  // ==========================================================================
+  initSlotGameSelectModal() {
+    const modal = document.getElementById('slot-game-select-modal');
+    const closeBtn = document.getElementById('close-game-select-btn');
+    const btnTexas = document.getElementById('btn-select-texas');
+    const btnBj = document.getElementById('btn-select-blackjack');
+
+    if (closeBtn && modal) {
+      closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+    }
+
+    if (btnTexas && modal) {
+      btnTexas.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        sounds.playClick();
+        const slotId = this.pendingSlotTarget;
+        const saves = SaveManager.getSaves();
+        const slotData = saves[`slot_${slotId}`];
+
+        if (this.pendingSlotIsContinuation && slotData) {
+          this.openBuyInModal(slotId, slotData.difficulty, true);
+        } else {
+          if (this.diffModal) this.diffModal.classList.remove('hidden');
+        }
+      });
+    }
+
+    if (btnBj && modal) {
+      btnBj.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        sounds.playClick();
+        this.openBlackjackSetup(this.pendingSlotTarget);
+      });
+    }
+  }
+
+  openSlotGameSelect(slotId, isContinuation = false) {
+    this.pendingSlotTarget = slotId;
+    this.pendingSlotIsContinuation = isContinuation;
+
+    const modal = document.getElementById('slot-game-select-modal');
+    const labelEl = document.getElementById('game-select-slot-label');
+    if (labelEl) {
+      labelEl.textContent = `SLOT ${slotId} • ${isContinuation ? 'CONTINUE RUN' : 'NEW CAMPAIGN'}`;
+    }
+    if (modal) modal.classList.remove('hidden');
+    sounds.playClick();
+  }
+
+  // ==========================================================================
+  // v1.1: BLACKJACK BUY-IN & BET SETUP MODAL
+  // ==========================================================================
+  initBlackjackBuyInModal() {
+    const modal = document.getElementById('blackjack-buyin-modal');
+    const closeBtn = document.getElementById('close-bj-buyin-btn');
+    const cancelBtn = document.getElementById('btn-cancel-bj-buyin');
+    const confirmBtn = document.getElementById('btn-confirm-bj-buyin');
+    const inputEl = document.getElementById('bj-hand-bet-input');
+    const errEl = document.getElementById('bj-buyin-error-msg');
+
+    const closeModal = () => {
+      if (modal) modal.classList.add('hidden');
+      if (errEl) errEl.textContent = '';
+    };
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+    // Preset bet buttons ($10, $25, $50, $100, $250, $500)
+    document.querySelectorAll('.bj-bet-preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const amt = Number(btn.dataset.bet) || 50;
+        if (inputEl) {
+          inputEl.value = Math.min(amt, this.bjSetupBankroll || 1000);
+        }
+        sounds.playChip();
+        if (errEl) errEl.textContent = '';
+      });
+    });
+
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', () => {
+        const bet = Number(inputEl ? inputEl.value : 50);
+        const bankroll = this.bjSetupBankroll || 1000;
+
+        if (isNaN(bet) || bet < 10) {
+          if (errEl) errEl.textContent = 'Minimum hand bet is $10.';
+          sounds.playFold();
+          return;
+        }
+        if (bet > bankroll) {
+          if (errEl) errEl.textContent = `Bet cannot exceed available bankroll ($${bankroll.toLocaleString()}).`;
+          sounds.playFold();
+          return;
+        }
+
+        closeModal();
+        this.startBlackjackGame(this.pendingSlotTarget, bankroll, bet);
+      });
+    }
+  }
+
+  openBlackjackSetup(slotId) {
+    this.pendingSlotTarget = slotId;
+    const saves = SaveManager.getSaves();
+    const slotData = saves[`slot_${slotId}`];
+    const bankroll = (slotData && slotData.chips > 0) ? slotData.chips : 1000;
+    this.bjSetupBankroll = bankroll;
+
+    const modal = document.getElementById('blackjack-buyin-modal');
+    const titleEl = document.getElementById('bj-modal-slot-title');
+    const bankrollEl = document.getElementById('bj-modal-avail-bankroll');
+    const inputEl = document.getElementById('bj-hand-bet-input');
+    const errEl = document.getElementById('bj-buyin-error-msg');
+
+    if (titleEl) titleEl.textContent = `SAVE SLOT ${slotId} • SOLAR BLACKJACK`;
+    if (bankrollEl) bankrollEl.textContent = `$${bankroll.toLocaleString()}`;
+    if (inputEl) inputEl.value = Math.min(50, bankroll);
+    if (errEl) errEl.textContent = '';
+
+    if (modal) modal.classList.remove('hidden');
+    sounds.playClick();
+  }
+
+  // ==========================================================================
+  // v1.1: SOLAR BLACKJACK ENGINE & CONTROLLER
+  // ==========================================================================
+  initBlackjack() {
+    this.bindBlackjackDOM();
+  }
+
+  bindBlackjackDOM() {
+    this.bjView = document.getElementById('blackjack-view');
+    this.bjBankrollEl = document.getElementById('bj-table-bankroll');
+    this.bjCurrentBetEl = document.getElementById('bj-table-current-bet');
+    this.bjActiveBetValEl = document.getElementById('bj-active-bet-val');
+    this.bjDealerScoreEl = document.getElementById('bj-dealer-score-tag');
+    this.bjDealerCardsEl = document.getElementById('bj-dealer-cards');
+    this.bjPlayerScoreEl = document.getElementById('bj-player-score-tag');
+    this.bjPlayerCardsEl = document.getElementById('bj-player-cards');
+    this.bjStatusMsgEl = document.getElementById('bj-status-message');
+
+    this.bjBettingControls = document.getElementById('bj-betting-controls');
+    this.bjPlayControls = document.getElementById('bj-play-controls');
+    this.bjPostControls = document.getElementById('bj-post-controls');
+
+    const btnBack = document.getElementById('btn-bj-back-menu');
+    const btnCashout = document.getElementById('btn-bj-cashout');
+    const btnClearBet = document.getElementById('btn-bj-clear-bet');
+    const btnDoubleBet = document.getElementById('btn-bj-double-bet');
+    const btnDeal = document.getElementById('btn-bj-deal');
+    const btnHit = document.getElementById('btn-bj-hit');
+    const btnStand = document.getElementById('btn-bj-stand');
+    const btnDouble = document.getElementById('btn-bj-double');
+    const btnSurrender = document.getElementById('btn-bj-surrender');
+    const btnNewHand = document.getElementById('btn-bj-new-hand');
+
+    if (btnBack) btnBack.addEventListener('click', () => this.hideBlackjackView());
+    if (btnCashout) btnCashout.addEventListener('click', () => this.cashoutBlackjack());
+
+    // Chips selection on table
+    document.querySelectorAll('.bj-chip-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (this.bjHandActive) return;
+        const val = Number(btn.dataset.chip) || 25;
+        this.bjSelectedChip = val;
+        document.querySelectorAll('.bj-chip-btn').forEach(b => b.classList.remove('active-chip'));
+        btn.classList.add('active-chip');
+
+        // Increment bet up to available bankroll
+        const newBet = Math.min(this.bjCurrentBet + val, this.bjBankroll);
+        this.bjCurrentBet = newBet;
+        this.updateBlackjackBetDisplay();
+        sounds.playChip();
+      });
+    });
+
+    if (btnClearBet) {
+      btnClearBet.addEventListener('click', () => {
+        if (this.bjHandActive) return;
+        this.bjCurrentBet = Math.min(10, this.bjBankroll);
+        this.updateBlackjackBetDisplay();
+        sounds.playClick();
+      });
+    }
+
+    if (btnDoubleBet) {
+      btnDoubleBet.addEventListener('click', () => {
+        if (this.bjHandActive) return;
+        this.bjCurrentBet = Math.min(this.bjCurrentBet * 2, this.bjBankroll);
+        this.updateBlackjackBetDisplay();
+        sounds.playChip();
+      });
+    }
+
+    if (btnDeal) btnDeal.addEventListener('click', () => this.dealBlackjackHand());
+    if (btnHit) btnHit.addEventListener('click', () => this.hitBlackjack());
+    if (btnStand) btnStand.addEventListener('click', () => this.standBlackjack());
+    if (btnDouble) btnDouble.addEventListener('click', () => this.doubleDownBlackjack());
+    if (btnSurrender) btnSurrender.addEventListener('click', () => this.surrenderBlackjack());
+    if (btnNewHand) btnNewHand.addEventListener('click', () => this.resetBlackjackForNewHand());
+  }
+
+  showBlackjackView() {
+    this.casinoPreviousView = 'menu';
+    const mainMenu = document.getElementById('main-menu');
+    const gameView = document.getElementById('game-view');
+    const casinoView = document.getElementById('casino-view');
+
+    if (mainMenu) mainMenu.classList.add('hidden');
+    if (gameView) gameView.classList.add('hidden');
+    if (casinoView) casinoView.classList.add('hidden');
+    if (this.bjView) this.bjView.classList.remove('hidden');
+
+    this.updateBlackjackTableUI();
+  }
+
+  hideBlackjackView() {
+    this.saveBlackjackSlotData();
+    if (this.bjView) this.bjView.classList.add('hidden');
+    const mainMenu = document.getElementById('main-menu');
+    if (mainMenu) {
+      mainMenu.classList.remove('hidden');
+      mainMenu.classList.add('page-slide-right-in');
+      setTimeout(() => mainMenu.classList.remove('page-slide-right-in'), 350);
+    }
+    this.renderMainMenuSlots();
+    this.updateDualWalletUI();
+    sounds.playClick();
+  }
+
+  cashoutBlackjack() {
+    sounds.playCashout();
+    this.saveBlackjackSlotData();
+    this.hideBlackjackView();
+    this.setAnnouncement(`[CASHOUT] Successfully saved $${this.bjBankroll.toLocaleString()} to Slot ${this.bjSlotId}!`);
+  }
+
+  saveBlackjackSlotData() {
+    const saves = SaveManager.getSaves();
+    let slotData = saves[`slot_${this.bjSlotId}`];
+    if (!slotData) {
+      slotData = {
+        slotId: this.bjSlotId,
+        username: localStorage.getItem('royal_poker_username') || 'Hero',
+        chips: this.bjBankroll,
+        difficulty: 'medium',
+        stage: 1,
+        handNumber: 1,
+        winRecord: { won: 0, total: 0 }
+      };
+    } else {
+      slotData.chips = this.bjBankroll;
+    }
+    SaveManager.saveSlot(this.bjSlotId, slotData);
+  }
+
+  resetBjShoe() {
+    this.bjShoe = [];
+    // 4 standard 52-card decks for authentic casino dealing
+    for (let d = 0; d < 4; d++) {
+      for (const suit of SUITS) {
+        for (let r = 2; r <= 14; r++) {
+          this.bjShoe.push(new Card(r, suit));
+        }
+      }
+    }
+    // Fisher-Yates shuffle
+    for (let i = this.bjShoe.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [this.bjShoe[i], this.bjShoe[j]] = [this.bjShoe[j], this.bjShoe[i]];
+    }
+  }
+
+  dealBjCard() {
+    if (!this.bjShoe || this.bjShoe.length < 10) {
+      this.resetBjShoe();
+    }
+    return this.bjShoe.pop();
+  }
+
+  calculateBjScore(cards) {
+    let total = 0;
+    let aces = 0;
+    for (const card of cards) {
+      if (card.rank === 14) {
+        aces++;
+        total += 11;
+      } else if (card.rank >= 10) {
+        total += 10;
+      } else {
+        total += card.rank;
+      }
+    }
+    while (total > 21 && aces > 0) {
+      total -= 10;
+      aces--;
+    }
+    return {
+      total,
+      isBust: total > 21,
+      isBlackjack: cards.length === 2 && total === 21,
+      isSoft: aces > 0
+    };
+  }
+
+  updateBlackjackBetDisplay() {
+    if (this.bjBankrollEl) this.bjBankrollEl.textContent = `$${this.bjBankroll.toLocaleString()}`;
+    if (this.bjCurrentBetEl) this.bjCurrentBetEl.textContent = `$${this.bjCurrentBet.toLocaleString()}`;
+    if (this.bjActiveBetValEl) this.bjActiveBetValEl.textContent = `$${this.bjCurrentBet.toLocaleString()}`;
+  }
+
+  updateBlackjackTableUI() {
+    this.updateBlackjackBetDisplay();
+    if (this.bjBankrollEl) this.bjBankrollEl.textContent = `$${this.bjBankroll.toLocaleString()}`;
+  }
+
+  renderBlackjackCards(revealDealerHole = false) {
+    if (this.bjPlayerCardsEl) {
+      this.bjPlayerCardsEl.innerHTML = '';
+      this.bjPlayerCards.forEach(card => {
+        this.bjPlayerCardsEl.appendChild(this.renderCardDOM(card, false));
+      });
+    }
+
+    if (this.bjDealerCardsEl) {
+      this.bjDealerCardsEl.innerHTML = '';
+      this.bjDealerCards.forEach((card, idx) => {
+        const isHidden = (idx === 1 && !revealDealerHole);
+        this.bjDealerCardsEl.appendChild(this.renderCardDOM(card, isHidden));
+      });
+    }
+
+    // Update Player Score
+    const pScore = this.calculateBjScore(this.bjPlayerCards);
+    if (this.bjPlayerScoreEl) {
+      if (this.bjPlayerCards.length === 0) {
+        this.bjPlayerScoreEl.textContent = 'Your Score: 0';
+      } else if (pScore.isBlackjack) {
+        this.bjPlayerScoreEl.textContent = 'BLACKJACK! (21)';
+      } else if (pScore.isBust) {
+        this.bjPlayerScoreEl.textContent = `BUSTED (${pScore.total})`;
+      } else if (pScore.isSoft && pScore.total < 21) {
+        this.bjPlayerScoreEl.textContent = `Score: ${pScore.total} (Soft)`;
+      } else {
+        this.bjPlayerScoreEl.textContent = `Your Score: ${pScore.total}`;
+      }
+    }
+
+    // Update Dealer Score
+    if (this.bjDealerScoreEl) {
+      if (this.bjDealerCards.length === 0) {
+        this.bjDealerScoreEl.textContent = 'Dealer Score: ?';
+      } else if (!revealDealerHole) {
+        const upCard = this.bjDealerCards[0];
+        const upVal = upCard.rank === 14 ? 11 : (upCard.rank >= 10 ? 10 : upCard.rank);
+        this.bjDealerScoreEl.textContent = `Dealer Shows: ${upVal} + ?`;
+      } else {
+        const dScore = this.calculateBjScore(this.bjDealerCards);
+        if (dScore.isBlackjack) {
+          this.bjDealerScoreEl.textContent = 'DEALER BLACKJACK! (21)';
+        } else if (dScore.isBust) {
+          this.bjDealerScoreEl.textContent = `DEALER BUST (${dScore.total})`;
+        } else {
+          this.bjDealerScoreEl.textContent = `Dealer Score: ${dScore.total}`;
+        }
+      }
+    }
+  }
+
+  startBlackjackGame(slotId, bankroll, startingBet) {
+    this.bjSlotId = slotId;
+    this.bjBankroll = bankroll;
+    this.bjCurrentBet = Math.min(startingBet || 50, bankroll);
+    this.bjSelectedChip = 25;
+    this.bjDealerCards = [];
+    this.bjPlayerCards = [];
+    this.bjHandActive = false;
+    this.bjHoleRevealed = false;
+
+    this.resetBjShoe();
+    this.showBlackjackView();
+    this.renderBlackjackCards(false);
+
+    if (this.bjStatusMsgEl) {
+      this.bjStatusMsgEl.textContent = `Solar Blackjack Arena Active! Bet is $${this.bjCurrentBet.toLocaleString()}. Press DEAL to play.`;
+    }
+
+    // Show betting controls initially
+    if (this.bjBettingControls) this.bjBettingControls.classList.remove('hidden');
+    if (this.bjPlayControls) this.bjPlayControls.classList.add('hidden');
+    if (this.bjPostControls) this.bjPostControls.classList.add('hidden');
+
+    // Automatically deal first hand with chosen bet
+    setTimeout(() => {
+      this.dealBlackjackHand();
+    }, 300);
+  }
+
+  dealBlackjackHand() {
+    if (this.bjBankroll < 10) {
+      this.bjBankroll = 500;
+      if (this.bjStatusMsgEl) {
+        this.bjStatusMsgEl.textContent = 'Bankroll recharged with $500 Casino Credit!';
+      }
+    }
+
+    this.bjCurrentBet = Math.min(this.bjCurrentBet, this.bjBankroll);
+    if (this.bjCurrentBet < 10) this.bjCurrentBet = 10;
+
+    // Deduct bet from bankroll
+    this.bjBankroll -= this.bjCurrentBet;
+    this.bjHandActive = true;
+    this.bjHoleRevealed = false;
+    this.updateBlackjackBetDisplay();
+
+    // Reset hands
+    this.bjPlayerCards = [this.dealBjCard(), this.dealBjCard()];
+    this.bjDealerCards = [this.dealBjCard(), this.dealBjCard()];
+
+    sounds.playShuffle();
+    sounds.playChip();
+    sounds.playCardDealingSequence(4);
+
+    this.renderBlackjackCards(false);
+
+    // Switch to Play Controls
+    if (this.bjBettingControls) this.bjBettingControls.classList.add('hidden');
+    if (this.bjPostControls) this.bjPostControls.classList.add('hidden');
+    if (this.bjPlayControls) this.bjPlayControls.classList.remove('hidden');
+
+    // Enable/disable Double Down and Surrender based on bankroll
+    const btnDouble = document.getElementById('btn-bj-double');
+    const btnSurrender = document.getElementById('btn-bj-surrender');
+    if (btnDouble) btnDouble.disabled = (this.bjBankroll < this.bjCurrentBet);
+    if (btnSurrender) btnSurrender.disabled = false;
+
+    const pScore = this.calculateBjScore(this.bjPlayerCards);
+
+    // Check for Natural Blackjack (Player 21)
+    if (pScore.isBlackjack) {
+      this.bjHoleRevealed = true;
+      this.renderBlackjackCards(true);
+      const dScore = this.calculateBjScore(this.bjDealerCards);
+
+      if (dScore.isBlackjack) {
+        // Push
+        this.bjBankroll += this.bjCurrentBet;
+        if (this.bjStatusMsgEl) {
+          this.bjStatusMsgEl.textContent = 'Push! Both Player and Dealer have Natural Blackjack!';
+        }
+        sounds.playCheck();
+      } else {
+        // Natural 3:2 payout!
+        const winProfit = Math.floor(this.bjCurrentBet * 1.5);
+        this.bjBankroll += (this.bjCurrentBet + winProfit);
+        if (this.bjStatusMsgEl) {
+          this.bjStatusMsgEl.textContent = `SOLAR NATURAL BLACKJACK! Paid 3:2 (+$$${winProfit.toLocaleString()})!`;
+        }
+        sounds.playJackpot();
+      }
+      this.finishBlackjackHand();
+      return;
+    }
+
+    if (this.bjStatusMsgEl) {
+      this.bjStatusMsgEl.textContent = `Your Turn: Score is ${pScore.total}. Hit, Stand, Double Down, or Surrender.`;
+    }
+  }
+
+  hitBlackjack() {
+    if (!this.bjHandActive) return;
+
+    // Draw card
+    const card = this.dealBjCard();
+    this.bjPlayerCards.push(card);
+    sounds.playCard();
+
+    // Disable double down & surrender after 1st hit
+    const btnDouble = document.getElementById('btn-bj-double');
+    const btnSurrender = document.getElementById('btn-bj-surrender');
+    if (btnDouble) btnDouble.disabled = true;
+    if (btnSurrender) btnSurrender.disabled = true;
+
+    this.renderBlackjackCards(false);
+    const pScore = this.calculateBjScore(this.bjPlayerCards);
+
+    if (pScore.isBust) {
+      this.bjHoleRevealed = true;
+      this.renderBlackjackCards(true);
+      if (this.bjStatusMsgEl) {
+        this.bjStatusMsgEl.textContent = `Player Busts with ${pScore.total}! Hand lost (-$$${this.bjCurrentBet.toLocaleString()}).`;
+      }
+      sounds.playLose();
+      this.finishBlackjackHand();
+    } else if (pScore.total === 21) {
+      if (this.bjStatusMsgEl) {
+        this.bjStatusMsgEl.textContent = '21! Standing automatically...';
+      }
+      setTimeout(() => this.standBlackjack(), 500);
+    } else {
+      if (this.bjStatusMsgEl) {
+        this.bjStatusMsgEl.textContent = `Hit! Current score is ${pScore.total}. Hit again or Stand?`;
+      }
+    }
+  }
+
+  standBlackjack() {
+    if (!this.bjHandActive) return;
+
+    sounds.playCheck();
+    this.bjHoleRevealed = true;
+    this.renderBlackjackCards(true);
+
+    // Dealer AI: dealer must stand on 17 (all 17s)
+    let dScore = this.calculateBjScore(this.bjDealerCards);
+    while (dScore.total < 17) {
+      const card = this.dealBjCard();
+      this.bjDealerCards.push(card);
+      dScore = this.calculateBjScore(this.bjDealerCards);
+    }
+
+    this.renderBlackjackCards(true);
+    const pScore = this.calculateBjScore(this.bjPlayerCards);
+
+    // Settle Hand
+    if (dScore.isBust) {
+      // Dealer busts -> Player wins 1:1
+      this.bjBankroll += this.bjCurrentBet * 2;
+      if (this.bjStatusMsgEl) {
+        this.bjStatusMsgEl.textContent = `Dealer Busted with ${dScore.total}! You Win +$$${this.bjCurrentBet.toLocaleString()}!`;
+      }
+      sounds.playWin();
+    } else if (pScore.total > dScore.total) {
+      // Player wins 1:1
+      this.bjBankroll += this.bjCurrentBet * 2;
+      if (this.bjStatusMsgEl) {
+        this.bjStatusMsgEl.textContent = `You Win! Score ${pScore.total} beats Dealer's ${dScore.total} (+$$${this.bjCurrentBet.toLocaleString()})!`;
+      }
+      sounds.playWin();
+    } else if (pScore.total < dScore.total) {
+      // Dealer wins
+      if (this.bjStatusMsgEl) {
+        this.bjStatusMsgEl.textContent = `Dealer Wins with ${dScore.total} against your ${pScore.total} (-$$${this.bjCurrentBet.toLocaleString()}).`;
+      }
+      sounds.playLose();
+    } else {
+      // Push (Tie)
+      this.bjBankroll += this.bjCurrentBet;
+      if (this.bjStatusMsgEl) {
+        this.bjStatusMsgEl.textContent = `Push! Standoff at ${pScore.total}. Bet of $${this.bjCurrentBet.toLocaleString()} returned.`;
+      }
+      sounds.playCheck();
+    }
+
+    this.finishBlackjackHand();
+  }
+
+  doubleDownBlackjack() {
+    if (!this.bjHandActive || this.bjPlayerCards.length !== 2) return;
+
+    const extra = Math.min(this.bjCurrentBet, this.bjBankroll);
+    this.bjBankroll -= extra;
+    this.bjCurrentBet += extra;
+    this.updateBlackjackBetDisplay();
+
+    sounds.playChip();
+    sounds.playCard();
+
+    // Deal exactly 1 card
+    this.bjPlayerCards.push(this.dealBjCard());
+    this.renderBlackjackCards(false);
+
+    const pScore = this.calculateBjScore(this.bjPlayerCards);
+    if (pScore.isBust) {
+      this.bjHoleRevealed = true;
+      this.renderBlackjackCards(true);
+      if (this.bjStatusMsgEl) {
+        this.bjStatusMsgEl.textContent = `Double Down Busted with ${pScore.total}! Hand lost (-$$${this.bjCurrentBet.toLocaleString()}).`;
+      }
+      sounds.playLose();
+      this.finishBlackjackHand();
+    } else {
+      setTimeout(() => this.standBlackjack(), 400);
+    }
+  }
+
+  surrenderBlackjack() {
+    if (!this.bjHandActive || this.bjPlayerCards.length !== 2) return;
+
+    sounds.playFold();
+    const refund = Math.floor(this.bjCurrentBet / 2);
+    this.bjBankroll += refund;
+    this.updateBlackjackBetDisplay();
+
+    this.bjHoleRevealed = true;
+    this.renderBlackjackCards(true);
+
+    if (this.bjStatusMsgEl) {
+      this.bjStatusMsgEl.textContent = `Hand Surrendered. 50% refunded ($$${refund.toLocaleString()}).`;
+    }
+
+    this.finishBlackjackHand();
+  }
+
+  finishBlackjackHand() {
+    this.bjHandActive = false;
+    this.updateBlackjackBetDisplay();
+    this.saveBlackjackSlotData();
+
+    // Switch to post-round controls (Next Hand button)
+    if (this.bjPlayControls) this.bjPlayControls.classList.add('hidden');
+    if (this.bjPostControls) this.bjPostControls.classList.remove('hidden');
+  }
+
+  resetBlackjackForNewHand() {
+    if (this.bjBankroll < 10) {
+      this.bjBankroll = 500;
+      if (this.bjStatusMsgEl) {
+        this.bjStatusMsgEl.textContent = 'Bankroll recharged with $500 Casino Line of Credit!';
+      }
+    }
+
+    this.bjCurrentBet = Math.min(this.bjCurrentBet, this.bjBankroll);
+    if (this.bjCurrentBet < 10) this.bjCurrentBet = 10;
+
+    this.bjPlayerCards = [];
+    this.bjDealerCards = [];
+    this.bjHandActive = false;
+    this.bjHoleRevealed = false;
+
+    this.renderBlackjackCards(false);
+    this.updateBlackjackBetDisplay();
+
+    if (this.bjStatusMsgEl) {
+      this.bjStatusMsgEl.textContent = `Ready for next hand! Active Bet: $${this.bjCurrentBet.toLocaleString()}. Press DEAL CARDS.`;
+    }
+
+    // Switch to betting controls
+    if (this.bjPostControls) this.bjPostControls.classList.add('hidden');
+    if (this.bjPlayControls) this.bjPlayControls.classList.add('hidden');
+    if (this.bjBettingControls) this.bjBettingControls.classList.remove('hidden');
+    sounds.playClick();
+  }
 }
+
 
 // Launch application on DOM ready
 window.addEventListener('DOMContentLoaded', () => {
