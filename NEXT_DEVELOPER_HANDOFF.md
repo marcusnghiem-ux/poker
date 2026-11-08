@@ -755,3 +755,68 @@ Update 1.12 delivers four major user requests: a 4-tier visual atmosphere select
 - `test_blackjack_engine.py`: 5/5 unit tests passed.
 - `simulate_performance_25_runs.py`: 25/25 benchmarks passed (0 regressions).
 - `simulate_10_full_games_to_2000.py`: 10/10 runs reached >= $2,000 target ($21,733 total cashout).
+
+
+## 35. Release v1.125: Lifestyle Update — 4 Save Slots, Symmetrical Main Hub, On-Page Scrollable Leaderboard, All-Games Rules & Ranks Fix
+
+### Executive Summary
+Update 1.125 ("Lifestyle Update") resolves critical navigation and accessibility issues while dramatically expanding the solo campaign and hub symmetry. The Ranks navigation button was diagnosed and fully repaired, the rules modal was expanded from Texas Hold'em-only into an all-games casino encyclopedic guide covering 7 distinct game modes, solo campaigns were expanded from 3 to 4 independent slots in a balanced 2x2 grid, the oversized casino banner was replaced by a sleek compact portal card, an interactive live-scrollable Global Leaderboard was embedded directly onto the main hub, and the bottom action bar was re-engineered into a symmetrical 4-card grid.
+
+### Key Architectural & Feature Deliverables
+1. **Critical Ranks Button Repair & Leaderboard Normalization:**
+   - **Root Cause Analysis:** Discovered two distinct issues preventing the Leaderboard from opening:
+     1. `#leaderboard-modal` was accidentally omitted from `index.html` during the 1.12 string slice, causing `openLeaderboardModal()` to exit early on `if (!modal) return;`.
+     2. `SaveManager.getAllSaves()` was called in `openLeaderboardModal()` but did not exist on `SaveManager`, and `EconomyManager.getMiniGameWallet()` returned an object (`{ balance: 1000 }`), which caused Javascript string concatenation (`1000[object Object]`) instead of numeric addition.
+   - **Fix Applied:**
+     - Inserted complete, accessible `#leaderboard-modal` right before `#stats-modal` in `index.html`.
+     - Added `SaveManager.getAllSaves()` alias to `SaveManager.getSaves()`.
+     - Corrected `walletObj = EconomyManager.getMiniGameWallet()` and extracted `walletObj.balance`.
+     - Summed all 4 save slots dynamically (`slot_1` through `slot_4`).
+     - Added click bindings for `#btn-nav-leaderboard`, `#drawer-item-leaderboard`, the new symmetrical `#btn-menu-ranks` button, and the on-page `#main-lb-expand-btn`.
+
+2. **All-Games Official Rules Guide (`#rules-modal`):**
+   - Transformed the rules modal from a Texas Hold'em-only reference into a comprehensive, multi-tab casino handbook featuring **7 complete game categories**:
+     - **Texas Hold'em (`tab-texas`)**: Core rules, 4-round betting street structure (Pre-Flop, Flop, Turn, River), and standard 10-tier poker hand hierarchy.
+     - **Solar Blackjack VIP (`tab-blackjack`)**: 6-deck shoe rules, dealer stands on soft 17, 3:2 natural blackjack payout, insurance (2:1), double down, and split rules.
+     - **Short Deck 6-Plus (`tab-shortdeck`)**: Stripped 36-card deck (deuces through fives removed), Flush beats Full House ranking adjustment, and Ace dual-wrap (A-6-7-8-9 wheel).
+     - **Omaha High Poker (`tab-omaha`)**: 4 hole cards dealt per player, strict requirement to use exactly 2 hole cards and 3 community board cards, and multi-way pot dynamics.
+     - **European Roulette (`tab-roulette`)**: Single-zero 37-pocket wheel (2.70% house edge), Inside bets (Straight Up 35:1, Split 17:1, Street 11:1, Corner 8:1, Six Line 5:1), and Outside bets (Red/Black, Odd/Even, High/Low 1:1, Columns/Dozens 2:1).
+     - **Solar Flare Slots (`tab-slots`)**: 3-reel high-volatility machine mechanics, payline configurations, and payout tables from Solar Crowns (50x) down to Wild Bells (3x).
+     - **Craps Arena (`tab-craps`)**: Authentic dice rules covering Come-Out roll, Pass Line / Don't Pass, Point establishment, and True Odds betting.
+   - Built with interactive `.rules-tab-btn` headers and animated `.rules-tab-pane` containers, dynamically toggled via unified event delegation.
+
+3. **4 Independent Solo Save Slots (`slot-card-1` through `slot-card-4`):**
+   - Expanded from 3 to 4 fully functional, isolated campaign slots displayed in a symmetrical 2x2 grid (`.four-slots-grid`).
+   - Integrated across the entire persistence pipeline:
+     - `SaveManager.getSaves()` defaults: `{ slot_1: null, slot_2: null, slot_3: null, slot_4: null }`.
+     - `EconomyManager.getPokerAllowances()` defaults: `{ slot_1: 0, slot_2: 0, slot_3: 0, slot_4: 0 }`.
+     - `renderMainMenuSlots()` iterates `slotId = 1..4`.
+     - `executeFactoryResetPurge()` initializes all 4 slots and all 4 cooldowns to baseline.
+   - Each slot independently supports Texas Hold'em or Blackjack, customizable buy-in stacks, stage tracking, win rates, and 3-hour $5,000 stipends.
+
+4. **Symmetrical Main Menu Hub & Sleek Compact Casino Card:**
+   - Restructured `#main-menu` into `.symmetrical-dashboard-grid`:
+     - **Left Column**: Player profile bar and the 4 solo save slots (2x2 grid) with updated stipend notification ("Each of your 4 save slots receives $5,000 every 3 hours").
+     - **Right Column**: Sleek `.casino-compact-card` (~110px height with neon gold border and `#btn-enter-casino-portal`), directly above the on-page Global Leaderboard section.
+     - **Bottom Row**: Symmetrical 4-card action grid (`.menu-symmetrical-actions-grid`) featuring **Rules Guide** (`#btn-menu-rules`), **Global Ranks** (`#btn-menu-ranks`), **Career Stats** (`#btn-menu-stats`), and **Settings** (`#btn-menu-settings`), complemented by a centered secondary utility row (Transfer, Reset, Audio).
+
+5. **Scrollable On-Page Global Leaderboard (`#main-leaderboard-section`):**
+   - Embedded directly on the right column of the main menu dashboard.
+   - Features a live Hero Standing Strip (`#main-lb-hero-name`, `#main-lb-hero-wealth`, `#main-lb-hero-rank`, `#main-lb-hero-tier`).
+   - Interactive `.main-lb-scroll-wrap` table container with custom golden scrollbar displaying all 12 circuit legends (Phil Ivey, Daniel Negreanu, Doyle Brunson, etc.) plus Hero's real-time position.
+   - Synchronized by `updateLeaderboardUI()`, called automatically on app init, whenever save slots update, after cashouts, and during factory resets.
+   - Includes `#main-lb-expand-btn` to pop open the full modal view at any time.
+
+6. **Rebrand to Update 1.125 ("Lifestyle Update"):**
+   - Top navbar version pill updated to `Update 1.125`.
+   - Main menu hero banner updated to `LIFESTYLE UPDATE 1.125`.
+   - Overpowering first-time update alert configured with `solar_poker_seen_version !== '1.125'`.
+   - `#update-announcement-modal` and `#update-log-modal` updated with full release details and features.
+
+### Verification Matrix
+- `verify_syntax.py`: 100% valid JavaScript AST, tags, and bracket nesting.
+- HTML tag validator: 0 syntax or closing tag errors.
+- Emoji compliance: Strictly 0 system emojis in HTML and CSS (100% pure SVG vector icons and HTML entities).
+- `test_blackjack_engine.py`: 5/5 unit tests passed.
+- `simulate_performance_25_runs.py`: 25/25 benchmarks passed (0 regressions).
+- `simulate_10_full_games_to_2000.py`: 10/10 runs reached >= $2,000 target ($20,829 total cashout).

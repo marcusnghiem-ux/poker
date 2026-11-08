@@ -1267,7 +1267,11 @@ class SaveManager {
       const data = localStorage.getItem(SaveManager.STORAGE_KEY);
       if (data) return JSON.parse(data);
     } catch (e) {}
-    return { slot_1: null, slot_2: null, slot_3: null };
+    return { slot_1: null, slot_2: null, slot_3: null, slot_4: null };
+  }
+
+  static getAllSaves() {
+    return SaveManager.getSaves();
   }
 
   static getSave(slotId) {
@@ -1450,7 +1454,7 @@ class EconomyManager {
       const data = localStorage.getItem(EconomyManager.POKER_ALLOWANCE_KEY);
       if (data) return JSON.parse(data);
     } catch (e) {}
-    return { slot_1: 0, slot_2: 0, slot_3: 0 };
+    return { slot_1: 0, slot_2: 0, slot_3: 0, slot_4: 0 };
   }
 
   static savePokerAllowances(allowances) {
@@ -2189,6 +2193,29 @@ class PokerApp {
     this.btnNavRules = document.getElementById('btn-nav-rules');
     if (this.btnNavRules && this.rulesModal) {
       this.btnNavRules.addEventListener('click', () => this.rulesModal.classList.remove('hidden'));
+    }
+
+    // Update 1.125: Symmetrical Main Menu Action Cards
+    const btnMenuRules = document.getElementById('btn-menu-rules');
+    if (btnMenuRules && this.rulesModal) {
+      btnMenuRules.addEventListener('click', () => {
+        this.rulesModal.classList.remove('hidden');
+        sounds.playClick();
+      });
+    }
+
+    const btnMenuStats = document.getElementById('btn-menu-stats');
+    if (btnMenuStats) {
+      btnMenuStats.addEventListener('click', () => {
+        this.openStatsModal();
+      });
+    }
+
+    const btnMenuSettings = document.getElementById('btn-menu-settings');
+    if (btnMenuSettings) {
+      btnMenuSettings.addEventListener('click', () => {
+        this.openSettingsModal();
+      });
     }
 
     // Cash Out Modal triggers (both game footer button and header action button)
@@ -3001,7 +3028,7 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
 
       // 2. Initialize pristine clean baselines
       try {
-        localStorage.setItem(SaveManager.STORAGE_KEY, JSON.stringify({ slot_1: null, slot_2: null, slot_3: null }));
+        localStorage.setItem(SaveManager.STORAGE_KEY, JSON.stringify({ slot_1: null, slot_2: null, slot_3: null, slot_4: null }));
       } catch (e) {}
       
       const cleanStats = {
@@ -3027,7 +3054,7 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
 
       EconomyManager.saveCumulativeSavings(1000);
       EconomyManager.saveMiniGameWallet({ balance: 1000, lastClaimTimestamp: 0 });
-      EconomyManager.savePokerAllowances({ slot_1: 0, slot_2: 0, slot_3: 0 });
+      EconomyManager.savePokerAllowances({ slot_1: 0, slot_2: 0, slot_3: 0, slot_4: 0 });
       try {
         localStorage.setItem(EconomyManager.GLOBAL_POKER_CLAIM_KEY, '0');
         localStorage.setItem('royal_poker_username', 'High Roller');
@@ -3073,6 +3100,7 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
       this.updateEconomyDashboard();
       this.updateRouletteUI();
       this.updateSlotsUI();
+      this.updateLeaderboardUI();
       this.updateDualWalletUI();
 
       const usernameInput = document.getElementById('player-username-input');
@@ -4719,7 +4747,7 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
   renderMainMenuSlots() {
     const saves = SaveManager.getSaves();
 
-    for (let slotId = 1; slotId <= 3; slotId++) {
+    for (let slotId = 1; slotId <= 4; slotId++) {
       const cardEl = document.getElementById(`slot-card-${slotId}`);
       if (!cardEl) continue;
       cardEl.innerHTML = '';
@@ -4848,6 +4876,8 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
         };
       }
     }
+    // Update live circuit standings when slot balances change
+    this.updateLeaderboardUI();
   }
 
   startNewGame(slotId, difficulty, buyIn = 1000) {
@@ -7855,11 +7885,13 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
   }
 
   // ==========================================================================
-  // v1.12: GLOBAL HIGH-ROLLER LEADERBOARD [IN PROGRESS] CONTROLLER
+  // v1.125: GLOBAL HIGH-ROLLER LEADERBOARD & ON-PAGE STANDINGS CONTROLLER
   // ==========================================================================
   initLeaderboard() {
     const btnNav = document.getElementById('btn-nav-leaderboard');
     const drawerItem = document.getElementById('drawer-item-leaderboard');
+    const btnMenuRanks = document.getElementById('btn-menu-ranks');
+    const mainLbExpand = document.getElementById('main-lb-expand-btn');
     const modal = document.getElementById('leaderboard-modal');
     const closeBtn = document.getElementById('close-leaderboard-btn');
     const closeFooterBtn = document.getElementById('btn-close-leaderboard');
@@ -7876,21 +7908,24 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
 
     if (btnNav) btnNav.addEventListener('click', openModal);
     if (drawerItem) drawerItem.addEventListener('click', openModal);
+    if (btnMenuRanks) btnMenuRanks.addEventListener('click', openModal);
+    if (mainLbExpand) mainLbExpand.addEventListener('click', openModal);
     if (closeBtn) closeBtn.addEventListener('click', closeModal);
     if (closeFooterBtn) closeFooterBtn.addEventListener('click', closeModal);
+
+    // Initial populate of on-page leaderboard
+    this.updateLeaderboardUI();
   }
 
-  openLeaderboardModal() {
-    const modal = document.getElementById('leaderboard-modal');
-    if (!modal) return;
-
-    // Calculate Hero Net Worth: Cumulative Savings + Mini-game Wallet + All Save Slots
+  updateLeaderboardUI() {
+    // Calculate Hero Net Worth: Cumulative Savings + Mini-game Wallet + All 4 Save Slots
     const cumulativeSavings = EconomyManager.getCumulativeSavings() || 0;
-    const miniGameWallet = EconomyManager.getMiniGameWallet() || 0;
-    const allSaves = SaveManager.getAllSaves() || {};
+    const walletObj = EconomyManager.getMiniGameWallet();
+    const miniGameWallet = (walletObj && typeof walletObj.balance === 'number') ? walletObj.balance : 0;
+    const saves = SaveManager.getSaves() || {};
     let slotsChips = 0;
-    for (let i = 1; i <= 3; i++) {
-      const slot = allSaves[i];
+    for (let i = 1; i <= 4; i++) {
+      const slot = saves[`slot_${i}`];
       if (slot && typeof slot.chips === 'number') {
         slotsChips += slot.chips;
       }
@@ -7898,7 +7933,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     const heroTotalWealth = cumulativeSavings + miniGameWallet + slotsChips;
     const heroName = (localStorage.getItem('royal_poker_username') || 'Hero').trim();
 
-    // Circuit Legends Database
+    // Circuit Legends Database (12 Worldwide Champions)
     const LEGENDS = [
       { name: "Phil Ivey", region: "Las Vegas, USA", title: "The Tiger Woods of Poker", wealth: 1250000 },
       { name: "Daniel Negreanu", region: "Toronto, Canada", title: "Kid Poker / Hall of Fame", wealth: 980000 },
@@ -7914,7 +7949,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       { name: "Dan Smith", region: "Manalapan, New Jersey", title: "Cowboy Dan / High Roller Pro", wealth: 50000 }
     ];
 
-    // Combine Hero into the standings
+    // Combine Hero into the circuit standings
     const standings = [
       ...LEGENDS,
       {
@@ -7932,7 +7967,14 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     // Find Hero Rank
     const heroRank = standings.findIndex(p => p.isHero) + 1;
 
-    // Update Hero Summary Card
+    let tierDesc = "High Roller Candidate";
+    if (heroTotalWealth >= 1000000) tierDesc = "Apex Sovereign Legend";
+    else if (heroTotalWealth >= 500000) tierDesc = "Solar Royalty VIP";
+    else if (heroTotalWealth >= 200000) tierDesc = "High-Roller Elite";
+    else if (heroTotalWealth >= 50000) tierDesc = "Circuit Contender";
+    else if (heroTotalWealth >= 10000) tierDesc = "Rising Table Specialist";
+
+    // 1. Update Leaderboard Modal Hero Summary Card
     const heroCallsignEl = document.getElementById('lb-hero-callsign');
     const heroWealthEl = document.getElementById('lb-hero-wealth');
     const heroRankEl = document.getElementById('lb-hero-rank');
@@ -7941,17 +7983,20 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     if (heroCallsignEl) heroCallsignEl.textContent = heroName;
     if (heroWealthEl) heroWealthEl.textContent = `$${heroTotalWealth.toLocaleString()}`;
     if (heroRankEl) heroRankEl.textContent = `#${heroRank} of ${standings.length}`;
-
-    let tierDesc = "High Roller Candidate";
-    if (heroTotalWealth >= 1000000) tierDesc = "Apex Sovereign Legend";
-    else if (heroTotalWealth >= 500000) tierDesc = "Solar Royalty VIP";
-    else if (heroTotalWealth >= 200000) tierDesc = "High-Roller Elite";
-    else if (heroTotalWealth >= 50000) tierDesc = "Circuit Contender";
-    else if (heroTotalWealth >= 10000) tierDesc = "Rising Table Specialist";
-
     if (heroTierEl) heroTierEl.textContent = tierDesc;
 
-    // Render Table Rows
+    // 2. Update On-Page Main Menu Leaderboard Strip
+    const mainHeroNameEl = document.getElementById('main-lb-hero-name');
+    const mainHeroWealthEl = document.getElementById('main-lb-hero-wealth');
+    const mainHeroRankEl = document.getElementById('main-lb-hero-rank');
+    const mainHeroTierEl = document.getElementById('main-lb-hero-tier');
+
+    if (mainHeroNameEl) mainHeroNameEl.textContent = heroName;
+    if (mainHeroWealthEl) mainHeroWealthEl.textContent = `$${heroTotalWealth.toLocaleString()}`;
+    if (mainHeroRankEl) mainHeroRankEl.textContent = `#${heroRank} of ${standings.length}`;
+    if (mainHeroTierEl) mainHeroTierEl.textContent = tierDesc;
+
+    // 3. Render Modal Table Body
     const tbody = document.getElementById('leaderboard-table-body');
     if (tbody) {
       tbody.innerHTML = standings.map((player, idx) => {
@@ -7977,12 +8022,43 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       }).join('');
     }
 
-    modal.classList.remove('hidden');
-    sounds.playToggleChime();
+    // 4. Render On-Page Scrollable Leaderboard Table Body
+    const mainTbody = document.getElementById('main-leaderboard-tbody');
+    if (mainTbody) {
+      mainTbody.innerHTML = standings.map((player, idx) => {
+        const rank = idx + 1;
+        const isHero = player.isHero;
+        const rankClass = rank === 1 ? 'gold-rank' : (rank === 2 ? 'silver-rank' : (rank === 3 ? 'bronze-rank' : ''));
+        const rowClass = isHero ? 'main-lb-hero-row' : '';
+
+        return `
+          <tr class="${rowClass}">
+            <td class="mlb-td-rank ${rankClass}">
+              ${rank === 1 ? '&#9733; #1' : `#${rank}`}
+            </td>
+            <td class="mlb-td-name">
+              <span class="mlb-name-text">${player.name}</span>
+              ${isHero ? '<span class="mlb-you-tag">YOU</span>' : ''}
+            </td>
+            <td class="mlb-td-origin">${player.region}</td>
+            <td class="mlb-td-wealth">$${player.wealth.toLocaleString()}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+  }
+
+  openLeaderboardModal() {
+    this.updateLeaderboardUI();
+    const modal = document.getElementById('leaderboard-modal');
+    if (modal) {
+      modal.classList.remove('hidden');
+      sounds.playToggleChime();
+    }
   }
 
   // ==========================================================================
-  // v1.12: FIRST-TIME OVERPOWERING UPDATE 1.12 ANNOUNCEMENT MODAL
+  // v1.125: FIRST-TIME OVERPOWERING UPDATE 1.125 ANNOUNCEMENT MODAL
   // ==========================================================================
   initUpdateAnnouncementModal() {
     const modal = document.getElementById('update-announcement-modal');
@@ -7992,15 +8068,15 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
 
     const dismissModal = () => {
       if (modal) modal.classList.add('hidden');
-      localStorage.setItem('solar_poker_seen_version', '1.12');
+      localStorage.setItem('solar_poker_seen_version', '1.125');
       sounds.playClick();
     };
 
     if (closeBtn) closeBtn.addEventListener('click', dismissModal);
     if (startBtn) startBtn.addEventListener('click', dismissModal);
 
-    // Initial first-time presentation for v1.12
-    if (seenVersion !== '1.12' && modal) {
+    // Initial first-time presentation for v1.125 Lifestyle Update
+    if (seenVersion !== '1.125' && modal) {
       setTimeout(() => {
         modal.classList.remove('hidden');
         sounds.playAlert();
