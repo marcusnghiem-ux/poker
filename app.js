@@ -1,5 +1,5 @@
 // ==========================================================================
-// SUPABASE CLIENT INITIALIZATION (v1.135 - Email Verification & Cloud Leaderboard)
+// SUPABASE CLIENT INITIALIZATION (v1.19 - Email Verification & Cloud Leaderboard)
 // ==========================================================================
 const SUPABASE_PROJECT_URL = 'https://hoffkfeyrottyjwjighs.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_1tDpwFvHrMKR_Bf_Llp61g_6CSQEb4G';
@@ -1203,7 +1203,8 @@ class SaveManager {
       exclusiveHands: 0,
       slotsSpins: 0,
       rouletteSpins: 0,
-      totalCashedOut: 0
+      totalCashedOut: 0,
+      totalLifetimeEarnings: 0
     };
   }
 
@@ -1234,9 +1235,19 @@ class SaveManager {
     } catch (e) {}
   }
 
+  static recordEarnings(amount) {
+    if (!amount || amount <= 0) return;
+    const stats = SaveManager.getGlobalStats();
+    stats.totalLifetimeEarnings = (stats.totalLifetimeEarnings || 0) + Math.floor(amount);
+    try {
+      localStorage.setItem(SaveManager.GLOBAL_KEY, JSON.stringify(stats));
+    } catch (e) {}
+  }
+
   static recordCashout(amount) {
     const stats = SaveManager.getGlobalStats();
     stats.totalCashedOut = (stats.totalCashedOut || 0) + amount;
+    stats.totalLifetimeEarnings = (stats.totalLifetimeEarnings || 0) + Math.floor(amount);
     try {
       localStorage.setItem(SaveManager.GLOBAL_KEY, JSON.stringify(stats));
     } catch (e) {}
@@ -1251,6 +1262,9 @@ class SaveManager {
       stats.currentStreak = (stats.currentStreak || 0) + 1;
       if (stats.currentStreak > (stats.bestStreak || 0)) {
         stats.bestStreak = stats.currentStreak;
+      }
+      if (pot > 0) {
+        stats.totalLifetimeEarnings = (stats.totalLifetimeEarnings || 0) + Math.floor(pot);
       }
     } else {
       stats.currentStreak = 0;
@@ -2689,7 +2703,7 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
       this.updateEconomyDashboard();
       if (modal) modal.classList.add('hidden');
 
-      this.startNewGame(slotId, diff, buyIn);
+      this.startNewGame(slotId, diff, buyIn, true);
     }
   }
 
@@ -3567,7 +3581,18 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
       if (s1 && s1.chips > 0) {
         this.loadGame(1);
       } else {
-        this.startNewGame(1, 'medium', 1000);
+        const savings = EconomyManager.getCumulativeSavings();
+        if (savings < 1000) {
+          sounds.playError();
+          this.showInGameAlert({
+            title: 'INSUFFICIENT FUNDS FOR ENTRY',
+            message: `Starting a Texas Hold'em run requires a minimum $1,000 buy-in from your Savings Vault (Current: $${savings.toLocaleString()}). Claim your 3-Hour Poker Allowance or earn chips in the Casino Lounge!`,
+            type: 'warning'
+          });
+          this.showMenuView();
+          return;
+        }
+        this.openBuyInModal(1, 'medium', false);
       }
     }
     sounds.playChip();
@@ -3615,6 +3640,47 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
     const sMinigames = document.getElementById('stat-career-minigames');
     const sSlots = document.getElementById('stat-slots-spins');
     const sRoulette = document.getElementById('stat-roulette-spins');
+
+    // Update 1.19: Current Earnings and Total Lifetime Earnings
+    const sCurrentEarnings = document.getElementById('stat-career-current-earnings');
+    const sLifetimeEarnings = document.getElementById('stat-career-lifetime-earnings');
+    const sBreakdownCurrent = document.getElementById('stat-breakdown-current-earnings');
+    const sBreakdownLifetime = document.getElementById('stat-breakdown-lifetime-earnings');
+
+    let currentEarnings = 0;
+    if (this.gameView && !this.gameView.classList.contains('hidden') && this.players && this.players[0]) {
+      currentEarnings = (this.players[0].chips || 0) - (this.currentRunBuyIn || 1000);
+    } else {
+      let totalSlotChips = 0;
+      const saves = SaveManager.getSaves();
+      [1, 2, 3, 4].forEach(sId => {
+        if (saves[`slot_${sId}`] && saves[`slot_${sId}`].chips) {
+          totalSlotChips += Number(saves[`slot_${sId}`].chips) || 0;
+        }
+      });
+      const netWorth = vaultBal + EconomyManager.getMiniGameBalance() + totalSlotChips;
+      currentEarnings = netWorth - 1500;
+    }
+
+    const currentSign = currentEarnings > 0 ? '+' : (currentEarnings < 0 ? '-' : '');
+    const currentFormatted = `${currentSign}$${Math.abs(currentEarnings).toLocaleString()}`;
+    const lifetimeTotal = Math.max(stats.totalLifetimeEarnings || 0, stats.totalCashedOut || 0, stats.biggestPot || 0);
+    const lifetimeFormatted = `$${lifetimeTotal.toLocaleString()}`;
+
+    if (sCurrentEarnings) {
+      sCurrentEarnings.textContent = currentFormatted;
+      sCurrentEarnings.className = `c-stat-val ${currentEarnings >= 0 ? 'emerald' : 'rose'}`;
+    }
+    if (sLifetimeEarnings) {
+      sLifetimeEarnings.textContent = lifetimeFormatted;
+    }
+    if (sBreakdownCurrent) {
+      sBreakdownCurrent.textContent = currentFormatted;
+      sBreakdownCurrent.className = currentEarnings >= 0 ? 'emerald' : 'rose';
+    }
+    if (sBreakdownLifetime) {
+      sBreakdownLifetime.textContent = lifetimeFormatted;
+    }
 
     if (sVault) sVault.textContent = `$${vaultBal.toLocaleString()}`;
     if (sCashed) sCashed.textContent = `$${(stats.totalCashedOut || 0).toLocaleString()}`;
@@ -4144,7 +4210,21 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
     if (this.btnQuickRebuy) {
       this.btnQuickRebuy.addEventListener('click', () => {
         if (this.gameOverModal) this.gameOverModal.classList.add('hidden');
-        this.startNewGame(this.activeSlot || 1, this.difficulty || 'medium');
+        const savings = EconomyManager.getCumulativeSavings();
+        if (savings < 1000) {
+          sounds.playError();
+          this.showInGameAlert({
+            title: 'INSUFFICIENT FUNDS FOR REBUY',
+            message: `Quick Rebuy requires a $1,000 buy-in from your Savings Vault (Current: $${savings.toLocaleString()}). Claim your 3-Hour Poker Allowance or transfer Casino funds!`,
+            type: 'warning'
+          });
+          this.showMenuView();
+          return;
+        }
+        EconomyManager.deductCumulativeSavings(1000);
+        this.updateDualWalletUI();
+        this.updateEconomyDashboard();
+        this.startNewGame(this.activeSlot || 1, this.difficulty || 'medium', 1000, true);
       });
     }
     if (this.btnGameoverMenu) {
@@ -4962,7 +5042,45 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
     this.updateLeaderboardUI();
   }
 
-  startNewGame(slotId, difficulty, buyIn = 1000) {
+  calculateBotStartingStack(playerBuyIn) {
+    const buyIn = Math.floor(Number(playerBuyIn) || 1000);
+    if (buyIn < 2000) {
+      return buyIn;
+    }
+    const str = String(buyIn);
+    const d = parseInt(str[0], 10);
+    const mag = Math.pow(10, str.length - 1);
+    const minVal = Math.max(100, Math.floor((d - 0.5) * mag));
+    const maxVal = Math.floor((d + 0.5) * mag);
+    // Upper and lower bounds of the first significant figure: e.g. 10000 -> 5000 <= x < 15000
+    const step = mag >= 10000 ? 100 : 25;
+    const numSteps = Math.max(1, Math.floor((maxVal - minVal) / step));
+    const chosenStep = Math.floor(Math.random() * numSteps);
+    return minVal + chosenStep * step;
+  }
+
+  startNewGame(slotId, difficulty, buyIn = 1000, isPrePaid = false) {
+    const startingStack = Math.max(1000, Math.floor(Number(buyIn) || 1000));
+
+    // Strict Anti-Glitch Safeguard: Verify payment before granting table entry
+    if (!isPrePaid) {
+      const savings = EconomyManager.getCumulativeSavings();
+      if (savings < startingStack) {
+        sounds.playError();
+        this.showInGameAlert({
+          title: 'INSUFFICIENT FUNDS',
+          message: `Cannot start a $${startingStack.toLocaleString()} table. Your Savings Vault only has $${savings.toLocaleString()}. Claim your Poker Allowance or transfer Casino funds.`,
+          type: 'warning'
+        });
+        this.showMenuView();
+        return;
+      }
+      EconomyManager.deductCumulativeSavings(startingStack);
+      this.updateDualWalletUI();
+      this.updateEconomyDashboard();
+    }
+
+    this.currentRunBuyIn = startingStack;
     this.activeSlot = slotId;
     this.difficulty = difficulty;
     this.stage = 1;
@@ -4976,7 +5094,6 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
     this.bigBlind = baseline.bb;
     this.dealerIdx = 0;
 
-    const startingStack = Math.max(1000, Math.floor(Number(buyIn) || 1000));
     const customName = localStorage.getItem('royal_poker_username') || 'High Roller';
     this.players[0].name = customName;
     this.players[0].chips = startingStack;
@@ -4990,7 +5107,7 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
       this.players[i].name = prof.name;
       this.players[i].style = prof.style;
       this.players[i].avatar = prof.avatar;
-      this.players[i].chips = startingStack;
+      this.players[i].chips = this.calculateBotStartingStack(startingStack);
       this.players[i].knockedOut = false;
       this.players[i].isBot = true;
       this.players[i].isRemote = false;
@@ -5304,10 +5421,10 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
     this.bigBlind = base.bb;
     this.dealerIdx = 0;
 
-    // Reset bot bankrolls for the new escalated stage
+    // Reset bot bankrolls for the new escalated stage with significant figure randomization
     const botStartChips = 1000 * this.stage;
     for (let i = 1; i < 5; i++) {
-      this.players[i].chips = botStartChips;
+      this.players[i].chips = this.calculateBotStartingStack(botStartChips);
       this.players[i].knockedOut = false;
       const seat = document.getElementById(`seat-${i}`);
       if (seat) {
@@ -7806,7 +7923,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
 
     // Database of 105 distinct headlines (15% Poker, 70% Global & Vietnam, 15% Space Weather)
     const HEADLINES = [
-      // Update 1.13 & Update 1.2 Roadmap Highlights
+      // Update 1.19 & Update 1.2 Roadmap Highlights
       { category: 'poker', tag: 'UPDATE 1.2 ROADMAP', text: "Official Announcement: Global Leaderboard with cloud sync and Exclusive Private Room multiplayer will be finished in Update 1.2!" },
       { category: 'poker', tag: 'AUDIO STUDIO', text: "Music Coming Soon: Dedicated atmospheric table soundtracks & ambient casino music currently in studio recording!" },
       { category: 'poker', tag: 'ROSTER STANDINGS', text: "In-game registered player leaderboard is now active: compete against registered players and table rivals!" },
@@ -9027,7 +9144,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
   }
 
   // ==========================================================================
-  // v1.13: FIRST-TIME OVERPOWERING UPDATE 1.13 ANNOUNCEMENT MODAL
+  // v1.19: FIRST-TIME UPDATE 1.19 ANNOUNCEMENT MODAL
   // ==========================================================================
   initUpdateAnnouncementModal() {
     const modal = document.getElementById('update-announcement-modal');
@@ -9037,15 +9154,15 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
 
     const dismissModal = () => {
       if (modal) modal.classList.add('hidden');
-      localStorage.setItem('solar_poker_seen_version', '1.13');
+      localStorage.setItem('solar_poker_seen_version', '1.19');
       sounds.playClick();
     };
 
     if (closeBtn) closeBtn.addEventListener('click', dismissModal);
     if (startBtn) startBtn.addEventListener('click', dismissModal);
 
-    // Initial first-time presentation for v1.13 In-Game Roster & Horizontal Hub Update
-    if (seenVersion !== '1.13' && modal) {
+    // Initial first-time presentation for v1.19 Fine Tuning Update
+    if (seenVersion !== '1.19' && modal) {
       setTimeout(() => {
         modal.classList.remove('hidden');
         sounds.playAlert();

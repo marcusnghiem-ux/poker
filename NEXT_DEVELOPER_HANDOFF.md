@@ -936,16 +936,20 @@ Update 1.13 delivers a comprehensive dashboard restructuring and local player id
 
 ---
 
-## 40. Update 1.55 (Part 2): Top-Left Sign-In / Log-In Navigation & Comprehensive Auth Button Alerts
+## 40. Update 1.155: Email Verification Fix, Global Access, Top-Left Login & Comprehensive Auth Alerts
 
 ### Architecture & System Enhancements
-1. **Top-Left Sign-In / Log-In Navigation Button:**
+1. **Version Correction:**
+   - Corrected previous release notation from the inadvertent 1.55 label to the canonical **v1.155**.
+   - Purged obsolete v1.13 placeholders across the entire interface.
+
+2. **Top-Left Sign-In / Log-In Navigation Button:**
    - Added `#btn-top-left-login` inside `<div class="top-bar-left">` with key SVG icon and dynamic text `#nav-login-btn-text`.
    - Wired click event to open `#email-auth-modal` from anywhere in the interface.
    - Synchronized live state in `updateAuthPillUI()`: reflects 'Sign In / Log In' for guest players and 'Verified Player' with green emblem for authenticated accounts.
    - Fully styled in `style.css` with responsive layout and zero high-unicode emojis.
 
-2. **Comprehensive In-Game Alerts for Every Auth Button:**
+3. **Comprehensive In-Game Alerts for Every Auth Button:**
    - Built custom in-game modal alert feedback (`this.showInGameAlert(...)`) with native audio triggers for every authentication interaction:
      - **Send Code (`#btn-send-otp-code`)**: Alerts on missing/invalid email, rate limits, network faults, or successful dispatch.
      - **Verify Code (`#btn-verify-otp-code`)**: Alerts with warning if code input is empty or not exactly 6 digits, alerts on invalid/expired OTP, and alerts with success modal on successful verification.
@@ -954,7 +958,7 @@ Update 1.13 delivers a comprehensive dashboard restructuring and local player id
      - **Change Email (`#btn-change-email`)**: Alerts instructing player on entering a new address.
      - **Unlink Account (`#btn-auth-sign-out`)**: Alerts confirming session unlinking.
 
-3. **Supabase OTP Template Token Guidance:**
+4. **Supabase OTP Template Token Guidance:**
    - Identified that default Supabase email template only renders `{{ .ConfirmationURL }}` without `{{ .Token }}`.
    - Documented exact template snippet placing `{{ .Token }}` prominently for one-click 6-digit OTP delivery.
 
@@ -965,4 +969,44 @@ Update 1.13 delivers a comprehensive dashboard restructuring and local player id
 - `test_blackjack_engine.py`: 5/5 unit tests passed.
 - `simulate_10_runs.py`: 10/10 game simulation runs passed.
 - `simulate_performance_25_runs.py`: 25/25 performance benchmarks passed.
+
+---
+
+## 41. Update 1.19: Fine Tuning, High-Roller Bot Stacks, Anti-Glitch & Earnings Stats
+
+### Architecture & System Enhancements
+1. **Dynamic High-Roller Bot Stack Scaling ($2,000+ Tables):**
+   - Implemented `calculateBotStartingStack(playerBuyIn)`: For tables with buy-ins starting at $2,000 and above, bot bankrolls dynamically randomize within the upper and lower bounds of the first significant figure of the player's buy-in.
+   - Example ($10,000 buy-in): First significant figure is 1, magnitude $10,000 $\rightarrow$ bot stacks randomize strictly in the range $5,000 \le x < 15,000$ (with clean step increments).
+   - Example ($2,000 buy-in): First significant figure is 2, magnitude $1,000 $\rightarrow$ bot stacks randomize strictly in the range $1,500 \le x < 2,500$.
+   - Applied to both initial table entry in `startNewGame()` and tournament level escalations in `advanceToNextStage()`.
+
+2. **Zero-Cost Table Entry Anti-Glitch Protection:**
+   - Eliminated the infinite money glitch where players could join a $1,000 Texas Hold'em game with $0 in savings.
+   - Added strict safeguards to `startNewGame(slotId, difficulty, buyIn, isPrePaid)`: If not prepaid, verifies `savings >= startingStack` and deducts funds immediately; otherwise halts table launch, plays warning audio, and displays modal alert.
+   - Enforced buy-in deduction and insufficient funds check on Quick Rebuy (`#btn-quick-rebuy`) and transit teleportation (`teleportToTexasHoldem()`).
+
+3. **Current Earnings & Total Lifetime Earnings in Career Statistics:**
+   - Added `#stat-career-current-earnings` and `#stat-career-lifetime-earnings` to `#stats-modal`.
+   - Computes live Current Earnings (active table net profit/loss or overall net worth above base starter funds) formatted with color coding (`.emerald` for positive, `.rose` for negative).
+   - Tracks Total Lifetime Earnings cumulatively across all poker showdown wins, cashouts, and casino payouts via `SaveManager.recordEarnings()`.
+
+4. **Update 1.2 Mega Expansion Announcement in Leaderboard:**
+   - Added prominent announcement badge (`.lb-wip-badge.update-1-2-badge`) and dedicated roadmap preview banner (`.lb-major-expansion-card`) inside `#leaderboard-modal` and on the main page compact leaderboard card.
+   - Highlights upcoming Update 1.2 features: real email-verified global leaderboards with 0 fake names, seamless cloud profile anchoring, and decluttered UI.
+
+5. **Full UI Version Synchronization:**
+   - Aligned all banners, pills, news tickers, modal headers, and footer credits to **Update 1.19 (Fine Tuning)**.
+   - Formally designated the previous release as **v1.155**.
+   - Eradicated all outdated 1.13 and 1.55 misnomers from user-facing surfaces.
+
+### Verification Suite
+- `test_update_119_suite.py`: 8/8 tests passed (covering bot stack significant figure bounds across 1,500 random samples, infinite money glitch prevention, stats elements, and label synchronization).
+- `verify_syntax.py`: 100% Valid JavaScript AST, bracket balance, and tag hierarchy.
+- Tag check: 100% perfect tag balance, 0 errors.
+- Emoji check: Strictly 0 high-unicode emojis in `index.html` and `style.css`.
+- `test_blackjack_engine.py`: 5/5 unit tests passed.
+- `simulate_10_runs.py`: 10/10 game simulation runs passed.
+- `simulate_performance_25_runs.py`: 25/25 performance benchmarks passed.
+
 
