@@ -660,3 +660,45 @@ Update 1.1 is a major platform milestone introducing **Solar Blackjack**, a dual
 - `test_blackjack_engine.py`: 5/5 unit tests passed (natural 3:2 payouts, soft/hard Aces, dealer standing on 17, double down, surrender).
 - `simulate_performance_25_runs.py`: 25/25 performance benchmarks passed (0 regressions).
 - `simulate_10_full_games_to_2000.py`: 10/10 complete tournament runs reached >= $2,000 target with $21,646 total cashout.
+
+---
+
+## 33. Release v1.11: Luxury Blackjack VIP Suite Overhaul, Settings Night Sky Theme Fix, Save Slot Game Identity & Allowance Cycle Clarification
+
+### Executive Summary
+Update 1.11 resolves player feedback following the v1.1 release by fixing the Settings background switcher, upgrading the Blackjack table and room into a luxury Monte Carlo VIP suite, embedding active game identity badges into save slot cards, and clarifying the 3-hour career allowance cycle.
+
+### Key Changes
+1. **Settings Night Sky Theme Fix (`body.low-detail-bg`):**
+   - Corrected CSS selectors to strictly target the actual SVG geometric structures: `.sawtooth-border-top`, `.sawtooth-border-bottom`, `.solar-arch-top`, `.solar-arch-bottom`, `.solar-diamond-structure`, `.left-pillar`, `.right-pillar`, `.asym-bastion`, `.solar-blazing-core`, `.solar-spiky-cog`, `.chevron-flow-group`, and `.solar-corona-pulse-bg`.
+   - In Night Sky mode, all aggressive geometries and spinning gears are removed, leaving a serene, deep navy starfield with gently glowing constellations (`.constellation-phoenix`, `.constellation-river`, `.mini-star-unit`).
+   - Added instant audio and in-game alert confirmation upon selecting either theme card in Settings.
+   - Automatically synchronizes `.active` theme card styling on modal open.
+2. **Allowance Cycle Clarification ($5,000 / 3 Hours):**
+   - Replaced leftover "$5,000 / Day" text in `#btn-claim-poker-daily` and the economy dashboard with **"$5,000 / 3 Hours"** to accurately reflect the accelerated 3-hour cooldown timer.
+3. **Save Slot Active Game Identity:**
+   - Each save slot card in `renderMainMenuSlots()` now prominently displays a glowing game identity banner and icon:
+     - **Solar Blackjack (`type-blackjack`)**: Glowing emerald card badge displaying "SOLAR BLACKJACK", hand number counter, and direct 1-click continuation into the Blackjack arena.
+     - **Solar Texas Hold'em (`type-texas`)**: Regal gold spade badge displaying "SOLAR TEXAS HOLD'EM", difficulty tier, stage counter, and tournament continuation.
+   - Empty slot cards now display dual campaign tags ("♦ Texas Hold'em • ♠ Blackjack") with "Choose Game • Start Run".
+   - Persisted `slotData.gameType = 'texas'` or `slotData.gameType = 'blackjack'` across all game initialization and cashout paths.
+4. **Luxury Blackjack VIP Suite & Room Overhaul (`#blackjack-view`):**
+   - Ambient overhead casino spotlight layer (`.bj-room-ambient-spotlight`) creating warm light cones over the table felt.
+   - Padded leather armrest rail (`.bj-leather-armrest-border`) surrounding the curved perimeter with brass-studded double-stitched leather.
+   - Authentic Casino Pit accessories:
+     - **Dealer Chip Rack (`.bj-dealer-chip-rack`)**: Color-coded acrylic chip vault with stacks of purple ($500), black ($100), blue ($50), green ($25), and red ($10) chips.
+     - **4-Deck Dealing Shoe (`.bj-shoe-box`)**: Translucent acrylic dispenser with gold beveling and visible card shoe bevel.
+     - **Acrylic Discard Tray (`.bj-discard-box`)**: Smoked acrylic discard rack.
+   - Table felt enhanced with gold foil rules watermark and curved insurance arc: `★ INSURANCE PAYS 2 TO 1 ★`.
+5. **Overpowering Update 1.11 Announcement Modal:**
+   - Updated version trigger to `solar_poker_seen_version !== '1.11'` to guarantee all first-time players of v1.11 receive the scrollable showcase overlay.
+   - Updated banner to **BIG UPDATE 1.11** and top nav pill to **Update 1.11**.
+   - Added **v1.11 CURRENT** release notes to `#update-log-modal`.
+
+### Verification
+- `verify_syntax.py`: 100% valid JavaScript AST, tags, and bracket nesting.
+- HTML tag check: 0 errors, unclosed remaining: 0.
+- Emoji check: 0 system emojis in HTML and CSS.
+- `test_blackjack_engine.py`: 5/5 unit tests passed.
+- `simulate_performance_25_runs.py`: 25/25 benchmarks passed (0 regressions).
+- `simulate_10_full_games_to_2000.py`: 10/10 runs reached >= $2,000 target ($21,255 total cashout).

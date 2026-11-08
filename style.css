@@ -7579,45 +7579,53 @@ body {
 }
 
 /* ==========================================================================
-   LOW DETAIL NIGHT SKY BACKGROUND MODE (Calm, Non-Overpowering Theme)
+   LOW DETAIL NIGHT SKY SERENADE THEME (SETTINGS v1.11 FIX)
    ========================================================================== */
 body.low-detail-bg .casino-bg-effects {
-  background: radial-gradient(ellipse at 50% 30%, #081127 0%, #020617 75%, #010208 100%) !important;
+  background: radial-gradient(ellipse at 50% 30%, #060e20 0%, #020614 70%, #010208 100%) !important;
 }
 
 body.low-detail-bg .bg-solar-flare-plasma {
-  opacity: 0.1 !important;
-  background: radial-gradient(circle at 50% 50%, rgba(30, 58, 138, 0.25) 0%, transparent 70%) !important;
+  opacity: 0.15 !important;
+  background: radial-gradient(circle at 50% 40%, rgba(14, 30, 70, 0.45) 0%, transparent 70%) !important;
 }
 
 body.low-detail-bg .layer0-cosmic-grid {
-  opacity: 0.05 !important;
+  opacity: 0.03 !important;
 }
 
+body.low-detail-bg .solar-corona-pulse-bg {
+  display: none !important;
+}
+
+/* Strictly hide all heavy geometric Solar Flare structures */
 body.low-detail-bg .layer0-starfield-svg .sawtooth-border-top,
 body.low-detail-bg .layer0-starfield-svg .sawtooth-border-bottom,
-body.low-detail-bg .layer0-starfield-svg .observatory-bastion,
-body.low-detail-bg .layer0-starfield-svg .bastion-apertures,
-body.low-detail-bg .layer0-starfield-svg .left-portal-wheel,
-body.low-detail-bg .layer0-starfield-svg .center-sun-core,
-body.low-detail-bg .layer0-starfield-svg g[id^="pillar"],
-body.low-detail-bg .layer0-starfield-svg g[class*="bastion"],
-body.low-detail-bg .layer0-starfield-svg g[class*="gear"],
-body.low-detail-bg .layer0-starfield-svg g[class*="sun-core"] {
-  opacity: 0.03 !important;
-  transition: opacity 0.4s ease;
+body.low-detail-bg .layer0-starfield-svg .solar-arch-top,
+body.low-detail-bg .layer0-starfield-svg .solar-arch-bottom,
+body.low-detail-bg .layer0-starfield-svg .solar-diamond-structure,
+body.low-detail-bg .layer0-starfield-svg .left-pillar,
+body.low-detail-bg .layer0-starfield-svg .right-pillar,
+body.low-detail-bg .layer0-starfield-svg .asym-bastion,
+body.low-detail-bg .layer0-starfield-svg .solar-blazing-core,
+body.low-detail-bg .layer0-starfield-svg .solar-spiky-cog,
+body.low-detail-bg .layer0-starfield-svg .chevron-flow-group,
+body.low-detail-bg .layer0-starfield-svg .celestial-portal-group g:not(.mini-star-unit) {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
 }
 
-body.low-detail-bg .celestial-constellations,
-body.low-detail-bg .constellations-svg,
-body.low-detail-bg .constellation-phoenix,
-body.low-detail-bg .constellation-river {
-  opacity: 0.85 !important;
-}
-
+/* Serene, calm night sky stars and constellations glow gracefully */
+body.low-detail-bg .layer0-starfield-svg .constellation-phoenix,
+body.low-detail-bg .layer0-starfield-svg .constellation-river,
+body.low-detail-bg .layer0-starfield-svg .celestial-constellations,
 body.low-detail-bg .layer0-starfield-svg .mini-star-unit,
-body.low-detail-bg .layer0-starfield-svg .c-star {
-  opacity: 0.8 !important;
+body.low-detail-bg .layer0-starfield-svg .c-star,
+body.low-detail-bg .layer0-starfield-svg [class*="star-anim"] {
+  opacity: 0.9 !important;
+  display: block !important;
+  visibility: visible !important;
 }
 
 /* ==========================================================================
@@ -8451,4 +8459,203 @@ body.low-detail-bg .layer0-starfield-svg .c-star {
   .bj-control-console { padding: 10px; }
   .bj-chips-tray { flex-wrap: wrap; justify-content: center; }
   .bj-play-controls { flex-wrap: wrap; justify-content: center; }
+}
+
+/* ==========================================================================
+   v1.11: SAVE SLOT GAME IDENTITY & LUXURY BLACKJACK VIP SUITE STYLES
+   ========================================================================== */
+
+/* Save Slot Game Identity Badges */
+.slot-game-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+.slot-game-indicator.type-blackjack {
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(52, 211, 153, 0.5);
+  color: #34d399;
+}
+
+.slot-game-indicator.type-texas {
+  background: rgba(253, 224, 71, 0.15);
+  border: 1px solid rgba(253, 224, 71, 0.45);
+  color: #ffd700;
+}
+
+.empty-slot-games-list {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin: 6px 0;
+}
+
+.empty-slot-games-list .eg-tag {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.empty-slot-games-list .eg-tag.gold {
+  color: #ffd700;
+  border: 1px solid rgba(253, 224, 71, 0.35);
+}
+
+.empty-slot-games-list .eg-tag.emerald {
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+/* Luxury Blackjack Room & VIP Table Overhaul */
+.bj-room-ambient-spotlight {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 700px;
+  height: 400px;
+  background: radial-gradient(ellipse at 50% 20%, rgba(16, 185, 129, 0.18) 0%, rgba(212, 175, 55, 0.08) 50%, transparent 75%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.bj-leather-armrest-border {
+  position: absolute;
+  inset: -14px;
+  border-radius: 260px 260px 140px 140px;
+  border: 12px solid #1a1007;
+  outline: 2px solid #d4af37;
+  box-shadow: 
+    0 0 0 4px #0d0803,
+    inset 0 2px 8px rgba(255, 255, 255, 0.2),
+    0 25px 70px rgba(0, 0, 0, 0.95);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.bj-pit-rack-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto 12px auto;
+  z-index: 8;
+  position: relative;
+}
+
+.bj-pit-tray {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.bj-tray-tag {
+  font-size: 0.55rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 1px;
+}
+
+.bj-discard-box {
+  width: 60px;
+  height: 48px;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6), 0 4px 10px rgba(0, 0, 0, 0.4);
+  position: relative;
+}
+
+.bj-discard-box::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  right: 10px;
+  height: 28px;
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 3px;
+  transform: rotate(-12deg);
+}
+
+.bj-dealer-chip-rack {
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  border: 2px solid #ffd700;
+  border-radius: 10px;
+  padding: 6px 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.8), inset 0 1px 3px rgba(255, 255, 255, 0.2);
+}
+
+.bj-chip-rack-inner {
+  display: flex;
+  gap: 10px;
+}
+
+.rack-col {
+  width: 22px;
+  height: 38px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background-size: 100% 7px;
+}
+
+.rack-col.col-purple {
+  background: repeating-linear-gradient(0deg, #7c3aed, #7c3aed 5px, #ffffff 5px, #ffffff 7px);
+}
+
+.rack-col.col-black {
+  background: repeating-linear-gradient(0deg, #111827, #111827 5px, #ffd700 5px, #ffd700 7px);
+}
+
+.rack-col.col-blue {
+  background: repeating-linear-gradient(0deg, #2563eb, #2563eb 5px, #ffffff 5px, #ffffff 7px);
+}
+
+.rack-col.col-green {
+  background: repeating-linear-gradient(0deg, #10b981, #10b981 5px, #ffffff 5px, #ffffff 7px);
+}
+
+.rack-col.col-red {
+  background: repeating-linear-gradient(0deg, #ef4444, #ef4444 5px, #ffffff 5px, #ffffff 7px);
+}
+
+.bj-shoe-box {
+  width: 68px;
+  height: 48px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1.5px solid rgba(253, 224, 71, 0.4);
+  border-radius: 8px 8px 3px 3px;
+  position: relative;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+}
+
+.bj-shoe-bezel {
+  position: absolute;
+  inset: 5px;
+  background: repeating-linear-gradient(45deg, #1e1b4b, #1e1b4b 4px, #4338ca 4px, #4338ca 8px);
+  border-radius: 4px;
+  border: 1px solid #d4af37;
+}
+
+.bj-insurance-arc-text {
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: rgba(253, 224, 71, 0.45);
+  letter-spacing: 3px;
+  margin-top: 4px;
+  text-align: center;
 }

@@ -2523,7 +2523,7 @@ class PokerApp {
           title: 'INSUFFICIENT FUNDS FOR TABLE ENTRY',
           message: `Your current save slot stack ($${currentStack.toLocaleString()}) and Savings Vault ($${savings.toLocaleString()}) cannot reach the minimum table entry of $1,000.
 
-Claim your $5,000 Daily Poker Allowance or transfer Casino funds to continue!`
+Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to continue!`
         });
         return;
       }
@@ -2544,7 +2544,7 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to continue!`
           title: 'INSUFFICIENT SAVINGS VAULT',
           message: `You currently have $${savings.toLocaleString()} in your Savings Vault. A minimum buy-in of $1,000 is required to launch a Poker Run.
 
-Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!`
+Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a run!`
         });
         return;
       }
@@ -3534,6 +3534,12 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
       volSlider.value = Math.round(sounds.volume * 100);
       if (volVal) volVal.textContent = `${volSlider.value}%`;
     }
+    const currentTheme = localStorage.getItem('solar_poker_bg_theme') || 'high';
+    const bgCardHigh = document.getElementById('bg-card-high');
+    const bgCardLow = document.getElementById('bg-card-low');
+    if (bgCardHigh) bgCardHigh.classList.toggle('active', currentTheme !== 'low');
+    if (bgCardLow) bgCardLow.classList.toggle('active', currentTheme === 'low');
+
     this.settingsModal.classList.remove('hidden');
   }
 
@@ -4646,12 +4652,16 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
           <div class="empty-slot-content">
             <div class="empty-slot-badge">SLOT ${slotId}</div>
             <div class="empty-slot-title">NEW CAMPAIGN</div>
+            <div class="empty-slot-games-list">
+              <span class="eg-tag gold">&diams; Texas Hold'em</span>
+              <span class="eg-tag emerald">&spades; Blackjack</span>
+            </div>
             <div class="empty-slot-starting-chips">
               <span class="chips-icon">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" fill="rgba(16,185,129,0.2)" stroke="#10b981" stroke-width="1.8"/><circle cx="12" cy="12" r="5" stroke="#34d399" stroke-width="1.2"/><path d="M12 9v6M10 10.5c.8-.7 2.2-.7 3 0s-.5 1.5-1.5 1.5-1.5.8-.7 1.5 2.2.7 3 0" stroke="#fde047" stroke-width="1.4"/></svg>
               </span> $1,000 Starting Bankroll
             </div>
-            <div class="empty-slot-cta">Select Difficulty &bull; Start Run</div>
+            <div class="empty-slot-cta">Choose Game &bull; Start Run</div>
           </div>
           <div class="slot-corner-bracket bottom-left"></div>
           <div class="slot-corner-bracket bottom-right"></div>
@@ -4668,8 +4678,15 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
           : 0;
         const slotUser = slotData.username || localStorage.getItem('royal_poker_username') || 'Hero';
         const slotStage = slotData.stage || 1;
-        const diffBadgeClass = slotData.difficulty === 'nightmare' ? 'diff-championship' : `diff-${slotData.difficulty}`;
-        const diffBadgeLabel = slotData.difficulty === 'nightmare' ? 'CHAMPIONSHIP' : slotData.difficulty.toUpperCase();
+        const gameType = slotData.gameType || 'texas';
+        const isBj = gameType === 'blackjack';
+        const diffBadgeClass = slotData.difficulty === 'nightmare' ? 'diff-championship' : `diff-${slotData.difficulty || 'medium'}`;
+        const diffBadgeLabel = isBj ? 'CASINO 21' : (slotData.difficulty === 'nightmare' ? 'CHAMPIONSHIP' : (slotData.difficulty || 'medium').toUpperCase());
+        const gameBadgeClass = isBj ? 'type-blackjack' : 'type-texas';
+        const gameBadgeIcon = isBj
+          ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="10" height="15" rx="2" transform="rotate(-10 3 4)" fill="#064e3b" stroke="#34d399" stroke-width="1.8"/><rect x="10" y="4" width="10" height="15" rx="2" transform="rotate(10 10 4)" fill="#0f172a" stroke="#ffd700" stroke-width="1.8"/><text x="13" y="15" font-family="'Cinzel',serif" font-size="7" font-weight="900" fill="#fde047">21</text></svg>`
+          : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2C9 7 4 9 4 14a8 8 0 0 0 16 0c0-5-5-7-8-12z" fill="#ffd700" stroke="#fef08a" stroke-width="1.2"/><path d="M12 18v4M9 22h6" stroke="#ffd700" stroke-width="1.5"/></svg>`;
+        const gameBadgeTitle = isBj ? 'SOLAR BLACKJACK' : "SOLAR TEXAS HOLD'EM";
 
         cardEl.innerHTML = `
           <div class="slot-corner-bracket top-left"></div>
@@ -4677,26 +4694,33 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
           <div class="slot-header">
             <div class="slot-badge-wrap">
               <span class="slot-crown-icon">
-                <svg width="16" height="13" viewBox="0 0 72 54" fill="none"><path d="M14 38 Q36 22 58 38 L54 44 Q36 34 18 44 Z" fill="#b91c1c"/><rect x="10" y="42" width="52" height="8" rx="2" fill="#ffd54f" stroke="#fef08a" stroke-width="1"/><path d="M12 42 L8 22 L20 30 L36 12 L52 30 L64 22 L60 42 Z" fill="#ffd54f" stroke="#fef08a" stroke-width="1.5"/><circle cx="36" cy="11" r="3" fill="#fff"/></svg>
+                <svg width="16" height="13" viewBox="0 0 72 54" fill="none"><path d="M14 38 Q36 22 58 38 L54 44 Q36 34 18 44 Z" fill="#b91c1c"/><rect x="10" y="42" width="52" height="8" rx="2" fill="#ffd700" stroke="#fef08a" stroke-width="1"/><path d="M12 42 L8 22 L20 30 L36 12 L52 30 L64 22 L60 42 Z" fill="#ffd700" stroke="#fef08a" stroke-width="1.5"/><circle cx="36" cy="11" r="3" fill="#fff"/></svg>
               </span>
               <span class="slot-badge">SLOT ${slotId} &bull; ${slotUser}</span>
             </div>
             <span class="slot-diff ${diffBadgeClass}">${diffBadgeLabel}</span>
           </div>
+
+          <!-- Active Game Identifier Badge -->
+          <div class="slot-game-indicator ${gameBadgeClass}">
+            <span class="game-ind-icon">${gameBadgeIcon}</span>
+            <span class="game-ind-name">${gameBadgeTitle}</span>
+          </div>
+
           <div class="slot-bankroll-wrap">
-            <span class="slot-bankroll-label">BANKROLL &bull; STAGE ${slotStage}</span>
+            <span class="slot-bankroll-label">BANKROLL &bull; ${isBj ? 'BLACKJACK TABLE' : 'STAGE ' + slotStage}</span>
             <div class="slot-bankroll">
               <span class="bankroll-currency">$</span>${(slotData.chips || 1000).toLocaleString()}
             </div>
           </div>
           <div class="slot-stats-grid">
             <div class="slot-stat-item">
-              <span class="slot-stat-lbl">Stage/Round</span>
-              <span class="slot-stat-val">S${slotStage} #h${slotData.handNumber || 1}</span>
+              <span class="slot-stat-lbl">Active Game</span>
+              <span class="slot-stat-val ${isBj ? 'emerald' : 'gold'}">${isBj ? 'Blackjack 21' : "Texas Hold'em"}</span>
             </div>
             <div class="slot-stat-item">
-              <span class="slot-stat-lbl">Record</span>
-              <span class="slot-stat-val">${slotData.winRecord ? slotData.winRecord.won : 0} Wins</span>
+              <span class="slot-stat-lbl">${isBj ? 'Hands' : 'Stage / Round'}</span>
+              <span class="slot-stat-val">${isBj ? '#' + (slotData.handNumber || 1) : 'S' + slotStage + ' #h' + (slotData.handNumber || 1)}</span>
             </div>
             <div class="slot-stat-item">
               <span class="slot-stat-lbl">Win Rate</span>
@@ -4717,7 +4741,13 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
 
         const handleContinuationClick = (e) => {
           if (e) e.stopPropagation();
-          this.requirePlayerName(() => this.openSlotGameSelect(slotId, true));
+          this.requirePlayerName(() => {
+            if (isBj) {
+              this.startBlackjackGame(slotId, slotData.chips || 1000, 50);
+            } else {
+              this.openSlotGameSelect(slotId, true);
+            }
+          });
         };
         cardEl.onclick = handleContinuationClick;
         cardEl.querySelector('.slot-btn-play').onclick = handleContinuationClick;
@@ -4861,6 +4891,7 @@ Claim your $5,000 Daily Poker Allowance or transfer Casino funds to start a run!
     const username = localStorage.getItem('royal_poker_username') || 'You';
 
     SaveManager.saveSlot(this.activeSlot, {
+      gameType: 'texas',
       username: username,
       stage: this.stage || 1,
       chips: this.players[0].chips,
@@ -7462,7 +7493,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     const bgCardLow = document.getElementById('bg-card-low');
     const savedTheme = localStorage.getItem('solar_poker_bg_theme') || 'high';
 
-    const applyTheme = (theme) => {
+    const applyTheme = (theme, notify = false) => {
       if (theme === 'low') {
         document.body.classList.add('low-detail-bg');
         if (bgCardLow) bgCardLow.classList.add('active');
@@ -7473,19 +7504,28 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
         if (bgCardLow) bgCardLow.classList.remove('active');
       }
       localStorage.setItem('solar_poker_bg_theme', theme);
+
+      if (notify) {
+        this.showInGameAlert({
+          title: theme === 'low' ? 'NIGHT SKY MODE' : 'SOLAR FLARE MODE',
+          message: theme === 'low' 
+            ? 'Switched to Night Sky Serenade. Heavy geometric structures softened for a calm, starry atmosphere.'
+            : 'Switched to Solar Flare Ultra. Dynamic cosmic geometry and plasma cores restored.'
+        });
+      }
     };
 
-    applyTheme(savedTheme);
+    applyTheme(savedTheme, false);
 
     if (bgCardHigh) {
       bgCardHigh.addEventListener('click', () => {
-        applyTheme('high');
+        applyTheme('high', true);
         sounds.playToggleChime();
       });
     }
     if (bgCardLow) {
       bgCardLow.addEventListener('click', () => {
-        applyTheme('low');
+        applyTheme('low', true);
         sounds.playToggleChime();
       });
     }
@@ -7502,15 +7542,15 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
 
     const dismissModal = () => {
       if (modal) modal.classList.add('hidden');
-      localStorage.setItem('solar_poker_seen_version', '1.1');
+      localStorage.setItem('solar_poker_seen_version', '1.11');
       sounds.playClick();
     };
 
     if (closeBtn) closeBtn.addEventListener('click', dismissModal);
     if (startBtn) startBtn.addEventListener('click', dismissModal);
 
-    // Initial first-time presentation
-    if (seenVersion !== '1.1' && modal) {
+    // Initial first-time presentation for v1.11
+    if (seenVersion !== '1.11' && modal) {
       setTimeout(() => {
         modal.classList.remove('hidden');
         sounds.playAlert();
@@ -7764,6 +7804,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     if (!slotData) {
       slotData = {
         slotId: this.bjSlotId,
+        gameType: 'blackjack',
         username: localStorage.getItem('royal_poker_username') || 'Hero',
         chips: this.bjBankroll,
         difficulty: 'medium',
@@ -7772,6 +7813,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
         winRecord: { won: 0, total: 0 }
       };
     } else {
+      slotData.gameType = 'blackjack';
       slotData.chips = this.bjBankroll;
     }
     SaveManager.saveSlot(this.bjSlotId, slotData);
