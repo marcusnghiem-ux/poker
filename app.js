@@ -1425,6 +1425,15 @@ class EconomyManager {
     return newTotal;
   }
 
+  static getMiniGameBalance() {
+    try {
+      const wallet = EconomyManager.getMiniGameWallet();
+      return (wallet && typeof wallet.balance === 'number') ? wallet.balance : 1000;
+    } catch (e) {
+      return 1000;
+    }
+  }
+
   static getMiniGameWallet() {
     try {
       const data = localStorage.getItem(EconomyManager.MINIGAME_STORAGE_KEY);
@@ -2216,15 +2225,33 @@ class PokerApp {
       });
     }
 
-    // Stats modal trigger
+    // Stats modal triggers & backdrop dismiss
     this.btnNavStats = document.getElementById('btn-nav-stats');
     this.statsModal = document.getElementById('stats-modal');
     this.closeStatsBtn = document.getElementById('close-stats-btn');
-    if (this.btnNavStats && this.statsModal) {
+    if (this.btnNavStats) {
       this.btnNavStats.addEventListener('click', () => this.openStatsModal());
     }
     if (this.closeStatsBtn && this.statsModal) {
       this.closeStatsBtn.addEventListener('click', () => this.statsModal.classList.add('hidden'));
+    }
+    if (this.statsModal) {
+      this.statsModal.addEventListener('click', (e) => {
+        if (e.target === this.statsModal) this.statsModal.classList.add('hidden');
+      });
+    }
+
+    // Top Bar Music Pill click notification
+    const navMusicPill = document.querySelector('.nav-music-pill');
+    if (navMusicPill) {
+      navMusicPill.addEventListener('click', () => {
+        sounds.playClick();
+        this.showInGameAlert({
+          title: 'CASINO MUSIC IN UPDATE 1.2',
+          message: 'Original atmospheric casino soundtracks, dynamic tournament music, and custom ambient lounge themes are currently in studio recording and will launch in the upcoming Update 1.2 Mega Expansion!',
+          type: 'info'
+        });
+      });
     }
 
     // Settings modal trigger
@@ -3612,85 +3639,96 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
   }
 
   openStatsModal() {
+    if (!this.statsModal) {
+      this.statsModal = document.getElementById('stats-modal');
+    }
     if (!this.statsModal) return;
-    const stats = SaveManager.getGlobalStats();
-    const vaultBal = EconomyManager.getCumulativeSavings();
 
-    const sHands = document.getElementById('stat-career-hands');
-    const sWon = document.getElementById('stat-career-won');
-    const sRate = document.getElementById('stat-career-winrate');
-    const sPot = document.getElementById('stat-career-biggest-pot');
-    const sStreak = document.getElementById('stat-career-streak');
-    const sBest = document.getElementById('stat-career-besthand');
+    try {
+      sounds.playClick();
+      const stats = SaveManager.getGlobalStats() || {};
+      const vaultBal = EconomyManager.getCumulativeSavings() || 0;
+      const miniGameBal = EconomyManager.getMiniGameBalance() || 0;
 
-    if (sHands) sHands.textContent = stats.totalHands || 0;
-    if (sWon) sWon.textContent = stats.handsWon || 0;
-    const rate = stats.totalHands > 0 ? Math.round(((stats.handsWon || 0) / stats.totalHands) * 100) : 0;
-    if (sRate) sRate.textContent = `${rate}%`;
-    if (sPot) sPot.textContent = `$${(stats.biggestPot || 0).toLocaleString()}`;
-    if (sStreak) sStreak.textContent = stats.bestStreak || 0;
-    if (sBest) sBest.textContent = stats.bestHandDesc || 'High Card';
+      const sHands = document.getElementById('stat-career-hands');
+      const sWon = document.getElementById('stat-career-won');
+      const sRate = document.getElementById('stat-career-winrate');
+      const sPot = document.getElementById('stat-career-biggest-pot');
+      const sStreak = document.getElementById('stat-career-streak');
+      const sBest = document.getElementById('stat-career-besthand');
 
-    const sVault = document.getElementById('stat-career-vault');
-    const sCashed = document.getElementById('stat-career-cashed');
-    const sTex = document.getElementById('stat-career-texas') || document.getElementById('stat-texas-hands');
-    const sShort = document.getElementById('stat-career-short') || document.getElementById('stat-shortdeck-hands');
-    const sOmaha = document.getElementById('stat-career-omaha') || document.getElementById('stat-omaha-hands');
-    const sExcl = document.getElementById('stat-career-exclusive') || document.getElementById('stat-exclusive-hands');
-    const sMinigames = document.getElementById('stat-career-minigames');
-    const sSlots = document.getElementById('stat-slots-spins');
-    const sRoulette = document.getElementById('stat-roulette-spins');
+      if (sHands) sHands.textContent = stats.totalHands || 0;
+      if (sWon) sWon.textContent = stats.handsWon || 0;
+      const rate = stats.totalHands > 0 ? Math.round(((stats.handsWon || 0) / stats.totalHands) * 100) : 0;
+      if (sRate) sRate.textContent = `${rate}%`;
+      if (sPot) sPot.textContent = `$${(stats.biggestPot || 0).toLocaleString()}`;
+      if (sStreak) sStreak.textContent = stats.bestStreak || 0;
+      if (sBest) sBest.textContent = stats.bestHandDesc || 'High Card';
 
-    // Update 1.19: Current Earnings and Total Lifetime Earnings
-    const sCurrentEarnings = document.getElementById('stat-career-current-earnings');
-    const sLifetimeEarnings = document.getElementById('stat-career-lifetime-earnings');
-    const sBreakdownCurrent = document.getElementById('stat-breakdown-current-earnings');
-    const sBreakdownLifetime = document.getElementById('stat-breakdown-lifetime-earnings');
+      // Update 1.19: Current Earnings and Total Lifetime Earnings
+      const sCurrentEarnings = document.getElementById('stat-career-current-earnings');
+      const sLifetimeEarnings = document.getElementById('stat-career-lifetime-earnings');
+      const sBreakdownCurrent = document.getElementById('stat-breakdown-current-earnings');
+      const sBreakdownLifetime = document.getElementById('stat-breakdown-lifetime-earnings');
 
-    let currentEarnings = 0;
-    if (this.gameView && !this.gameView.classList.contains('hidden') && this.players && this.players[0]) {
-      currentEarnings = (this.players[0].chips || 0) - (this.currentRunBuyIn || 1000);
-    } else {
-      let totalSlotChips = 0;
-      const saves = SaveManager.getSaves();
-      [1, 2, 3, 4].forEach(sId => {
-        if (saves[`slot_${sId}`] && saves[`slot_${sId}`].chips) {
-          totalSlotChips += Number(saves[`slot_${sId}`].chips) || 0;
-        }
-      });
-      const netWorth = vaultBal + EconomyManager.getMiniGameBalance() + totalSlotChips;
-      currentEarnings = netWorth - 1500;
+      let currentEarnings = 0;
+      if (this.gameView && !this.gameView.classList.contains('hidden') && this.players && this.players[0]) {
+        currentEarnings = (this.players[0].chips || 0) - (this.currentRunBuyIn || 1000);
+      } else {
+        let totalSlotChips = 0;
+        const saves = SaveManager.getSaves() || {};
+        [1, 2, 3, 4].forEach(sId => {
+          if (saves[`slot_${sId}`] && saves[`slot_${sId}`].chips) {
+            totalSlotChips += Number(saves[`slot_${sId}`].chips) || 0;
+          }
+        });
+        const netWorth = vaultBal + miniGameBal + totalSlotChips;
+        currentEarnings = netWorth - 2000;
+      }
+
+      const currentSign = currentEarnings > 0 ? '+' : (currentEarnings < 0 ? '-' : '');
+      const currentFormatted = `${currentSign}$${Math.abs(currentEarnings).toLocaleString()}`;
+      const lifetimeTotal = Math.max(stats.totalLifetimeEarnings || 0, stats.totalCashedOut || 0, stats.biggestPot || 0);
+      const lifetimeFormatted = `$${lifetimeTotal.toLocaleString()}`;
+
+      if (sCurrentEarnings) {
+        sCurrentEarnings.textContent = currentFormatted;
+        sCurrentEarnings.className = `c-stat-val ${currentEarnings >= 0 ? 'emerald' : 'rose'}`;
+      }
+      if (sLifetimeEarnings) {
+        sLifetimeEarnings.textContent = lifetimeFormatted;
+      }
+      if (sBreakdownCurrent) {
+        sBreakdownCurrent.textContent = currentFormatted;
+        sBreakdownCurrent.className = currentEarnings >= 0 ? 'emerald' : 'rose';
+      }
+      if (sBreakdownLifetime) {
+        sBreakdownLifetime.textContent = lifetimeFormatted;
+      }
+
+      const sVault = document.getElementById('stat-career-vault');
+      const sCashed = document.getElementById('stat-career-cashed');
+      const sTex = document.getElementById('stat-career-texas') || document.getElementById('stat-texas-hands');
+      const sShort = document.getElementById('stat-career-short') || document.getElementById('stat-shortdeck-hands');
+      const sOmaha = document.getElementById('stat-career-omaha') || document.getElementById('stat-omaha-hands');
+      const sExcl = document.getElementById('stat-career-exclusive') || document.getElementById('stat-exclusive-hands');
+      const sMinigames = document.getElementById('stat-career-minigames');
+      const sSlots = document.getElementById('stat-slots-spins');
+      const sRoulette = document.getElementById('stat-roulette-spins');
+
+      if (sVault) sVault.textContent = `$${vaultBal.toLocaleString()}`;
+      if (sCashed) sCashed.textContent = `$${(stats.totalCashedOut || 0).toLocaleString()}`;
+      if (sTex) sTex.textContent = stats.texasHands || (stats.totalHands || 0);
+      if (sShort) sShort.textContent = stats.shortDeckHands || 0;
+      if (sOmaha) sOmaha.textContent = stats.omahaHands || 0;
+      if (sExcl) sExcl.textContent = stats.exclusiveHands || (stats.onlineHandsPlayed || 0);
+      if (sMinigames) sMinigames.textContent = `${stats.slotsSpins || 0} / ${stats.rouletteSpins || 0}`;
+      if (sSlots) sSlots.textContent = stats.slotsSpins || 0;
+      if (sRoulette) sRoulette.textContent = stats.rouletteSpins || 0;
+
+    } catch (err) {
+      console.error('Stats formatting error:', err);
     }
-
-    const currentSign = currentEarnings > 0 ? '+' : (currentEarnings < 0 ? '-' : '');
-    const currentFormatted = `${currentSign}$${Math.abs(currentEarnings).toLocaleString()}`;
-    const lifetimeTotal = Math.max(stats.totalLifetimeEarnings || 0, stats.totalCashedOut || 0, stats.biggestPot || 0);
-    const lifetimeFormatted = `$${lifetimeTotal.toLocaleString()}`;
-
-    if (sCurrentEarnings) {
-      sCurrentEarnings.textContent = currentFormatted;
-      sCurrentEarnings.className = `c-stat-val ${currentEarnings >= 0 ? 'emerald' : 'rose'}`;
-    }
-    if (sLifetimeEarnings) {
-      sLifetimeEarnings.textContent = lifetimeFormatted;
-    }
-    if (sBreakdownCurrent) {
-      sBreakdownCurrent.textContent = currentFormatted;
-      sBreakdownCurrent.className = currentEarnings >= 0 ? 'emerald' : 'rose';
-    }
-    if (sBreakdownLifetime) {
-      sBreakdownLifetime.textContent = lifetimeFormatted;
-    }
-
-    if (sVault) sVault.textContent = `$${vaultBal.toLocaleString()}`;
-    if (sCashed) sCashed.textContent = `$${(stats.totalCashedOut || 0).toLocaleString()}`;
-    if (sTex) sTex.textContent = stats.texasHands || (stats.totalHands || 0);
-    if (sShort) sShort.textContent = stats.shortDeckHands || 0;
-    if (sOmaha) sOmaha.textContent = stats.omahaHands || 0;
-    if (sExcl) sExcl.textContent = stats.exclusiveHands || (stats.onlineHandsPlayed || 0);
-    if (sMinigames) sMinigames.textContent = `${stats.slotsSpins || 0} / ${stats.rouletteSpins || 0}`;
-    if (sSlots) sSlots.textContent = stats.slotsSpins || 0;
-    if (sRoulette) sRoulette.textContent = stats.rouletteSpins || 0;
 
     this.statsModal.classList.remove('hidden');
   }
@@ -7925,7 +7963,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     const HEADLINES = [
       // Update 1.19 & Update 1.2 Roadmap Highlights
       { category: 'poker', tag: 'UPDATE 1.2 ROADMAP', text: "Official Announcement: Global Leaderboard with cloud sync and Exclusive Private Room multiplayer will be finished in Update 1.2!" },
-      { category: 'poker', tag: 'AUDIO STUDIO', text: "Music Coming Soon: Dedicated atmospheric table soundtracks & ambient casino music currently in studio recording!" },
+      { category: 'poker', tag: 'AUDIO STUDIO', text: "Music Coming in Update 1.2: Dedicated atmospheric table soundtracks & ambient casino music launching in the Update 1.2 Mega Expansion!" },
       { category: 'poker', tag: 'ROSTER STANDINGS', text: "In-game registered player leaderboard is now active: compete against registered players and table rivals!" },
       // --- POKER & CASINO WIRE (~15%) ---
       { category: 'poker', tag: 'POKER WIRE', text: "High-stakes titan Phil Ivey spotted executing deep river check-raises in the Solar VIP lounge." },

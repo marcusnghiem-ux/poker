@@ -1000,6 +1000,15 @@ Update 1.13 delivers a comprehensive dashboard restructuring and local player id
    - Formally designated the previous release as **v1.155**.
    - Eradicated all outdated 1.13 and 1.55 misnomers from user-facing surfaces.
 
+6. **Career Statistics Button Hotfix:**
+   - Resolved runtime `TypeError` in `openStatsModal()` caused by missing `EconomyManager.getMiniGameBalance()`.
+   - Added `EconomyManager.getMiniGameBalance()` method and wrapped stats computations in defensive `try/catch` to guarantee modal visibility.
+   - Added backdrop click-outside dismissal and tactile audio to `#btn-nav-stats` and `#btn-menu-stats`.
+
+7. **Original Casino Music Announcement (Update 1.2):**
+   - Transformed the top bar music pill into an interactive element (`.nav-music-pill`) labeled **Music Coming Update 1.2** with hover effects and in-game modal preview.
+   - Highlighted incoming original casino soundtracks and ambient lounge music in the Settings Audio Synthesizer panel, Leaderboard Roadmap banner, and news ticker.
+
 ### Verification Suite
 - `test_update_119_suite.py`: 8/8 tests passed (covering bot stack significant figure bounds across 1,500 random samples, infinite money glitch prevention, stats elements, and label synchronization).
 - `verify_syntax.py`: 100% Valid JavaScript AST, bracket balance, and tag hierarchy.

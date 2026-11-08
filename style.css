@@ -10480,7 +10480,15 @@ body.bg-theme-minimal .layer0-starfield-svg .c-star {
   font-family: 'Cinzel', serif;
   font-size: 0.72rem;
   color: #d8b4fe;
-  cursor: default;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-music-pill:hover {
+  background: rgba(168, 85, 247, 0.3);
+  border-color: #c084fc;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.4);
+  transform: translateY(-1px);
 }
 
 .nav-music-pill .music-note-icon {
