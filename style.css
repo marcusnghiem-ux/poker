@@ -9850,3 +9850,713 @@ body.bg-theme-minimal .layer0-starfield-svg .c-star {
 .rules-payout-table tr:hover {
   background: rgba(255, 255, 255, 0.02);
 }
+
+/* ==========================================================================
+   UPDATE 1.13: IN-GAME ROSTER LEADERBOARD, HORIZONTAL SLOTS & BIG CASINO RESORT
+   ========================================================================== */
+
+/* 1. Left-Aligned Money Display & Clean Single Transfer Button */
+.dual-wallet-display-hero.money-left-aligned {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 1.2rem 0 1.5rem 0;
+  width: 100%;
+}
+
+.dual-wallet-display-hero.money-left-aligned .dual-wallet-card {
+  flex: 0 1 290px;
+  min-width: 260px;
+  margin: 0;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+}
+
+.hero-transfer-action-wrap.single-transfer-wrap {
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.hero-transfer-money-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  border-radius: 8px;
+  cursor: pointer;
+  background: linear-gradient(135deg, #ffd700 0%, #f59e0b 60%, #b45309 100%);
+  color: #0b0f19;
+  border: 1px solid #fef08a;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hero-transfer-money-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.55);
+  background: linear-gradient(135deg, #fffbeb 0%, #ffd700 50%, #f59e0b 100%);
+}
+
+.hero-transfer-money-btn svg {
+  color: #0b0f19;
+}
+
+/* 2. Main Top Split Section (Top Left & Top Right) */
+.main-top-split-section {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 20px;
+  align-items: start;
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.top-left-hub-col,
+.top-right-hub-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+/* 3. Bigger Grand Casino Resort Entrance Card (Top Left) */
+.casino-grand-portal-card {
+  position: relative;
+  background: radial-gradient(circle at 15% 30%, rgba(245, 158, 11, 0.16) 0%, rgba(15, 23, 42, 0.92) 55%, rgba(6, 9, 18, 0.98) 100%);
+  border: 1.8px solid #ffd700;
+  border-radius: 14px;
+  padding: 18px 20px;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(251, 191, 36, 0.2);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.casino-grand-portal-card:hover {
+  transform: translateY(-3px);
+  border-color: #fef08a;
+  box-shadow: 0 12px 38px rgba(0, 0, 0, 0.7), 0 0 35px rgba(251, 191, 36, 0.35);
+}
+
+.cgp-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cgp-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cgp-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cgp-badge {
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.cgp-badge.live {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.5);
+}
+
+.cgp-badge.gold {
+  background: rgba(251, 191, 36, 0.2);
+  color: #ffd700;
+  border: 1px solid rgba(251, 191, 36, 0.4);
+}
+
+.cgp-badge.amber {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.cgp-wallet-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.cgp-w-lbl {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+}
+
+.cgp-w-val {
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.cgp-hero-body {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cgp-sun-icon-wrap {
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.5));
+}
+
+.cgp-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #ffd700;
+  margin: 0 0 4px 0;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8), 0 0 16px rgba(251, 191, 36, 0.35);
+}
+
+.cgp-subtitle {
+  font-size: 0.82rem;
+  color: #cbd5e1;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.cgp-cta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(251, 191, 36, 0.15);
+}
+
+.cgp-perk-pills {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cgp-perk {
+  font-size: 0.72rem;
+  color: #fef08a;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 3px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.cgp-enter-btn {
+  padding: 10px 20px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 4. Smaller, Compact Local Registered Leaderboard (Top Left) */
+.compact-local-leaderboard-card {
+  background: rgba(13, 18, 30, 0.94);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.clb-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid rgba(251, 191, 36, 0.15);
+  padding-bottom: 8px;
+}
+
+.clb-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.clb-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #ffd700;
+  margin: 0;
+  letter-spacing: 0.8px;
+}
+
+.clb-sub {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  display: block;
+}
+
+.clb-wip-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.65rem;
+  color: #fbbf24;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+}
+
+.clb-wip-badge .wip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fbbf24;
+  box-shadow: 0 0 6px #fbbf24;
+  animation: pulseWip 1.8s infinite;
+}
+
+@keyframes pulseWip {
+  0%, 100% { opacity: 0.5; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.clb-hero-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
+.clb-strip-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.clb-lbl {
+  font-size: 0.6rem;
+  color: #64748b;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.clb-val {
+  font-family: 'Cinzel', serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.clb-scroll-wrap {
+  max-height: 190px;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  background: rgba(9, 12, 22, 0.8);
+}
+
+.clb-scroll-wrap::-webkit-scrollbar {
+  width: 6px;
+}
+
+.clb-scroll-wrap::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.clb-scroll-wrap::-webkit-scrollbar-thumb {
+  background: #d97706;
+  border-radius: 3px;
+}
+
+.clb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.clb-table th {
+  background: rgba(15, 23, 42, 0.95);
+  padding: 6px 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.68rem;
+  color: #ffd700;
+  text-align: left;
+  border-bottom: 1px solid rgba(251, 191, 36, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.clb-table td {
+  padding: 5px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.clb-table tr.main-lb-hero-row {
+  background: rgba(251, 191, 36, 0.12);
+  border-left: 3px solid #ffd700;
+}
+
+.clb-th-rank { width: 50px; text-align: center; }
+.clb-th-wealth { text-align: right; }
+.clb-table td.mlb-td-rank { text-align: center; font-weight: 700; }
+.clb-table td.mlb-td-wealth { text-align: right; font-family: 'Cinzel', serif; color: #34d399; font-weight: 700; }
+
+.clb-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.7rem;
+  color: #94a3b8;
+  padding-top: 4px;
+}
+
+.clb-expand-btn {
+  background: none;
+  border: none;
+  color: #ffd700;
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 0;
+}
+
+.clb-expand-btn:hover {
+  color: #fef08a;
+  text-decoration: underline;
+}
+
+/* 5. Update 1.2 Roadmap Progress Card (Top Right) */
+.roadmap-wip-card {
+  background: radial-gradient(circle at 90% 10%, rgba(99, 102, 241, 0.12) 0%, rgba(15, 23, 42, 0.92) 65%);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rwc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+  padding-bottom: 6px;
+}
+
+.rwc-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rwc-star {
+  color: #a855f7;
+  font-size: 1rem;
+}
+
+.rwc-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #e2e8f0;
+  margin: 0;
+  letter-spacing: 0.6px;
+}
+
+.rwc-badge {
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: rgba(168, 85, 247, 0.2);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.4);
+}
+
+.rwc-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rwc-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.76rem;
+  line-height: 1.35;
+  color: #cbd5e1;
+}
+
+.rwc-bullet {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  margin-top: 1px;
+}
+
+.rwc-bullet.gold { color: #ffd700; }
+.rwc-bullet.cyan { color: #38bdf8; }
+.rwc-bullet.purple { color: #c084fc; }
+
+/* 6. Horizontal 4 Save Slots Grid (Full Width Row) */
+.horizontal-slots-section {
+  width: 100%;
+  margin-top: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.horizontal-four-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  width: 100%;
+}
+
+.horizontal-four-slots-grid .slot-card {
+  padding: 12px 10px;
+  min-height: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.horizontal-four-slots-grid .slot-card .slot-bankroll {
+  font-size: 1.25rem;
+}
+
+.horizontal-four-slots-grid .slot-card .slot-stat-val {
+  font-size: 0.8rem;
+}
+
+.horizontal-four-slots-grid .slot-card .slot-actions {
+  margin-top: 8px;
+}
+
+/* 7. Bottom Update Notes Card */
+.bottom-update-notes-card {
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin: 1.5rem 0 1rem 0;
+  box-shadow: 0 4px 22px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.bun-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  border-bottom: 1px solid rgba(251, 191, 36, 0.15);
+  padding-bottom: 10px;
+}
+
+.bun-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.bun-badge {
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #ffd700;
+  letter-spacing: 0.8px;
+}
+
+.bun-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: 0.6px;
+}
+
+.bun-more-btn {
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  color: #ffd700;
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.bun-more-btn:hover {
+  background: rgba(251, 191, 36, 0.22);
+  border-color: #ffd700;
+  transform: translateX(2px);
+}
+
+.bun-content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.bun-col h4 {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  color: #ffd700;
+  margin: 0 0 8px 0;
+  letter-spacing: 0.5px;
+}
+
+.bun-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.78rem;
+  color: #cbd5e1;
+  line-height: 1.45;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 8. Top Nav Music Pill & Settings Music Notice */
+.nav-music-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  border-radius: 20px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  color: #d8b4fe;
+  cursor: default;
+}
+
+.nav-music-pill .music-note-icon {
+  color: #c084fc;
+}
+
+.settings-music-notice {
+  margin-top: 10px;
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  border-radius: 8px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.smn-icon {
+  font-size: 1.1rem;
+  color: #c084fc;
+  line-height: 1;
+}
+
+.smn-content strong {
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  color: #d8b4fe;
+  margin-bottom: 2px;
+}
+
+.smn-content p {
+  margin: 0;
+  font-size: 0.76rem;
+  color: #cbd5e1;
+  line-height: 1.35;
+}
+
+.modal-wip-strip {
+  background: linear-gradient(90deg, rgba(46, 196, 182, 0.15) 0%, rgba(15, 23, 42, 0.8) 100%);
+  border-bottom: 1px solid rgba(46, 196, 182, 0.4);
+  padding: 6px 14px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  color: #2ec4b6;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-sub-wip-badge {
+  font-size: 0.65rem;
+  color: #2ec4b6;
+  background: rgba(46, 196, 182, 0.15);
+  border: 1px solid rgba(46, 196, 182, 0.35);
+  padding: 2px 6px;
+  border-radius: 8px;
+  margin-left: 6px;
+}
+
+/* 9. Media Query Responsive Adjustments */
+@media (max-width: 1024px) {
+  .main-top-split-section {
+    grid-template-columns: 1fr;
+  }
+  .horizontal-four-slots-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .bun-content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 580px) {
+  .horizontal-four-slots-grid {
+    grid-template-columns: 1fr;
+  }
+}

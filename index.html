@@ -580,10 +580,14 @@
           <span class="hamburger-bar"></span>
         </button>
         <!-- Top Left Update Log Trigger (v1.1) -->
-        <button id="btn-update-log-trigger" class="update-log-pill-btn" title="View Version 1.125 Release Notes" type="button">
+        <button id="btn-update-log-trigger" class="update-log-pill-btn" title="View Version 1.13 Release Notes" type="button">
           <span class="update-pill-dot"></span>
-          <span class="update-pill-text">Update 1.125</span>
+          <span class="update-pill-text">Update 1.13</span>
         </button>
+        <div class="nav-music-pill" title="Atmospheric Casino Music in Studio Production">
+          <span class="music-note-icon">&#9835;</span>
+          <span class="music-pill-text">Music Coming Soon</span>
+        </div>
         <div class="nav-brand-wrap">
           <svg class="nav-crown-svg" width="22" height="18" viewBox="0 0 72 54" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M14 38 Q36 22 58 38 L54 44 Q36 34 18 44 Z" fill="#991b1b"/>
@@ -675,25 +679,25 @@
     <!-- ======================================================================
          1. MAIN MENU SCREEN
          ====================================================================== -->
-    <section id="main-menu" class="main-menu-view">
+        <section id="main-menu" class="main-menu-view">
       <div class="menu-hero">
-        <!-- Main Menu Update Banner v1.125 -->
-        <div class="menu-update-banner" id="menu-update-log-trigger" role="button" tabindex="0" title="Click to view v1.125 Release Notes">
-          <span class="update-badge-tag">LIFESTYLE UPDATE 1.125</span>
-          <span class="update-badge-ver">1.125 &bull; 4 Save Slots, Symmetrical Main Hub, On-Page Leaderboard &amp; All-Games Rules</span>
+        <!-- Main Menu Update Banner v1.13 -->
+        <div class="menu-update-banner" id="menu-update-log-trigger" role="button" tabindex="0" title="Click to view v1.13 Release Notes &amp; Roadmap">
+          <span class="update-badge-tag">UPDATE 1.13</span>
+          <span class="update-badge-ver">1.13 &bull; In-Game Roster Leaderboard, Horizontal Slots &amp; Big Casino Resort &bull; Update 1.2 WIP</span>
           <span class="update-badge-arrow">&rarr;</span>
         </div>
         <h1 class="menu-title">SOLAR TEXAS HOLD'EM</h1>
         <div class="menu-subtitle-wrap">
-          <span class="menu-subtitle-diamond">♦</span>
+          <span class="menu-subtitle-diamond">&diams;</span>
           <span class="menu-subtitle">HIGH STAKES CASINO &bull; MULTIPLAYER EDITION</span>
-          <span class="menu-subtitle-diamond">♦</span>
+          <span class="menu-subtitle-diamond">&diams;</span>
         </div>
         <div class="menu-decor-line">
-          <span class="decor-suit">♠</span>
-          <span class="decor-suit red">♥</span>
-          <span class="decor-suit red">♦</span>
-          <span class="decor-suit">♣</span>
+          <span class="decor-suit">&spades;</span>
+          <span class="decor-suit red">&hearts;</span>
+          <span class="decor-suit red">&diams;</span>
+          <span class="decor-suit">&clubs;</span>
         </div>
       </div>
 
@@ -706,7 +710,7 @@
         <div class="news-ticker-marquee">
           <div id="news-ticker-content" class="news-ticker-content">
             <span id="news-ticker-tag" class="news-headline-tag poker">POKER WIRE</span>
-            <span id="news-ticker-text" class="news-headline-text">Welcome to Solar Texas Hold'em v1.12. Initializing satellite news feed...</span>
+            <span id="news-ticker-text" class="news-headline-text">Welcome to Solar Texas Hold'em v1.13. Initializing satellite news feed...</span>
           </div>
         </div>
         <div class="news-ticker-hint">
@@ -714,9 +718,9 @@
         </div>
       </div>
 
-
-      <!-- DUAL WALLET DISPLAY (Main Menu Front Page) -->
-      <div class="dual-wallet-display-hero">
+      <!-- DUAL WALLET DISPLAY (Shifted to Left Side • Single Transfer Money Button) -->
+      <div class="dual-wallet-display-hero money-left-aligned">
+        <!-- Cumulative Poker Savings Card -->
         <div class="dual-wallet-card poker-vault-hero-card" title="Cumulative Poker Savings Vault">
           <div class="dwh-icon-wrap">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -733,14 +737,7 @@
           </div>
         </div>
 
-        <!-- Direct Main Menu Bank Account Transfer Quick Trigger -->
-        <div class="hero-transfer-action-wrap">
-          <button id="btn-hero-transfer" class="hero-bank-transfer-btn" title="Transfer Money to Bank Account" type="button">
-            <svg class="btn-svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 16V4M7 4L3 8M7 4L11 8M17 8V20M17 20L13 16M17 20L21 16" stroke="#ffd700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span>Transfer to Bank</span>
-          </button>
-        </div>
-
+        <!-- Mini-Games Wallet Card -->
         <div class="dual-wallet-card minigames-hero-card" title="Dedicated Mini-Games Wallet">
           <div class="dwh-icon-wrap">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -755,12 +752,129 @@
             <span class="dwh-sub">Dedicated casino funds &bull; Roulette, Slots &amp; Craps</span>
           </div>
         </div>
+
+        <!-- Single Dedicated Transfer Money Button (Decluttered) -->
+        <div class="hero-transfer-action-wrap single-transfer-wrap">
+          <button id="btn-hero-transfer" class="btn btn-primary gold-action-btn hero-transfer-money-btn" title="Transfer Funds Between Poker Savings and Mini-Game Wallet" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 16V4M7 4L3 8M7 4L11 8M17 8V20M17 20L13 16M17 20L21 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Transfer Money</span>
+          </button>
+        </div>
       </div>
 
-      <!-- MAIN DASHBOARD SPLIT GRID (4 Save Slots Left • Compact Casino & Scrollable Leaderboard Right) -->
-      <div class="main-dashboard-grid symmetrical-dashboard-grid">
-        <!-- LEFT COLUMN: Texas Hold'em & Blackjack Solo Campaign Hub (4 Save Slots) -->
-        <div class="dashboard-left-col">
+      <!-- MAIN TOP SPLIT SECTION: Top Left (Big Casino + Small Leaderboard) & Top Right (Profile + Stipends + Roadmap) -->
+      <div class="main-top-split-section">
+        <!-- TOP LEFT HUB COLUMN: Big Casino Resort Entrance + Small In-Game Leaderboard -->
+        <div class="top-left-hub-col">
+          <!-- Bigger Grand Casino Resort Entrance Card -->
+          <div class="casino-grand-portal-card" id="btn-enter-casino-portal" role="button" tabindex="0" title="Step Onto The High Roller Casino Floor" onclick="if(window.pokerGame){window.pokerGame.showCasinoView()}">
+            <div class="cgp-ambient-glow"></div>
+            <div class="cgp-inner">
+              <div class="cgp-header-row">
+                <div class="cgp-badge-group">
+                  <span class="cgp-badge live">&#9679; FLOOR OPEN</span>
+                  <span class="cgp-badge gold">SOLAR RESORT VIP</span>
+                  <span class="cgp-badge amber">ROULETTE &bull; SLOTS &bull; CRAPS</span>
+                </div>
+                <div class="cgp-wallet-chip">
+                  <span class="cgp-w-lbl">CASINO CHIPS:</span>
+                  <strong class="cgp-w-val emerald" id="portal-minigame-val">$1,000</strong>
+                </div>
+              </div>
+
+              <div class="cgp-hero-body">
+                <div class="cgp-sun-icon-wrap">
+                  <svg class="cgp-sun-svg" width="46" height="46" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="13" fill="rgba(251,191,36,0.25)" stroke="#ffd700" stroke-width="2.2"/>
+                    <circle cx="24" cy="24" r="7" fill="#fef08a" stroke="#f59e0b" stroke-width="1.5"/>
+                    <path d="M24 2v6M24 40v6M2 24h6M40 24h6M8.44 8.44l4.24 4.24M35.32 35.32l4.24 4.24M8.44 39.56l4.24-4.24M35.32 12.68l4.24-4.24" stroke="#ffd700" stroke-width="2.5" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <div class="cgp-hero-text">
+                  <h2 class="cgp-title">SOLAR FLARE CASINO RESORT</h2>
+                  <p class="cgp-subtitle">Step into the premier high-stakes casino floor &bull; European Single-Zero Roulette, 50x Multiplier Slots &amp; Authentic Craps Arena</p>
+                </div>
+              </div>
+
+              <div class="cgp-cta-row">
+                <div class="cgp-perk-pills">
+                  <span class="cgp-perk">&diams; 35:1 Single-Zero</span>
+                  <span class="cgp-perk">&spades; Free $1,000 / 30m</span>
+                  <span class="cgp-perk">&hearts; Dual-View Hub</span>
+                </div>
+                <button class="btn btn-primary cgp-enter-btn gold-action-btn" type="button">
+                  <span>ENTER CASINO FLOOR</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Smaller, Compact In-Game Registered Leaderboard (Top Left) -->
+          <div class="compact-local-leaderboard-card" id="main-leaderboard-section">
+            <div class="clb-header">
+              <div class="clb-title-wrap">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M6 9H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3m12 5h3a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-3M6 4h12v7a6 6 0 0 1-12 0V4z" fill="rgba(253,224,71,0.25)" stroke="#ffd700" stroke-width="1.8"/>
+                  <path d="M12 17v4m-4 0h8" stroke="#ffd700" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+                <div class="clb-titles">
+                  <h3 class="clb-title">REGISTERED PLAYERS STANDINGS</h3>
+                  <span class="clb-sub">In-game registered names &bull; Solar tournament rivals</span>
+                </div>
+              </div>
+              <div class="clb-wip-badge" title="Full Global Leaderboard cross-device cloud persistence will be finished in Update 1.2">
+                <span class="wip-dot"></span>
+                <span>WIP &bull; Finished in Update 1.2</span>
+              </div>
+            </div>
+
+            <!-- Compact Hero Live Standing Strip -->
+            <div class="clb-hero-strip">
+              <div class="clb-strip-item">
+                <span class="clb-lbl">PLAYER:</span>
+                <strong class="clb-val gold" id="main-lb-hero-name">Hero</strong>
+              </div>
+              <div class="clb-strip-item">
+                <span class="clb-lbl">NET WORTH:</span>
+                <strong class="clb-val emerald" id="main-lb-hero-wealth">$1,000</strong>
+              </div>
+              <div class="clb-strip-item">
+                <span class="clb-lbl">RANK:</span>
+                <strong class="clb-val cyan" id="main-lb-hero-rank">#--</strong>
+              </div>
+              <div class="clb-strip-item">
+                <span class="clb-lbl">TIER:</span>
+                <strong class="clb-val gold" id="main-lb-hero-tier">Candidate</strong>
+              </div>
+            </div>
+
+            <!-- Smaller, Compact Scrollable Table of In-Game Registered Players -->
+            <div class="clb-scroll-wrap">
+              <table class="clb-table">
+                <thead>
+                  <tr>
+                    <th class="clb-th-rank">Rank</th>
+                    <th class="clb-th-name">Registered Player</th>
+                    <th class="clb-th-role">Role / Status</th>
+                    <th class="clb-th-wealth">Total Wealth</th>
+                  </tr>
+                </thead>
+                <tbody id="main-leaderboard-tbody">
+                  <!-- Populated by updateLeaderboardUI() with in-game registered players & rivals -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="clb-footer">
+              <span class="clb-footer-note">&bull; In Update 1.2, Leaderboard will be finished with full cloud sync &bull;</span>
+              <button id="main-lb-expand-btn" class="clb-expand-btn" type="button" title="Open Full Standings Modal">Full Modal View &rarr;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TOP RIGHT HUB COLUMN: Profile Bar + Stipends + Update 1.2 Roadmap Progress Card -->
+        <div class="top-right-hub-col">
           <!-- Player Profile & Permanent Identity Bar -->
           <div class="player-profile-bar">
             <div class="profile-input-wrap">
@@ -772,23 +886,6 @@
             <div class="permanent-id-badge" title="Identity is permanently bound to this device session. Factory reset in settings to change.">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#f59e0b" stroke-width="2"/><path d="M12 16v-4m0-4h.01" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/></svg>
               <span>PERMANENT ID</span>
-            </div>
-          </div>
-
-          <!-- 4 Private Solo Save Slots (Stored strictly on each player's device) -->
-          <div class="save-slots-section">
-            <div class="section-title-wrap">
-              <div class="title-with-badge">
-                <h2 class="section-title">SOLO CAMPAIGN &bull; 4 SAVE SLOTS</h2>
-                <span class="slots-count-badge">4 SLOTS</span>
-              </div>
-              <p class="section-desc">Personal saves are private to your device. Online games never affect your solo bankroll.</p>
-            </div>
-            <div class="slots-grid four-slots-grid" id="slots-container">
-              <div class="slot-card" id="slot-card-1" data-slot="1"></div>
-              <div class="slot-card" id="slot-card-2" data-slot="2"></div>
-              <div class="slot-card" id="slot-card-3" data-slot="3"></div>
-              <div class="slot-card" id="slot-card-4" data-slot="4"></div>
             </div>
           </div>
 
@@ -834,99 +931,54 @@
               </div>
             </div>
           </div>
+
+          <!-- UPDATE 1.2 ROADMAP & PROGRESS REPORT CARD -->
+          <div class="roadmap-wip-card">
+            <div class="rwc-header">
+              <div class="rwc-title-wrap">
+                <span class="rwc-star">&#9733;</span>
+                <h3 class="rwc-title">RELEASE 1.2 ROADMAP &bull; WORK IN PROGRESS</h3>
+              </div>
+              <span class="rwc-badge">COMING IN 1.2</span>
+            </div>
+            <div class="rwc-items">
+              <div class="rwc-item">
+                <div class="rwc-bullet gold">&#9670;</div>
+                <div class="rwc-desc">
+                  <strong>Global Leaderboard:</strong> In Update 1.2, the Leaderboard will be finished with full online cross-device synchronization and permanent global standings!
+                </div>
+              </div>
+              <div class="rwc-item">
+                <div class="rwc-bullet cyan">&#9670;</div>
+                <div class="rwc-desc">
+                  <strong>Exclusive Private Room:</strong> In Update 1.2, the Private Room will be finished with real-time peer-to-peer multiplayer tables and custom friend codes!
+                </div>
+              </div>
+              <div class="rwc-item">
+                <div class="rwc-bullet purple">&#9670;</div>
+                <div class="rwc-desc">
+                  <strong>Atmospheric Music:</strong> Music coming soon! Dedicated studio synthwave, lounge jazz, and authentic table audio are currently in production.
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <!-- RIGHT COLUMN: Compact Casino Card & Scrollable Global Leaderboard Widget -->
-        <div class="dashboard-right-col">
-          <!-- Compact Casino Lounge Portal Card (Update 1.125) -->
-          <div class="casino-compact-card" id="btn-enter-casino-portal" role="button" tabindex="0" title="Step Onto The High Roller Casino Floor" onclick="if(window.pokerGame){window.pokerGame.showCasinoView()}">
-            <div class="ccc-left">
-              <div class="ccc-icon-wrap">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="9" stroke="#ffd700" stroke-width="2"/>
-                  <circle cx="12" cy="12" r="5" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3 2"/>
-                  <circle cx="12" cy="12" r="2" fill="#ffd700"/>
-                </svg>
-              </div>
-              <div class="ccc-info">
-                <div class="ccc-badge-row">
-                  <span class="ccc-badge live">CASINO FLOOR OPEN</span>
-                  <span class="ccc-badge gold">SOLAR RESORT</span>
-                </div>
-                <h3 class="ccc-title">SOLAR FLARE CASINO RESORT</h3>
-                <p class="ccc-desc">European Roulette &bull; 50x Multiplier Slots &bull; Craps Arena</p>
-              </div>
-            </div>
-            <div class="ccc-right">
-              <div class="ccc-wallet-box">
-                <span class="ccc-w-lbl">CASINO CHIPS:</span>
-                <strong class="ccc-w-val emerald" id="portal-minigame-val">$1,000</strong>
-              </div>
-              <button class="ccc-enter-btn" type="button">
-                <span>Enter Casino Floor</span>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-            </div>
+      <!-- HORIZONTAL 4 SAVE SLOTS (Update 1.13: Full Width Horizontally Perfect) -->
+      <div class="save-slots-section horizontal-slots-section">
+        <div class="section-title-wrap">
+          <div class="title-with-badge">
+            <h2 class="section-title">SOLO CAMPAIGN &bull; 4 SAVE SLOTS</h2>
+            <span class="slots-count-badge">4 HORIZONTAL SLOTS</span>
           </div>
-
-          <!-- On-Page Scrollable Global High-Roller Leaderboard Widget (Update 1.125) -->
-          <div class="main-leaderboard-card" id="main-leaderboard-section">
-            <div class="main-lb-header">
-              <div class="main-lb-title-wrap">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M6 9H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3m12 5h3a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-3M6 4h12v7a6 6 0 0 1-12 0V4z" fill="rgba(253,224,71,0.25)" stroke="#ffd700" stroke-width="1.8"/>
-                  <path d="M12 17v4m-4 0h8" stroke="#ffd700" stroke-width="1.8" stroke-linecap="round"/>
-                </svg>
-                <div class="main-lb-titles">
-                  <h3 class="main-lb-title">GLOBAL HIGH-ROLLER STANDINGS</h3>
-                  <span class="main-lb-sub">Live circuit rankings &bull; Scroll to explore all legends</span>
-                </div>
-              </div>
-              <span class="main-lb-badge">IN PROGRESS &bull; v1.125</span>
-            </div>
-
-            <!-- Hero Live Standing Strip -->
-            <div class="main-lb-hero-strip">
-              <div class="mlb-strip-item">
-                <span class="mlb-lbl">PLAYER:</span>
-                <strong class="mlb-val gold" id="main-lb-hero-name">Hero</strong>
-              </div>
-              <div class="mlb-strip-item">
-                <span class="mlb-lbl">NET WORTH:</span>
-                <strong class="mlb-val emerald" id="main-lb-hero-wealth">$1,000</strong>
-              </div>
-              <div class="mlb-strip-item">
-                <span class="mlb-lbl">GLOBAL RANK:</span>
-                <strong class="mlb-val cyan" id="main-lb-hero-rank">#--</strong>
-              </div>
-              <div class="mlb-strip-item">
-                <span class="mlb-lbl">DIVISION:</span>
-                <strong class="mlb-val gold" id="main-lb-hero-tier">Candidate</strong>
-              </div>
-            </div>
-
-            <!-- Scrollable Table -->
-            <div class="main-lb-scroll-wrap">
-              <table class="main-lb-table">
-                <thead>
-                  <tr>
-                    <th class="mlb-th-rank">Rank</th>
-                    <th class="mlb-th-name">Player / Legend</th>
-                    <th class="mlb-th-origin">Origin</th>
-                    <th class="mlb-th-wealth">Total Wealth</th>
-                  </tr>
-                </thead>
-                <tbody id="main-leaderboard-tbody">
-                  <!-- Populated by updateLeaderboardUI() -->
-                </tbody>
-              </table>
-            </div>
-
-            <div class="main-lb-footer">
-              <span class="main-lb-note">&bull; Scroll table above to view all 12 circuit legends &bull;</span>
-              <button id="main-lb-expand-btn" class="main-lb-expand-btn" type="button" title="Open Full Standings Modal">Full Modal View &rarr;</button>
-            </div>
-          </div>
+          <p class="section-desc">Personal saves are private to your device. Online games never affect your solo bankroll.</p>
+        </div>
+        <div class="slots-grid horizontal-four-slots-grid" id="slots-container">
+          <div class="slot-card" id="slot-card-1" data-slot="1"></div>
+          <div class="slot-card" id="slot-card-2" data-slot="2"></div>
+          <div class="slot-card" id="slot-card-3" data-slot="3"></div>
+          <div class="slot-card" id="slot-card-4" data-slot="4"></div>
         </div>
       </div>
 
@@ -943,13 +995,13 @@
           <span class="sym-card-arrow">&rarr;</span>
         </button>
 
-        <button id="btn-menu-ranks" class="sym-action-card" type="button" title="Explore Global Circuit Standings &amp; Tiers">
+        <button id="btn-menu-ranks" class="sym-action-card" type="button" title="Explore Registered Players Standings &amp; Tiers">
           <div class="sym-card-icon amber">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 9H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3m12 5h3a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-3M6 4h12v7a6 6 0 0 1-12 0V4z" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="1.8"/><path d="M12 17v4m-4 0h8" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round"/></svg>
           </div>
           <div class="sym-card-content">
-            <span class="sym-card-title">Global Standings</span>
-            <span class="sym-card-sub">High-roller tiers &amp; legend rankings</span>
+            <span class="sym-card-title">Registered Standings</span>
+            <span class="sym-card-sub">In-game registered names &amp; tiers</span>
           </div>
           <span class="sym-card-arrow">&rarr;</span>
         </button>
@@ -970,31 +1022,59 @@
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="#c084fc" stroke-width="2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="#c084fc" stroke-width="1.8"/></svg>
           </div>
           <div class="sym-card-content">
-            <span class="sym-card-title">Settings &amp; 4 Themes</span>
-            <span class="sym-card-sub">Ultra, Balanced, Night Sky &amp; Minimal</span>
+            <span class="sym-card-title">Settings &amp; Themes</span>
+            <span class="sym-card-sub">4 Themes &bull; Music Coming Soon</span>
           </div>
           <span class="sym-card-arrow">&rarr;</span>
         </button>
       </div>
 
-      <!-- Secondary Utility Row (Bank Transfer & Exclusive Room) -->
+      <!-- Secondary Utility Row (Exclusive Room with 1.2 Notice) -->
       <div class="menu-utility-action-row">
-        <button id="btn-menu-bank-transfer" class="utility-pill-btn" type="button" title="Transfer Money Between Mini-Game Wallet and Bank Account">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="3" stroke="#ffd700" stroke-width="2"/><circle cx="12" cy="12" r="3.5" stroke="#ffd700" stroke-width="1.8"/><path d="M7 12h10M12 7v10" stroke="#ffd700" stroke-width="1.5"/></svg>
-          <span>Savings Bank Transfer</span>
-        </button>
         <button id="btn-open-online-room" class="utility-pill-btn" type="button" title="Enter Exclusive Room with Online Players">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#2ec4b6" stroke-width="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#2ec4b6" stroke-width="2"/></svg>
           <span>Exclusive Private Room</span>
+          <span class="btn-sub-wip-badge">WIP &bull; Finished in Update 1.2</span>
         </button>
       </div>
-<footer class="menu-footer">
-        <span>Offline AI Tournament &bull; Real-Time Online Room &bull; Dynamic Blinds &bull; Private Device Saves</span>
-      </footer>
-    </section>
 
-    <!-- ======================================================================
-         1B. DEDICATED CASINO VIEW (Vibrant High-Stakes Non-Poker Arena)
+      <!-- BOTTOM UPDATE NOTES SECTION (Update 1.13) -->
+      <div class="bottom-update-notes-card" id="bottom-update-notes" role="region" aria-label="Version 1.13 Update Notes &amp; Roadmap">
+        <div class="bun-header">
+          <div class="bun-header-left">
+            <span class="bun-badge">LATEST RELEASE &bull; v1.13</span>
+            <h3 class="bun-title">UPDATE 1.13 &bull; IN-GAME ROSTER &amp; HORIZONTAL HUB</h3>
+          </div>
+          <button id="bottom-update-notes-more-btn" class="bun-more-btn" type="button">
+            <span>View Full Historical Release Notes</span>
+            <span class="bun-arrow">&rarr;</span>
+          </button>
+        </div>
+        <div class="bun-content-grid">
+          <div class="bun-col">
+            <h4>&diams; What's New in Update 1.13</h4>
+            <ul class="bun-list">
+              <li><strong>Local Registered Leaderboard:</strong> Moved to the top left and made compact. Now strictly displays players in this game with registered names and solar table rivals (Viper, Atlas, Luna, Duke, etc.) instead of external international pros.</li>
+              <li><strong>Horizontal 4 Save Slots:</strong> All 4 solo campaign slots are now aligned horizontally side-by-side in a single balanced 4-column row.</li>
+              <li><strong>Left-Aligned Money &amp; Clean Transfer:</strong> Money shifted to the left side with cluttered secondary transfer labels removed. A single clean &quot;Transfer Money&quot; button opens the transfer modal.</li>
+              <li><strong>Bigger Casino Resort Portal:</strong> Expanded, illuminated grand entrance card prominently located in the top left.</li>
+            </ul>
+          </div>
+          <div class="bun-col">
+            <h4>&spades; Update 1.2 Roadmap &amp; Progress</h4>
+            <ul class="bun-list">
+              <li><strong>Global Leaderboard Finished in 1.2:</strong> Real-time cross-client cloud persistence and global tournament standings will be fully completed in Update 1.2!</li>
+              <li><strong>Private Room Finished in 1.2:</strong> Peer-to-peer multiplayer lobbies, custom room codes, and synchronized live play will be fully completed in Update 1.2!</li>
+              <li><strong>Atmospheric Music Coming Soon:</strong> Original Solar Flare casino soundtracks, ambient lounge jazz, and table audio are currently in studio recording!</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <footer class="menu-footer">
+        <span>Offline AI Tournament &bull; Real-Time Online Room &bull; Dynamic Blinds &bull; Private Device Saves &bull; Update 1.13</span>
+      </footer>
+    </section> (Vibrant High-Stakes Non-Poker Arena)
          ====================================================================== -->
     <section id="casino-view" class="casino-view-container hidden">
       <!-- Solar Corona & Plasma Flare Ambient Glows -->
@@ -2340,14 +2420,16 @@
 
         <div class="modal-footer update-announcement-footer">
           <button id="btn-start-playing-v11" class="btn btn-primary gold-action-btn btn-explore-update" type="button">
-            <span>START PLAYING UPDATE 1.125</span> <span class="play-arrow">▶</span>
+            <span>START PLAYING UPDATE 1.13</span> <span class="play-arrow">▶</span>
           </button>
         </div>
       </div>
     </div>
 
     <!-- ======================================================================
-         UPDATE LOG MODAL class="modal-overlay hidden">
+         UPDATE LOG MODAL
+         ====================================================================== -->
+    <div id="update-log-modal" class="modal-overlay hidden">
       <div class="modal-card update-log-card">
         <div class="modal-header">
           <div class="update-log-header-left">
@@ -3771,8 +3853,8 @@
               <path d="M6 9H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3m12 5h3a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-3M6 4h12v7a6 6 0 0 1-12 0V4z" fill="rgba(253,224,71,0.3)" stroke="#ffd700" stroke-width="1.8"/>
               <path d="M12 17v4m-4 0h8" stroke="#ffd700" stroke-width="1.8" stroke-linecap="round"/>
             </svg>
-            <h2 id="lb-modal-title">GLOBAL HIGH-ROLLER LEADERBOARD</h2>
-            <span class="lb-wip-badge">IN PROGRESS &bull; v1.125</span>
+            <h2 id="lb-modal-title">REGISTERED PLAYERS STANDINGS</h2>
+            <span class="lb-wip-badge">WIP &bull; Finished in Update 1.2</span>
           </div>
           <button id="close-leaderboard-btn" class="close-btn" aria-label="Close Leaderboard">&times;</button>
         </div>
@@ -3783,8 +3865,8 @@
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#f59e0b" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="16" r="1" fill="#f59e0b"/></svg>
             </div>
             <div class="lb-notice-text">
-              <strong>GLOBAL SATELLITE RELAY &bull; EXPERIMENTAL WIP:</strong>
-              Cross-device cloud database sync is currently in development for v1.13. Your position is dynamically calculated based on your total cumulative net worth across all 4 save slots, cumulative savings vault, and mini-game wallet.
+              <strong>REGISTERED PLAYERS ROSTER &bull; WORK IN PROGRESS:</strong>
+              In Update 1.2, the Leaderboard will be finished with full online cross-device synchronization! Standings show players in this game with registered callsigns and solar table rivals.
             </div>
           </div>
 
@@ -3815,8 +3897,8 @@
                 <tr>
                   <th class="th-rank">Rank</th>
                   <th class="th-player">Player / Legend</th>
-                  <th class="th-region">Origin / Venue</th>
-                  <th class="th-title">Title / Division</th>
+                  <th class="th-region">Role / Division</th>
+                  <th class="th-title">Status</th>
                   <th class="th-wealth">Total Wealth</th>
                 </tr>
               </thead>

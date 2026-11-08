@@ -820,3 +820,52 @@ Update 1.125 ("Lifestyle Update") resolves critical navigation and accessibility
 - `test_blackjack_engine.py`: 5/5 unit tests passed.
 - `simulate_performance_25_runs.py`: 25/25 benchmarks passed (0 regressions).
 - `simulate_10_full_games_to_2000.py`: 10/10 runs reached >= $2,000 target ($20,829 total cashout).
+
+
+## 36. Release v1.13: In-Game Roster Leaderboard, Horizontal 4 Save Slots, Left-Aligned Money, Big Casino Resort & Update 1.2 Roadmap
+
+### Executive Summary
+Update 1.13 delivers a comprehensive dashboard restructuring and local player identity overhaul. The on-page Leaderboard has been relocated to the top left and scaled into a compact, responsive widget that exclusively ranks in-game registered players and authentic table rivals (eliminating external international pros). All 4 solo campaign save slots have been unified into a single, horizontally balanced row spanning the full width of the hub. The money display has been shifted to the left with cluttered secondary transfer elements stripped in favor of a single, prominent "Transfer Money" button. The Casino Resort entrance in the top left has been expanded into a grand, glowing portal card. Crucially, `#update-log-modal` was repaired and connected to an on-page bottom release notes section that automatically scrolls directly to the start of the notes upon trigger. Finally, an official Update 1.2 roadmap was posted across the interface, announcing that the Global Leaderboard and Private Room will be finished in Update 1.2, alongside an upcoming atmospheric music soundtrack.
+
+### Key Architectural & Feature Deliverables
+1. **Top-Left In-Game Registered Leaderboard (`.compact-local-leaderboard-card`):**
+   - **Relocation & Scaling:** Moved from the right column to the top left of the main hub, styled with tight vertical padding and compact scrollable viewport (`max-height: 190px`) with custom gold scrollbar.
+   - **Local In-Game Roster:** Replaced the international poker legends (Phil Ivey, Daniel Negreanu, etc.) with registered players from this game:
+     - Hero's registered callsign (from `royal_poker_username`) dynamically calculated from Savings Vault + Mini-Game Wallet + all 4 save slots.
+     - Persistent device roster stored in `solar_poker_registered_roster` (purged on Factory Reset).
+     - Authentic in-game rivals: Viper (TAG Shark Rival, $185k), Atlas (Solid TAG Contender, $142k), Luna (Nit Master, $98k), Duke (Maniac High-Roller, $76k), Rex 'Bluff King' (Tournament Challenger, $54k), Jade 'Solar Ace' (Floor Master, $42k), Nova 'The Comet' (Blackjack Specialist, $28k), Maverick (Circuit Veteran, $19.5k), and Helios (Arena Host, $12k).
+   - **Work in Progress Badge:** Embedded header badge & footer note: `WORK IN PROGRESS • In Update 1.2, Leaderboard will be finished!`
+   - Modal view (`#leaderboard-modal`) synchronized with identical in-game registered roster.
+
+2. **Horizontally Perfect 4 Save Slots (`.horizontal-slots-section`):**
+   - Transformed the 2x2 grid into a single horizontal row (`.horizontal-four-slots-grid` with `grid-template-columns: repeat(4, 1fr)`).
+   - Carefully proportioned each slot card (`min-height: 250px`, compact headers, 1.25rem bankroll displays, streamlined stats grid, and compact action buttons) so that all 4 slots fit side-by-side cleanly without overflowing.
+   - Fully responsive: drops to a 2x2 grid on tablets ($\le 1024px$) and single-column on mobile ($\le 580px$).
+
+3. **Left-Aligned Money Display & Single "Transfer Money" Button:**
+   - Restructured `.dual-wallet-display-hero.money-left-aligned` to justify wallets to the left with compact cards for Cumulative Poker Savings and Mini-Games Wallet.
+   - Stripped away confusing inline "Transfer to Bank" elements and duplicate forms.
+   - Replaced with a single, dedicated **`Transfer Money`** button (`#btn-hero-transfer`) that opens `#transfer-modal`, enabling instant bidirectional transfers between Bank Account and Mini-Game funds.
+
+4. **Bigger Grand Casino Resort Portal Card (`.casino-grand-portal-card`):**
+   - Expanded into a grand high-roller entrance card in the top left (`min-height: 165px`) with radial gold glow, animated sun corona SVG, live status badge (`● FLOOR OPEN`), VIP perks (`35:1 Single-Zero`, `Free $1,000 / 30m`, `Dual-View Hub`), and large `ENTER CASINO FLOOR ▶` CTA button.
+
+5. **Bottom Update Notes Section & Release Notes Navigation Fix:**
+   - **Root Cause Fixed:** Discovered `#update-log-modal` was missing its outer `<div id="update-log-modal" class="modal-overlay hidden">` wrapper due to a malformed comment tag, causing `document.getElementById('update-log-modal')` to return null. Restored the div wrapper, restoring exact 0-diff tag balance across the entire DOM (865 opened, 865 closed).
+   - **On-Page Bottom Update Notes (`#bottom-update-notes`):** Added a dedicated summary card directly above the footer detailing What's New in Update 1.13 and the Update 1.2 Roadmap.
+   - **Start of Update Notes Navigation:** Clicking `#btn-update-log-trigger`, `#menu-update-log-trigger`, or `#bottom-update-notes-more-btn`:
+     1. Smoothly scrolls the viewport to `#bottom-update-notes`.
+     2. Opens `#update-log-modal` and resets `.update-log-body.scrollTop = 0` so the player is taken directly to the start of the latest release notes.
+
+6. **Update 1.2 Roadmap & Music Coming Soon Announcements:**
+   - **Leaderboard Finished in 1.2:** Stated across Leaderboard header, Leaderboard modal, roadmap card, and ticker.
+   - **Private Room Finished in 1.2:** Stated on `#btn-open-online-room`, transit drawer, online auth modal, and roadmap card.
+   - **Music Coming Soon:** Added `Music Coming Soon` pill in top navbar (`.nav-music-pill`), audio notice in `#settings-modal` (`.settings-music-notice`), and ticker headlines announcing upcoming atmospheric casino soundtracks and ambient table music.
+
+### Verification Matrix
+- `verify_syntax.py`: 100% valid JavaScript AST, tags, and bracket nesting.
+- HTML tag validator: Exactly 0 tag discrepancy across all elements (865 divs, 3 sections, 222 buttons, 5 tables, 22 trs, 18 ths, 51 tds).
+- Emoji compliance: Strictly 0 high-unicode system emojis in HTML and CSS (100% pure SVG vector icons and HTML entities).
+- `test_blackjack_engine.py`: 5/5 unit tests passed.
+- `simulate_performance_25_runs.py`: 25/25 benchmarks passed (0 regressions).
+- `simulate_10_runs.py`: 10/10 automated simulation runs passed.

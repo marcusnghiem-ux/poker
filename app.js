@@ -1959,18 +1959,36 @@ class PokerApp {
     const modal = document.getElementById('update-log-modal');
     const btnNav = document.getElementById('btn-update-log-trigger');
     const btnHero = document.getElementById('menu-update-log-trigger');
+    const btnMore = document.getElementById('bottom-update-notes-more-btn');
     const closeBtn = document.getElementById('close-update-log-btn');
     const closeBtnBottom = document.getElementById('btn-close-update-log');
 
     const openModal = () => {
-      if (modal) modal.classList.remove('hidden');
+      // 1. If on main menu, smooth scroll down to the start of the bottom update notes
+      const bottomNotes = document.getElementById('bottom-update-notes');
+      if (bottomNotes) {
+        bottomNotes.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      // 2. Open update log modal and ensure scrolled to the very start of latest release notes
+      if (modal) {
+        modal.classList.remove('hidden');
+        const modalBody = modal.querySelector('.update-log-body');
+        if (modalBody) {
+          modalBody.scrollTop = 0;
+        }
+      }
+      sounds.playClick();
     };
+
     const closeModal = () => {
       if (modal) modal.classList.add('hidden');
+      sounds.playClick();
     };
 
     if (btnNav) btnNav.addEventListener('click', openModal);
     if (btnHero) btnHero.addEventListener('click', openModal);
+    if (btnMore) btnMore.addEventListener('click', openModal);
     if (closeBtn) closeBtn.addEventListener('click', closeModal);
     if (closeBtnBottom) closeBtnBottom.addEventListener('click', closeModal);
   }
@@ -3011,7 +3029,8 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
         'royal_poker_username',
         'royal_poker_name_locked',
         'royal_poker_volume',
-        'solar_poker_leaderboard_data'
+        'solar_poker_leaderboard_data',
+        'solar_poker_registered_roster'
       ];
       knownKeys.forEach(k => {
         try { localStorage.removeItem(k); } catch (e) {}
@@ -7708,6 +7727,10 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
 
     // Database of 105 distinct headlines (15% Poker, 70% Global & Vietnam, 15% Space Weather)
     const HEADLINES = [
+      // Update 1.13 & Update 1.2 Roadmap Highlights
+      { category: 'poker', tag: 'UPDATE 1.2 ROADMAP', text: "Official Announcement: Global Leaderboard with cloud sync and Exclusive Private Room multiplayer will be finished in Update 1.2!" },
+      { category: 'poker', tag: 'AUDIO STUDIO', text: "Music Coming Soon: Dedicated atmospheric table soundtracks & ambient casino music currently in studio recording!" },
+      { category: 'poker', tag: 'ROSTER STANDINGS', text: "In-game registered player leaderboard is now active: compete against registered players and table rivals!" },
       // --- POKER & CASINO WIRE (~15%) ---
       { category: 'poker', tag: 'POKER WIRE', text: "High-stakes titan Phil Ivey spotted executing deep river check-raises in the Solar VIP lounge." },
       { category: 'poker', tag: 'POKER WIRE', text: "Record-breaking $2,400,000 bad-beat jackpot triggered on Table 7 with Quad Aces cracked by a Royal Flush." },
@@ -7933,29 +7956,50 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     const heroTotalWealth = cumulativeSavings + miniGameWallet + slotsChips;
     const heroName = (localStorage.getItem('royal_poker_username') || 'Hero').trim();
 
-    // Circuit Legends Database (12 Worldwide Champions)
-    const LEGENDS = [
-      { name: "Phil Ivey", region: "Las Vegas, USA", title: "The Tiger Woods of Poker", wealth: 1250000 },
-      { name: "Daniel Negreanu", region: "Toronto, Canada", title: "Kid Poker / Hall of Fame", wealth: 980000 },
-      { name: "Doyle Brunson", region: "Longworth, Texas", title: "The Godfather of Poker", wealth: 850000 },
-      { name: "Gerald 'Solar King'", region: "Monte Carlo, Monaco", title: "Solar Sovereign Grandmaster", wealth: 620000 },
-      { name: "Vanessa Selbst", region: "New York, USA", title: "Triple WSOP Bracelet Titan", wealth: 450000 },
-      { name: "Justin Bonomo", region: "Denver, Colorado", title: "Super High-Roller Crusher", wealth: 380000 },
-      { name: "Erik Seidel", region: "New York, USA", title: "Old School High-Stakes Pro", wealth: 290000 },
-      { name: "Antonio Esfandiari", region: "Tehran, Iran", title: "The Magician / One Drop Champ", wealth: 210000 },
-      { name: "Tom Dwan", region: "Edison, New Jersey", title: "durrrr / High-Stakes Phenom", wealth: 150000 },
-      { name: "Phil Hellmuth", region: "Madison, Wisconsin", title: "The Poker Brat / 17 Bracelets", wealth: 95000 },
-      { name: "Fedor Holz", region: "Saarbrücken, Germany", title: "CrownUpGuy / High-Roller Icon", wealth: 75000 },
-      { name: "Dan Smith", region: "Manalapan, New Jersey", title: "Cowboy Dan / High Roller Pro", wealth: 50000 }
+    // In-Game Registered Standings & Solar Rivals (No external international players)
+    const IN_GAME_RIVALS = [
+      { name: "Viper", role: "TAG Shark Rival", status: "Solar Diamond VIP", wealth: 185000 },
+      { name: "Atlas", role: "Solid TAG Contender", status: "Solar Elite", wealth: 142000 },
+      { name: "Luna", role: "Nit Master / Rock", status: "Solar Elite", wealth: 98000 },
+      { name: "Duke", role: "Maniac High-Roller", status: "High Roller", wealth: 76000 },
+      { name: "Rex 'Bluff King'", role: "Tournament Challenger", status: "Circuit Pro", wealth: 54000 },
+      { name: "Jade 'Solar Ace'", role: "Floor Master", status: "Circuit Pro", wealth: 42000 },
+      { name: "Nova 'The Comet'", role: "Blackjack Specialist", status: "Table Regular", wealth: 28000 },
+      { name: "Maverick", role: "Solar Circuit Veteran", status: "Table Regular", wealth: 19500 },
+      { name: "Helios", role: "Grand Arena Host", status: "Rising Contender", wealth: 12000 }
     ];
 
-    // Combine Hero into the circuit standings
+    // Maintain persistent registered players roster on this device
+    let savedProfiles = [];
+    try {
+      const raw = localStorage.getItem('solar_poker_registered_roster');
+      if (raw) savedProfiles = JSON.parse(raw);
+    } catch (e) {}
+
+    // Save Hero into registered roster if not already saved
+    if (heroName && heroName !== 'Hero') {
+      const existing = savedProfiles.find(p => p.name.toLowerCase() === heroName.toLowerCase());
+      if (existing) {
+        existing.wealth = heroTotalWealth;
+      } else {
+        savedProfiles.push({ name: heroName, role: "Registered Player", status: "Active Hero", wealth: heroTotalWealth });
+      }
+      try {
+        localStorage.setItem('solar_poker_registered_roster', JSON.stringify(savedProfiles));
+      } catch (e) {}
+    }
+
+    // Filter out Hero from savedProfiles so Hero isn't duplicated
+    const otherRegistered = savedProfiles.filter(p => p.name.toLowerCase() !== heroName.toLowerCase());
+
+    // Combine Hero into in-game registered standings
     const standings = [
-      ...LEGENDS,
+      ...IN_GAME_RIVALS,
+      ...otherRegistered,
       {
         name: heroName,
-        region: "Solar Transit Lounge",
-        title: "Solar High Roller Candidate",
+        role: "Registered Player",
+        status: "Active Hero",
         wealth: heroTotalWealth,
         isHero: true
       }
@@ -8014,8 +8058,8 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
               <strong>${player.name}</strong>
               ${isHero ? '<span class="hero-tag-badge">YOU</span>' : ''}
             </td>
-            <td class="region-cell">${player.region}</td>
-            <td class="title-cell">${player.title}</td>
+            <td class="region-cell">${player.role || 'Registered Player'}</td>
+            <td class="title-cell">${player.status || 'Active Member'}</td>
             <td class="td-wealth gold">$${player.wealth.toLocaleString()}</td>
           </tr>
         `;
@@ -8040,7 +8084,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
               <span class="mlb-name-text">${player.name}</span>
               ${isHero ? '<span class="mlb-you-tag">YOU</span>' : ''}
             </td>
-            <td class="mlb-td-origin">${player.region}</td>
+            <td class="mlb-td-origin">${player.role || 'Player'}</td>
             <td class="mlb-td-wealth">$${player.wealth.toLocaleString()}</td>
           </tr>
         `;
@@ -8058,7 +8102,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
   }
 
   // ==========================================================================
-  // v1.125: FIRST-TIME OVERPOWERING UPDATE 1.125 ANNOUNCEMENT MODAL
+  // v1.13: FIRST-TIME OVERPOWERING UPDATE 1.13 ANNOUNCEMENT MODAL
   // ==========================================================================
   initUpdateAnnouncementModal() {
     const modal = document.getElementById('update-announcement-modal');
@@ -8068,15 +8112,15 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
 
     const dismissModal = () => {
       if (modal) modal.classList.add('hidden');
-      localStorage.setItem('solar_poker_seen_version', '1.125');
+      localStorage.setItem('solar_poker_seen_version', '1.13');
       sounds.playClick();
     };
 
     if (closeBtn) closeBtn.addEventListener('click', dismissModal);
     if (startBtn) startBtn.addEventListener('click', dismissModal);
 
-    // Initial first-time presentation for v1.125 Lifestyle Update
-    if (seenVersion !== '1.125' && modal) {
+    // Initial first-time presentation for v1.13 In-Game Roster & Horizontal Hub Update
+    if (seenVersion !== '1.13' && modal) {
       setTimeout(() => {
         modal.classList.remove('hidden');
         sounds.playAlert();
