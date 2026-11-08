@@ -8497,7 +8497,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       return;
     }
 
-    const email = (this.authEmailInput?.value || '').trim();
+    const email = (this.authEmailInput?.value || '').trim().toLowerCase();
     const callsign = (localStorage.getItem('royal_poker_username') || 'High Roller').trim();
 
     if (!email || !email.includes('@') || !email.includes('.')) {
@@ -8525,7 +8525,10 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
 
       if (error) {
         sounds.playError();
-        this.showAuthFeedback(`Could not send code: ${error.message}`, 'error');
+        const msg = error.message && error.message.toLowerCase().includes('rate limit')
+          ? 'Email rate limit reached. Please wait 60 seconds before requesting another code.'
+          : `Could not send code: ${error.message}`;
+        this.showAuthFeedback(msg, 'error');
         return;
       }
 
@@ -8553,8 +8556,8 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       return;
     }
 
-    const email = this.pendingAuthEmail || (this.authEmailInput?.value || '').trim();
-    const code = (this.authOtpCodeInput?.value || '').trim();
+    const email = (this.pendingAuthEmail || this.authEmailInput?.value || '').trim().toLowerCase();
+    const code = (this.authOtpCodeInput?.value || '').replace(/\s+/g, '').trim();
 
     if (!code || code.length !== 6) {
       sounds.playError();
@@ -8623,7 +8626,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
 
   async handleResendOtpCode() {
     if (!supabaseClient) return;
-    const email = this.pendingAuthEmail || (this.authEmailInput?.value || '').trim();
+    const email = (this.pendingAuthEmail || this.authEmailInput?.value || '').trim().toLowerCase();
     if (!email) {
       this.showOtpFeedback('Email address missing. Please click Change Email to enter your address.', 'error');
       return;
