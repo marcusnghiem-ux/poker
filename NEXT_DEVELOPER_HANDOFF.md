@@ -933,3 +933,36 @@ Update 1.13 delivers a comprehensive dashboard restructuring and local player id
 
 4. **10 Exhaustive Stress Tests Passed:**
    - Ran 10 edge-case bug-out scenarios covering whitespace trimming, email aliases, code sanitation, debouncing, 429 handling, and verified session persistence with 100% pass rate.
+
+---
+
+## 40. Update 1.55 (Part 2): Top-Left Sign-In / Log-In Navigation & Comprehensive Auth Button Alerts
+
+### Architecture & System Enhancements
+1. **Top-Left Sign-In / Log-In Navigation Button:**
+   - Added `#btn-top-left-login` inside `<div class="top-bar-left">` with key SVG icon and dynamic text `#nav-login-btn-text`.
+   - Wired click event to open `#email-auth-modal` from anywhere in the interface.
+   - Synchronized live state in `updateAuthPillUI()`: reflects 'Sign In / Log In' for guest players and 'Verified Player' with green emblem for authenticated accounts.
+   - Fully styled in `style.css` with responsive layout and zero high-unicode emojis.
+
+2. **Comprehensive In-Game Alerts for Every Auth Button:**
+   - Built custom in-game modal alert feedback (`this.showInGameAlert(...)`) with native audio triggers for every authentication interaction:
+     - **Send Code (`#btn-send-otp-code`)**: Alerts on missing/invalid email, rate limits, network faults, or successful dispatch.
+     - **Verify Code (`#btn-verify-otp-code`)**: Alerts with warning if code input is empty or not exactly 6 digits, alerts on invalid/expired OTP, and alerts with success modal on successful verification.
+     - **Resend Code (`#btn-resend-otp-code`)**: Alerts on active cooldown timer, missing email, or successful fresh code dispatch.
+     - **Switch to Code View (`#btn-switch-to-code`)**: Alerts confirming switch to manual code entry mode.
+     - **Change Email (`#btn-change-email`)**: Alerts instructing player on entering a new address.
+     - **Unlink Account (`#btn-auth-sign-out`)**: Alerts confirming session unlinking.
+
+3. **Supabase OTP Template Token Guidance:**
+   - Identified that default Supabase email template only renders `{{ .ConfirmationURL }}` without `{{ .Token }}`.
+   - Documented exact template snippet placing `{{ .Token }}` prominently for one-click 6-digit OTP delivery.
+
+### Verification Suite
+- `verify_syntax.py`: 100% Valid JavaScript syntax, AST, bracket balance, and tag hierarchy.
+- HTML tag check: 100% perfect tag balance, 0 errors.
+- Emoji check: Strictly 0 high-unicode emojis in `index.html` and `style.css`.
+- `test_blackjack_engine.py`: 5/5 unit tests passed.
+- `simulate_10_runs.py`: 10/10 game simulation runs passed.
+- `simulate_performance_25_runs.py`: 25/25 performance benchmarks passed.
+

@@ -11123,3 +11123,39 @@ body.bg-theme-minimal .layer0-starfield-svg .c-star {
   border-color: rgba(251, 191, 36, 0.4);
   color: #ffd700;
 }
+
+/* Top Left Nav Sign In / Log In Button */
+.nav-auth-login-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(15, 23, 42, 0.8) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.45);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #ffd700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.nav-auth-login-btn:hover {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.3) 0%, rgba(30, 41, 59, 0.9) 100%);
+  border-color: #ffd700;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.3);
+  transform: translateY(-1px);
+}
+
+.nav-auth-login-btn.verified {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(15, 23, 42, 0.85) 100%);
+  border-color: rgba(16, 185, 129, 0.5);
+  color: #34d399;
+}
+
+.nav-auth-login-btn.verified:hover {
+  border-color: #10b981;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
+}

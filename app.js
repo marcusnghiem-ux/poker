@@ -8283,6 +8283,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
   initEmailAuth() {
     this.authModal = document.getElementById('email-auth-modal');
     this.btnOpenAuthModal = document.getElementById('btn-open-auth-modal');
+    this.btnTopLeftLogin = document.getElementById('btn-top-left-login');
     this.btnCloseAuthModal = document.getElementById('close-email-auth-btn');
 
     this.authStatusBox = document.getElementById('email-auth-status-box');
@@ -8316,6 +8317,12 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       });
     }
 
+    if (this.btnTopLeftLogin) {
+      this.btnTopLeftLogin.addEventListener('click', () => {
+        this.openEmailAuthModal();
+      });
+    }
+
     if (this.btnCloseAuthModal) {
       this.btnCloseAuthModal.addEventListener('click', () => {
         if (this.authModal) this.authModal.classList.add('hidden');
@@ -8339,6 +8346,11 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
         if (val) this.pendingAuthEmail = val;
         this.switchToOtpCodeView(this.pendingAuthEmail || 'your email');
         sounds.playClick();
+        this.showInGameAlert({
+          title: 'ENTER 6-DIGIT CODE',
+          message: 'Switched to code entry view. Enter the unique 6-digit code sent to your email and click Verify!',
+          type: 'info'
+        });
       });
     }
 
@@ -8362,6 +8374,11 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
         if (this.authEmailStepView) this.authEmailStepView.classList.remove('hidden');
         if (this.authEmailInput) this.authEmailInput.focus();
         sounds.playClick();
+        this.showInGameAlert({
+          title: 'CHANGE EMAIL ADDRESS',
+          message: 'Enter your new email address and click Email Me Code to dispatch a fresh unique verification code.',
+          type: 'info'
+        });
       });
     }
 
@@ -8529,9 +8546,14 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
 
   async checkUserAuthStatus(isUserInitiated = false) {
     if (!supabaseClient) {
-      this.updateAuthPillUI(null);
+      this.updateAuthPillUI(null, false);
       if (isUserInitiated) {
         this.showAuthFeedback('Supabase cloud service connecting or offline. Please check connection.', 'error');
+        this.showInGameAlert({
+          title: 'CLOUD SERVICE OFFLINE',
+          message: 'Could not connect to Supabase authentication service. Please check your network connection.',
+          type: 'error'
+        });
       }
       return;
     }
@@ -8556,6 +8578,11 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
           if (isUserInitiated) {
             sounds.playWin();
             this.showAuthFeedback('Official email verified! Bankroll and save slots are securely cloud-anchored.', 'success');
+            this.showInGameAlert({
+              title: 'ACCOUNT STATUS: VERIFIED',
+              message: `You are signed in as ${user.email}. Bankroll and save slots are safely anchored in the cloud.`,
+              type: 'success'
+            });
           }
         }
       } else {
@@ -8593,29 +8620,16 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     }
   }
 
-  updateAuthPillUI(email, isVerified) {
-    if (!this.btnOpenAuthModal) return;
-
-    if (email && isVerified) {
-      this.btnOpenAuthModal.className = 'account-cloud-btn verified';
-      this.btnOpenAuthModal.title = `Cloud Verified: ${email}. Leaderboard status active.`;
-      this.btnOpenAuthModal.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="#10b981" stroke="#059669" stroke-width="1.5"/><path d="M9 12l2 2 4-4" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Verified Player</span>';
-    } else if (email && !isVerified) {
-      this.btnOpenAuthModal.className = 'account-cloud-btn pending';
-      this.btnOpenAuthModal.title = `Verification Pending for ${email}. Click to enter 6-digit code.`;
-      this.btnOpenAuthModal.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#f59e0b" stroke-width="2"/><polyline points="12,6 12,12 16,14" stroke="#f59e0b" stroke-width="2"/></svg><span>Enter 6-Digit Code</span>';
-    } else {
-      this.btnOpenAuthModal.className = 'account-cloud-btn unverified';
-      this.btnOpenAuthModal.title = 'Link Email with 6-digit code to join official Leaderboard';
-      this.btnOpenAuthModal.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2"/><polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="2"/></svg><span>Link Email</span>';
-    }
-  }
-
   async handleSendOtpCode() {
     if (this.isOtpSending) return; // Debounce in-flight requests
 
     if (!supabaseClient) {
       this.showAuthFeedback('Supabase cloud service is loading. Please check your internet connection.', 'error');
+      this.showInGameAlert({
+        title: 'SERVICE LOADING',
+        message: 'Supabase cloud authentication is initializing. Please wait a moment and try again.',
+        type: 'info'
+      });
       return;
     }
 
@@ -8626,6 +8640,11 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       const waitSec = Math.ceil((60000 - (now - lastSent)) / 1000);
       sounds.playError();
       this.showAuthFeedback(`Anti-spam protection active. Please wait ${waitSec}s before sending another email.`, 'error');
+      this.showInGameAlert({
+        title: 'ANTI-SPAM COOLDOWN',
+        message: `To prevent rate limits, please wait ${waitSec} seconds before requesting another code.`,
+        type: 'warning'
+      });
       return;
     }
 
@@ -8635,6 +8654,11 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     if (!email || !email.includes('@') || !email.includes('.')) {
       sounds.playError();
       this.showAuthFeedback('Please enter a valid email address.', 'error');
+      this.showInGameAlert({
+        title: 'EMAIL REQUIRED',
+        message: 'Please enter a valid email address (e.g. player@gmail.com) to receive your verification code.',
+        type: 'warning'
+      });
       return;
     }
 
@@ -8667,6 +8691,11 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
           : `Could not send code: ${error.message}`;
 
         this.showAuthFeedback(msg, 'error');
+        this.showInGameAlert({
+          title: isRateLimit ? 'EMAIL RATE LIMIT REACHED' : 'CODE DISPATCH FAILED',
+          message: msg,
+          type: 'error'
+        });
 
         // Provide immediate button to switch to 6-digit code screen anyway
         const fb = this.authFeedback;
@@ -8694,16 +8723,31 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       // Switch to 6-digit OTP code entry view
       this.switchToOtpCodeView(email);
       this.showOtpFeedback(`A verification code was emailed to ${email}! Enter the 6 digits below.`, 'success');
+      this.showInGameAlert({
+        title: 'UNIQUE CODE SENT',
+        message: `A unique 6-digit verification code has been dispatched to ${email}! Check your inbox or spam folder and enter the code below.`,
+        type: 'success'
+      });
     } catch (err) {
       this.isOtpSending = false;
       sounds.playError();
       this.showAuthFeedback(`An unexpected error occurred: ${err.message}`, 'error');
+      this.showInGameAlert({
+        title: 'DISPATCH ERROR',
+        message: `An unexpected error occurred: ${err.message}`,
+        type: 'error'
+      });
     }
   }
 
   async handleVerifyOtpCode() {
     if (!supabaseClient) {
       this.showOtpFeedback('Supabase cloud service is loading. Please retry in a moment.', 'error');
+      this.showInGameAlert({
+        title: 'SERVICE LOADING',
+        message: 'Supabase cloud service is loading. Please wait a moment and try again.',
+        type: 'info'
+      });
       return;
     }
 
@@ -8711,14 +8755,34 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     const rawCode = (this.authOtpCodeInput?.value || '');
     const code = rawCode.replace(/\s+/g, '').replace(/-/g, '').trim();
 
-    if (!code || code.length !== 6 || !/^\d{6}$/.test(code)) {
+    // Check if code was not entered
+    if (!code) {
       sounds.playError();
-      this.showOtpFeedback('Please enter the exact 6-digit numeric verification code.', 'error');
+      this.showOtpFeedback('Please enter the 6-digit verification code from your email.', 'error');
+      this.showInGameAlert({
+        title: 'CODE REQUIRED',
+        message: 'You must enter your 6-digit verification code before submitting. Check your email for the code.',
+        type: 'warning'
+      });
+      if (this.authOtpCodeInput) this.authOtpCodeInput.focus();
+      return;
+    }
+
+    // Check code length and format
+    if (code.length !== 6 || !/^\d{6}$/.test(code)) {
+      sounds.playError();
+      this.showOtpFeedback('The verification code must be exactly 6 numeric digits.', 'error');
+      this.showInGameAlert({
+        title: '6-DIGIT CODE REQUIRED',
+        message: `You entered "${rawCode}". The verification code must be exactly 6 numeric digits (e.g. 123456).`,
+        type: 'warning'
+      });
+      if (this.authOtpCodeInput) this.authOtpCodeInput.focus();
       return;
     }
 
     try {
-      this.showOtpFeedback('Verifying 6-digit code...', 'info');
+      this.showOtpFeedback('Verifying 6-digit code with Supabase...', 'info');
       sounds.playClick();
 
       let result = await supabaseClient.auth.verifyOtp({
@@ -8741,6 +8805,11 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       if (result.error) {
         sounds.playError();
         this.showOtpFeedback(`Verification failed: ${result.error.message}. Please check code and try again.`, 'error');
+        this.showInGameAlert({
+          title: 'VERIFICATION FAILED',
+          message: `Verification code was rejected: ${result.error.message}. Please double-check your email or click Resend Code to receive a fresh unique code.`,
+          type: 'error'
+        });
         return;
       }
 
@@ -8760,8 +8829,8 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       this.updateLeaderboardUI();
 
       this.showInGameAlert({
-        title: 'EMAIL VERIFIED & ANCHORED',
-        message: `Your email (${email}) is officially verified! Your chips and save slots are safely anchored in the cloud, and you now have an active rank on the Global Leaderboard.`,
+        title: 'VERIFICATION SUCCESSFUL',
+        message: `Success! Your email (${email}) is verified! Your net worth and save slots are safely anchored in the cloud, and your rank is now active on the Global Leaderboard!`,
         type: 'success'
       });
 
@@ -8773,6 +8842,11 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     } catch (err) {
       sounds.playError();
       this.showOtpFeedback(`Verification error: ${err.message}`, 'error');
+      this.showInGameAlert({
+        title: 'VERIFICATION ERROR',
+        message: `An unexpected error occurred during verification: ${err.message}`,
+        type: 'error'
+      });
     }
   }
 
@@ -8786,17 +8860,27 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       const waitSec = Math.ceil((60000 - (now - lastSent)) / 1000);
       sounds.playError();
       this.showOtpFeedback(`Anti-spam cooldown: Please wait ${waitSec}s before requesting a new code.`, 'error');
+      this.showInGameAlert({
+        title: 'COOLDOWN ACTIVE',
+        message: `Please wait ${waitSec} seconds before resending another verification code.`,
+        type: 'warning'
+      });
       return;
     }
 
     const email = (this.pendingAuthEmail || this.authEmailInput?.value || '').trim().toLowerCase();
     if (!email) {
       this.showOtpFeedback('Email address missing. Please click Change Email to enter your address.', 'error');
+      this.showInGameAlert({
+        title: 'EMAIL REQUIRED',
+        message: 'No email address found. Click Change Email to enter your address.',
+        type: 'warning'
+      });
       return;
     }
 
     try {
-      this.showOtpFeedback(`Resending 6-digit code to ${email}...`, 'info');
+      this.showOtpFeedback(`Resending unique 6-digit code to ${email}...`, 'info');
       sounds.playClick();
 
       const { error } = await supabaseClient.auth.signInWithOtp({
@@ -8813,15 +8897,30 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
           ? 'Supabase email rate limit reached (max 3/hour). Please wait before requesting another code.'
           : `Resend error: ${error.message}`;
         this.showOtpFeedback(msg, 'error');
+        this.showInGameAlert({
+          title: 'RESEND FAILED',
+          message: msg,
+          type: 'error'
+        });
         return;
       }
 
       this.startAntiSpamCountdown(60);
       sounds.playWin();
-      this.showOtpFeedback(`A fresh 6-digit verification code has been emailed to ${email}!`, 'success');
+      this.showOtpFeedback(`A fresh unique 6-digit verification code has been emailed to ${email}!`, 'success');
+      this.showInGameAlert({
+        title: 'FRESH CODE SENT',
+        message: `A fresh unique 6-digit verification code was emailed to ${email}! Check your inbox or spam folder.`,
+        type: 'success'
+      });
     } catch (err) {
       sounds.playError();
       this.showOtpFeedback(`Resend failed: ${err.message}`, 'error');
+      this.showInGameAlert({
+        title: 'RESEND ERROR',
+        message: `Resend failed: ${err.message}`,
+        type: 'error'
+      });
     }
   }
 
@@ -8838,6 +8937,11 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       this.updateLeaderboardUI();
       this.showAuthFeedback('Account unlinked from this browser session.', 'info');
       sounds.playFold();
+      this.showInGameAlert({
+        title: 'ACCOUNT UNLINKED',
+        message: 'Your account has been unlinked from this device session.',
+        type: 'info'
+      });
     } catch (err) {
       console.warn('Sign-out error:', err);
     }
