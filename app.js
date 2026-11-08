@@ -3049,6 +3049,8 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
         'solar_poker_leaderboard_data',
         'solar_poker_registered_roster',
         'royal_poker_name_last_changed',
+        'solar_poker_last_email_prompt',
+        'solar_poker_verified_cloud_roster',
         'solar_poker_user_session',
         'solar_poker_cloud_user_id'
       ];
@@ -6124,6 +6126,14 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
     if (!this.isOnlineRoom) {
       this.saveCurrentGame();
     }
+    this.handsPlayedSincePrompt = (this.handsPlayedSincePrompt || 0) + 1;
+    if (this.handsPlayedSincePrompt >= 5) {
+      setTimeout(() => {
+        if (typeof this.maybePromptEmailVerification === 'function') {
+          this.maybePromptEmailVerification();
+        }
+      }, 2000);
+    }
 
     const hero = this.players[0];
     if (hero.chips === 0) {
@@ -8001,7 +8011,52 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     this.updateLeaderboardUI();
   }
 
-  updateLeaderboardUI() {
+  // Helper to check if current user is email verified
+  isUserEmailVerified() {
+    try {
+      const sess = localStorage.getItem('solar_poker_user_session');
+      if (sess) {
+        const parsed = JSON.parse(sess);
+        if (parsed && parsed.isVerified) return true;
+      }
+    } catch (e) {}
+    return false;
+  }
+
+  getUserEmail() {
+    try {
+      const sess = localStorage.getItem('solar_poker_user_session');
+      if (sess) {
+        const parsed = JSON.parse(sess);
+        return parsed.email || null;
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  // Periodic reminder prompt (Update 1.15)
+  maybePromptEmailVerification() {
+    if (this.isUserEmailVerified()) return; // Never ask verified players!
+
+    const now = Date.now();
+    const lastPrompt = parseInt(localStorage.getItem('solar_poker_last_email_prompt') || '0', 10);
+    // At least 4 minutes cooldown between prompts
+    if (now - lastPrompt < 4 * 60 * 1000) return;
+
+    localStorage.setItem('solar_poker_last_email_prompt', now.toString());
+    this.handsPlayedSincePrompt = 0;
+
+    const reminderModal = document.getElementById('email-link-reminder-modal');
+    if (reminderModal) {
+      reminderModal.classList.remove('hidden');
+      sounds.playAlert();
+    }
+  }
+
+  // ==========================================================================
+  // v1.15: REAL EMAIL VERIFIED LEADERBOARD (ZERO FAKE NAMES)
+  // ==========================================================================
+  async updateLeaderboardUI() {
     // Calculate Hero Net Worth: Cumulative Savings + Mini-game Wallet + All 4 Save Slots
     const cumulativeSavings = EconomyManager.getCumulativeSavings() || 0;
     const walletObj = EconomyManager.getMiniGameWallet();
@@ -8016,72 +8071,78 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     }
     const heroTotalWealth = cumulativeSavings + miniGameWallet + slotsChips;
     const heroName = (localStorage.getItem('royal_poker_username') || 'Hero').trim();
+    const heroVerified = this.isUserEmailVerified();
+    const heroEmail = this.getUserEmail();
 
-    // In-Game Registered Standings & Solar Rivals (No external international players)
-    const IN_GAME_RIVALS = [
-      { name: "Viper", role: "TAG Shark Rival", status: "Solar Diamond VIP", wealth: 185000 },
-      { name: "Atlas", role: "Solid TAG Contender", status: "Solar Elite", wealth: 142000 },
-      { name: "Luna", role: "Nit Master / Rock", status: "Solar Elite", wealth: 98000 },
-      { name: "Duke", role: "Maniac High-Roller", status: "High Roller", wealth: 76000 },
-      { name: "Rex 'Bluff King'", role: "Tournament Challenger", status: "Circuit Pro", wealth: 54000 },
-      { name: "Jade 'Solar Ace'", role: "Floor Master", status: "Circuit Pro", wealth: 42000 },
-      { name: "Nova 'The Comet'", role: "Blackjack Specialist", status: "Table Regular", wealth: 28000 },
-      { name: "Maverick", role: "Solar Circuit Veteran", status: "Table Regular", wealth: 19500 },
-      { name: "Helios", role: "Grand Arena Host", status: "Rising Contender", wealth: 12000 }
-    ];
-
-    // Maintain persistent registered players roster on this device
-    let savedProfiles = [];
-    try {
-      const raw = localStorage.getItem('solar_poker_registered_roster');
-      if (raw) savedProfiles = JSON.parse(raw);
-    } catch (e) {}
-
-    // Save Hero into registered roster if not already saved
-    if (heroName && heroName !== 'Hero') {
-      const existing = savedProfiles.find(p => p.name.toLowerCase() === heroName.toLowerCase());
-      if (existing) {
-        existing.wealth = heroTotalWealth;
-      } else {
-        savedProfiles.push({ name: heroName, role: "Registered Player", status: "Active Hero", wealth: heroTotalWealth });
-      }
+    // Fetch verified cloud players from Supabase
+    let cloudPlayers = [];
+    if (supabaseClient) {
       try {
-        localStorage.setItem('solar_poker_registered_roster', JSON.stringify(savedProfiles));
+        const { data, error } = await supabaseClient
+          .from('leaderboard')
+          .select('player_name, email, wealth, is_verified, updated_at')
+          .eq('is_verified', true)
+          .order('wealth', { ascending: false })
+          .limit(50);
+        if (!error && Array.isArray(data)) {
+          cloudPlayers = data.map(p => ({
+            name: p.player_name || 'Verified Player',
+            email: p.email,
+            wealth: p.wealth || 0,
+            isVerified: true,
+            isHero: heroVerified && Boolean(heroEmail && p.email && p.email.toLowerCase() === heroEmail.toLowerCase())
+          }));
+        }
       } catch (e) {}
     }
 
-    // Filter out Hero from savedProfiles so Hero isn't duplicated
-    const otherRegistered = savedProfiles.filter(p => p.name.toLowerCase() !== heroName.toLowerCase());
-
-    // Check if hero has a verified email session
-    let heroVerified = false;
+    // Merge with local verified roster
     try {
-      const sess = localStorage.getItem('solar_poker_user_session');
-      if (sess) {
-        const parsed = JSON.parse(sess);
-        heroVerified = Boolean(parsed && parsed.isVerified);
+      const raw = localStorage.getItem('solar_poker_verified_cloud_roster');
+      if (raw) {
+        const list = JSON.parse(raw);
+        if (Array.isArray(list)) {
+          list.filter(p => p && p.isVerified).forEach(localP => {
+            const exists = cloudPlayers.some(cp => cp.email && localP.email && cp.email.toLowerCase() === localP.email.toLowerCase());
+            if (!exists) {
+              cloudPlayers.push({
+                name: localP.name || 'Verified Player',
+                email: localP.email,
+                wealth: localP.wealth || 0,
+                isVerified: true,
+                isHero: heroVerified && Boolean(heroEmail && localP.email && localP.email.toLowerCase() === heroEmail.toLowerCase())
+              });
+            }
+          });
+        }
       }
     } catch (e) {}
 
-    // Combine Hero into in-game registered standings
-    const standings = [
-      ...IN_GAME_RIVALS,
-      ...otherRegistered,
-      {
-        name: heroName,
-        role: heroVerified ? "Verified Player" : "Registered Player",
-        status: heroVerified ? "Cloud Verified Hero" : "Active Hero",
-        wealth: heroTotalWealth,
-        isHero: true,
-        isVerified: heroVerified
+    // If Hero is verified, ensure Hero is present in the list
+    if (heroVerified) {
+      const heroIdx = cloudPlayers.findIndex(p => p.isHero || (heroEmail && p.email && p.email.toLowerCase() === heroEmail.toLowerCase()));
+      if (heroIdx !== -1) {
+        cloudPlayers[heroIdx].wealth = heroTotalWealth;
+        cloudPlayers[heroIdx].name = heroName;
+        cloudPlayers[heroIdx].isHero = true;
+      } else {
+        cloudPlayers.push({
+          name: heroName,
+          email: heroEmail,
+          wealth: heroTotalWealth,
+          isVerified: true,
+          isHero: true
+        });
       }
-    ];
+    }
 
-    // Sort descending by total wealth
+    // STRICT USER REQUIREMENT: ZERO FAKE NAMES! ONLY REAL PLAYERS LINKED TO VERIFIED EMAILS!
+    const standings = cloudPlayers.filter(p => p.isVerified);
     standings.sort((a, b) => b.wealth - a.wealth);
 
     // Find Hero Rank
-    const heroRank = standings.findIndex(p => p.isHero) + 1;
+    const heroIdx = standings.findIndex(p => p.isHero);
+    const heroRank = heroIdx !== -1 ? (heroIdx + 1) : null;
 
     let tierDesc = "High Roller Candidate";
     if (heroTotalWealth >= 1000000) tierDesc = "Apex Sovereign Legend";
@@ -8098,8 +8159,12 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
 
     if (heroCallsignEl) heroCallsignEl.textContent = heroName;
     if (heroWealthEl) heroWealthEl.textContent = `$${heroTotalWealth.toLocaleString()}`;
-    if (heroRankEl) heroRankEl.textContent = `#${heroRank} of ${standings.length}`;
-    if (heroTierEl) heroTierEl.textContent = tierDesc;
+    if (heroRankEl) {
+      heroRankEl.textContent = heroVerified ? `#${heroRank} of ${standings.length}` : 'Unranked (Link Email to Join)';
+    }
+    if (heroTierEl) {
+      heroTierEl.textContent = heroVerified ? `${tierDesc} • Verified` : `${tierDesc} (Unverified)`;
+    }
 
     // 2. Update On-Page Main Menu Leaderboard Strip
     const mainHeroNameEl = document.getElementById('main-lb-hero-name');
@@ -8109,60 +8174,89 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
 
     if (mainHeroNameEl) mainHeroNameEl.textContent = heroName;
     if (mainHeroWealthEl) mainHeroWealthEl.textContent = `$${heroTotalWealth.toLocaleString()}`;
-    if (mainHeroRankEl) mainHeroRankEl.textContent = `#${heroRank} of ${standings.length}`;
-    if (mainHeroTierEl) mainHeroTierEl.textContent = tierDesc;
+    if (mainHeroRankEl) {
+      mainHeroRankEl.textContent = heroVerified ? `#${heroRank}` : 'Unranked';
+    }
+    if (mainHeroTierEl) {
+      mainHeroTierEl.textContent = heroVerified ? 'Verified Cloud Hero' : 'Email Unlinked';
+    }
 
-    // 3. Render Modal Table Body
+    // 3. Render Modal Table Body (Real Email Players Only)
     const tbody = document.getElementById('leaderboard-table-body');
     if (tbody) {
-      tbody.innerHTML = standings.map((player, idx) => {
-        const rank = idx + 1;
-        const isHero = player.isHero;
-        const rankClass = rank === 1 ? 'rank-1' : (rank === 2 ? 'rank-2' : (rank === 3 ? 'rank-3' : ''));
-        const rowClass = isHero ? 'hero-leaderboard-row' : '';
-
-        return `
-          <tr class="${rowClass}">
-            <td class="rank-cell ${rankClass}">
-              ${rank === 1 ? '&#9733; #1' : `#${rank}`}
+      if (standings.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="empty-lb-notice">
+              <div class="empty-lb-card">
+                <span class="empty-lb-shield">&#9670;</span>
+                <h4>NO VERIFIED EMAIL PLAYERS YET</h4>
+                <p>Only real players with verified emails appear on this leaderboard. Zero bot or fake profiles.</p>
+                <button class="btn btn-primary gold-action-btn btn-sm" type="button" onclick="if(window.pokerApp){window.pokerApp.openEmailAuthModal()}">Link Email With 6-Digit Code</button>
+              </div>
             </td>
-            <td class="player-cell">
-              <strong>${player.name}</strong>
-              ${player.isVerified ? '<span class="verified-cloud-badge" title="Supabase Verified">&#10004;</span>' : ''}
-              ${isHero ? '<span class="hero-tag-badge">YOU</span>' : ''}
-            </td>
-            <td class="region-cell">${player.role || 'Registered Player'}</td>
-            <td class="title-cell">${player.status || 'Active Member'}</td>
-            <td class="td-wealth gold">$${player.wealth.toLocaleString()}</td>
           </tr>
         `;
-      }).join('');
+      } else {
+        tbody.innerHTML = standings.map((player, idx) => {
+          const rank = idx + 1;
+          const isHero = player.isHero;
+          const rankClass = rank === 1 ? 'rank-1' : (rank === 2 ? 'rank-2' : (rank === 3 ? 'rank-3' : ''));
+          const rowClass = isHero ? 'hero-leaderboard-row' : '';
+
+          return `
+            <tr class="${rowClass}">
+              <td class="rank-cell ${rankClass}">
+                ${rank === 1 ? '&#9733; #1' : `#${rank}`}
+              </td>
+              <td class="player-cell">
+                <strong>${player.name}</strong>
+                <span class="verified-cloud-badge" title="Verified Real Email">&#10004;</span>
+                ${isHero ? '<span class="hero-tag-badge">YOU</span>' : ''}
+              </td>
+              <td class="region-cell">Verified Player</td>
+              <td class="title-cell">Cloud Verified</td>
+              <td class="td-wealth gold">$${player.wealth.toLocaleString()}</td>
+            </tr>
+          `;
+        }).join('');
+      }
     }
 
     // 4. Render On-Page Scrollable Leaderboard Table Body
     const mainTbody = document.getElementById('main-leaderboard-tbody');
     if (mainTbody) {
-      mainTbody.innerHTML = standings.map((player, idx) => {
-        const rank = idx + 1;
-        const isHero = player.isHero;
-        const rankClass = rank === 1 ? 'gold-rank' : (rank === 2 ? 'silver-rank' : (rank === 3 ? 'bronze-rank' : ''));
-        const rowClass = isHero ? 'main-lb-hero-row' : '';
-
-        return `
-          <tr class="${rowClass}">
-            <td class="mlb-td-rank ${rankClass}">
-              ${rank === 1 ? '&#9733; #1' : `#${rank}`}
+      if (standings.length === 0) {
+        mainTbody.innerHTML = `
+          <tr>
+            <td colspan="4" class="empty-lb-notice">
+              <span class="empty-mini-text">No verified email players yet. Link your email with 6-digit code to take #1!</span>
             </td>
-            <td class="mlb-td-name">
-              <span class="mlb-name-text">${player.name}</span>
-              ${player.isVerified ? '<span class="verified-cloud-badge" title="Supabase Verified">&#10004;</span>' : ''}
-              ${isHero ? '<span class="mlb-you-tag">YOU</span>' : ''}
-            </td>
-            <td class="mlb-td-origin">${player.role || 'Player'}</td>
-            <td class="mlb-td-wealth">$${player.wealth.toLocaleString()}</td>
           </tr>
         `;
-      }).join('');
+      } else {
+        mainTbody.innerHTML = standings.map((player, idx) => {
+          const rank = idx + 1;
+          const isHero = player.isHero;
+          const rankClass = rank === 1 ? 'gold-rank' : (rank === 2 ? 'silver-rank' : (rank === 3 ? 'bronze-rank' : ''));
+          const rowClass = isHero ? 'main-lb-hero-row' : '';
+
+          return `
+            <tr class="${rowClass}">
+              <td class="mlb-td-rank ${rankClass}">
+                ${rank === 1 ? '&#9733; #1' : `#${rank}`}
+              </td>
+              <td class="mlb-td-name">
+                <span class="mlb-name-text">${player.name}</span>
+                <span class="verified-cloud-badge" title="Verified Real Email">&#10004;</span>
+                ${isHero ? '<span class="mlb-you-tag">YOU</span>' : ''}
+              </td>
+              <td class="mlb-td-origin">Verified</td>
+              <td class="mlb-td-wealth">$${player.wealth.toLocaleString()}</td>
+            </tr>
+          `;
+        }).join('');
+      }
     }
   }
 
@@ -8176,7 +8270,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
   }
 
   // ==========================================================================
-  // v1.135: EMAIL VERIFICATION & SUPABASE CLOUD LEADERBOARD INTEGRATION
+  // v1.15: 6-DIGIT EMAIL CODE VERIFICATION & SUPABASE CLOUD SYNC
   // ==========================================================================
   initEmailAuth() {
     this.authModal = document.getElementById('email-auth-modal');
@@ -8187,16 +8281,25 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     this.authBadge = document.getElementById('eas-badge');
     this.authEmailDisplay = document.getElementById('eas-email-display');
     this.authInstructions = document.getElementById('eas-instructions');
-    this.btnResendVerification = document.getElementById('btn-resend-verification');
-    this.btnCheckStatus = document.getElementById('btn-check-verified-status');
     this.btnSignOut = document.getElementById('btn-signout-email');
 
-    this.authForm = document.getElementById('email-auth-form');
+    this.authEmailStepView = document.getElementById('auth-email-step-view');
     this.authEmailInput = document.getElementById('auth-email-input');
-    this.authPassInput = document.getElementById('auth-password-input');
     this.authFeedback = document.getElementById('auth-feedback-msg');
-    this.btnAuthSignUp = document.getElementById('btn-auth-signup');
-    this.btnAuthSignIn = document.getElementById('btn-auth-signin');
+    this.btnAuthSendCode = document.getElementById('btn-auth-send-code');
+
+    this.authOtpStepView = document.getElementById('auth-otp-step-view');
+    this.authOtpTargetEmail = document.getElementById('auth-otp-target-email');
+    this.authOtpCodeInput = document.getElementById('auth-otp-code-input');
+    this.authOtpFeedback = document.getElementById('auth-otp-feedback-msg');
+    this.btnVerifyOtpCode = document.getElementById('btn-verify-otp-code');
+    this.btnResendOtpCode = document.getElementById('btn-resend-otp-code');
+    this.btnChangeEmail = document.getElementById('btn-change-email');
+
+    // Periodic reminder modal controls
+    this.reminderModal = document.getElementById('email-link-reminder-modal');
+    this.btnReminderLinkNow = document.getElementById('btn-reminder-link-now');
+    this.btnReminderSnooze = document.getElementById('btn-reminder-snooze');
 
     if (this.btnOpenAuthModal) {
       this.btnOpenAuthModal.addEventListener('click', () => {
@@ -8211,24 +8314,57 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       });
     }
 
-    if (this.btnAuthSignUp) {
-      this.btnAuthSignUp.addEventListener('click', () => this.handleEmailSignUp());
+    if (this.btnAuthSendCode) {
+      this.btnAuthSendCode.addEventListener('click', () => this.handleSendOtpCode());
     }
 
-    if (this.btnAuthSignIn) {
-      this.btnAuthSignIn.addEventListener('click', () => this.handleEmailSignIn());
+    if (this.authEmailInput) {
+      this.authEmailInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') this.handleSendOtpCode();
+      });
     }
 
-    if (this.btnResendVerification) {
-      this.btnResendVerification.addEventListener('click', () => this.handleResendVerification());
+    if (this.btnVerifyOtpCode) {
+      this.btnVerifyOtpCode.addEventListener('click', () => this.handleVerifyOtpCode());
     }
 
-    if (this.btnCheckStatus) {
-      this.btnCheckStatus.addEventListener('click', () => this.checkUserAuthStatus(true));
+    if (this.authOtpCodeInput) {
+      this.authOtpCodeInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') this.handleVerifyOtpCode();
+      });
+    }
+
+    if (this.btnResendOtpCode) {
+      this.btnResendOtpCode.addEventListener('click', () => this.handleResendOtpCode());
+    }
+
+    if (this.btnChangeEmail) {
+      this.btnChangeEmail.addEventListener('click', () => {
+        if (this.authOtpStepView) this.authOtpStepView.classList.add('hidden');
+        if (this.authEmailStepView) this.authEmailStepView.classList.remove('hidden');
+        if (this.authEmailInput) this.authEmailInput.focus();
+        sounds.playClick();
+      });
     }
 
     if (this.btnSignOut) {
       this.btnSignOut.addEventListener('click', () => this.handleSignOut());
+    }
+
+    if (this.btnReminderLinkNow) {
+      this.btnReminderLinkNow.addEventListener('click', () => {
+        if (this.reminderModal) this.reminderModal.classList.add('hidden');
+        this.openEmailAuthModal();
+      });
+    }
+
+    if (this.btnReminderSnooze) {
+      this.btnReminderSnooze.addEventListener('click', () => {
+        if (this.reminderModal) this.reminderModal.classList.add('hidden');
+        localStorage.setItem('solar_poker_last_email_prompt', Date.now().toString());
+        this.handsPlayedSincePrompt = 0;
+        sounds.playClick();
+      });
     }
 
     // Check existing authentication session on launch
@@ -8248,8 +8384,22 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     this.authFeedback.classList.add('hidden');
   }
 
+  showOtpFeedback(msg, type = 'info') {
+    if (!this.authOtpFeedback) return;
+    this.authOtpFeedback.textContent = msg;
+    this.authOtpFeedback.className = `auth-feedback-msg auth-${type}`;
+    this.authOtpFeedback.classList.remove('hidden');
+  }
+
+  clearOtpFeedback() {
+    if (!this.authOtpFeedback) return;
+    this.authOtpFeedback.textContent = '';
+    this.authOtpFeedback.classList.add('hidden');
+  }
+
   openEmailAuthModal() {
     this.clearAuthFeedback();
+    this.clearOtpFeedback();
     if (this.authModal) {
       this.authModal.classList.remove('hidden');
       sounds.playToggleChime();
@@ -8287,17 +8437,11 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
             sounds.playWin();
             this.showAuthFeedback('Official email verified! Bankroll and save slots are securely cloud-anchored.', 'success');
           }
-        } else if (isUserInitiated) {
-          sounds.playAlert();
-          this.showAuthFeedback('Verification email pending confirmation. Please click the link in your inbox.', 'warning');
         }
       } else {
         localStorage.removeItem('solar_poker_user_session');
         this.renderAuthBoxState(null, false);
         this.updateAuthPillUI(null, false);
-        if (isUserInitiated) {
-          this.showAuthFeedback('No active cloud account linked. Sign up or sign in below.', 'info');
-        }
       }
     } catch (err) {
       console.warn('[Supabase] checkUserAuthStatus error:', err);
@@ -8305,35 +8449,27 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
   }
 
   renderAuthBoxState(email, isVerified) {
-    if (!this.authStatusBox || !this.authForm) return;
+    if (!this.authStatusBox) return;
 
-    if (email) {
+    if (email && isVerified) {
       this.authStatusBox.classList.remove('hidden');
       if (this.authEmailDisplay) this.authEmailDisplay.textContent = email;
 
       if (this.authBadge) {
-        if (isVerified) {
-          this.authBadge.textContent = 'VERIFIED CLOUD MEMBER';
-          this.authBadge.className = 'eas-badge verified';
-        } else {
-          this.authBadge.textContent = 'VERIFICATION PENDING';
-          this.authBadge.className = 'eas-badge unverified';
-        }
+        this.authBadge.textContent = 'VERIFIED CLOUD MEMBER';
+        this.authBadge.className = 'eas-badge verified';
       }
 
       if (this.authInstructions) {
-        if (isVerified) {
-          this.authInstructions.innerHTML = '<span style="color:#10b981;">&#10003; Your identity is verified.</span> Net worth and save slots automatically sync to the official Global Leaderboard.';
-        } else {
-          this.authInstructions.innerHTML = 'A verification confirmation link has been sent to your email. Click it to activate your permanent leaderboard rank and cloud safety.';
-        }
+        this.authInstructions.innerHTML = '<span style="color:#10b981;">&#10003; Your identity is verified.</span> All bankroll data and save slots are safely anchored in the cloud. Real email rank is active on the Global Leaderboard.';
       }
 
-      // Hide or minimize input form when already logged in
-      this.authForm.classList.add('hidden');
+      if (this.authEmailStepView) this.authEmailStepView.classList.add('hidden');
+      if (this.authOtpStepView) this.authOtpStepView.classList.add('hidden');
     } else {
       this.authStatusBox.classList.add('hidden');
-      this.authForm.classList.remove('hidden');
+      if (this.authEmailStepView) this.authEmailStepView.classList.remove('hidden');
+      if (this.authOtpStepView) this.authOtpStepView.classList.add('hidden');
     }
   }
 
@@ -8346,45 +8482,40 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       this.btnOpenAuthModal.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="#10b981" stroke="#059669" stroke-width="1.5"/><path d="M9 12l2 2 4-4" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Verified Player</span>';
     } else if (email && !isVerified) {
       this.btnOpenAuthModal.className = 'account-cloud-btn pending';
-      this.btnOpenAuthModal.title = `Verification Pending for ${email}. Click to verify.`;
-      this.btnOpenAuthModal.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#f59e0b" stroke-width="2"/><polyline points="12,6 12,12 16,14" stroke="#f59e0b" stroke-width="2"/></svg><span>Verify Email</span>';
+      this.btnOpenAuthModal.title = `Verification Pending for ${email}. Click to enter 6-digit code.`;
+      this.btnOpenAuthModal.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#f59e0b" stroke-width="2"/><polyline points="12,6 12,12 16,14" stroke="#f59e0b" stroke-width="2"/></svg><span>Enter 6-Digit Code</span>';
     } else {
       this.btnOpenAuthModal.className = 'account-cloud-btn unverified';
-      this.btnOpenAuthModal.title = 'Link Email to secure bankroll and join official Leaderboard';
+      this.btnOpenAuthModal.title = 'Link Email with 6-digit code to join official Leaderboard';
       this.btnOpenAuthModal.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2"/><polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="2"/></svg><span>Link Email</span>';
     }
   }
 
-  async handleEmailSignUp() {
+  async handleSendOtpCode() {
     if (!supabaseClient) {
-      this.showAuthFeedback('Supabase cloud service is loading. Please retry in a moment.', 'error');
+      this.showAuthFeedback('Supabase cloud service is loading. Please check your internet connection.', 'error');
       return;
     }
 
     const email = (this.authEmailInput?.value || '').trim();
-    const password = (this.authPassInput?.value || '').trim();
     const callsign = (localStorage.getItem('royal_poker_username') || 'High Roller').trim();
 
     if (!email || !email.includes('@') || !email.includes('.')) {
       sounds.playError();
-      this.showAuthFeedback('Please provide a valid email address.', 'error');
-      return;
-    }
-
-    if (!password || password.length < 6) {
-      sounds.playError();
-      this.showAuthFeedback('Password must be at least 6 characters long.', 'error');
+      this.showAuthFeedback('Please enter a valid email address.', 'error');
       return;
     }
 
     try {
-      this.showAuthFeedback('Sending verification email and creating account...', 'info');
+      this.showAuthFeedback('Sending 6-digit verification code to your email...', 'info');
       sounds.playClick();
 
-      const { data, error } = await supabaseClient.auth.signUp({
+      this.pendingAuthEmail = email;
+
+      const { data, error } = await supabaseClient.auth.signInWithOtp({
         email,
-        password,
         options: {
+          shouldCreateUser: true,
           data: {
             player_callsign: callsign,
             registered_at: new Date().toISOString()
@@ -8394,91 +8525,130 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
 
       if (error) {
         sounds.playError();
-        this.showAuthFeedback(`Registration failed: ${error.message}`, 'error');
+        this.showAuthFeedback(`Could not send code: ${error.message}`, 'error');
         return;
       }
 
       sounds.playWin();
-      this.showAuthFeedback(`Verification email sent to ${email}! Please check your inbox or spam folder and click the link to verify.`, 'success');
-      this.checkUserAuthStatus(false);
+      this.clearAuthFeedback();
+
+      // Switch to 6-digit OTP code entry view
+      if (this.authEmailStepView) this.authEmailStepView.classList.add('hidden');
+      if (this.authOtpStepView) this.authOtpStepView.classList.remove('hidden');
+      if (this.authOtpTargetEmail) this.authOtpTargetEmail.textContent = email;
+      if (this.authOtpCodeInput) {
+        this.authOtpCodeInput.value = '';
+        this.authOtpCodeInput.focus();
+      }
+      this.showOtpFeedback(`A 6-digit code was sent to ${email}! Check your inbox or spam folder.`, 'success');
     } catch (err) {
       sounds.playError();
       this.showAuthFeedback(`An unexpected error occurred: ${err.message}`, 'error');
     }
   }
 
-  async handleEmailSignIn() {
+  async handleVerifyOtpCode() {
     if (!supabaseClient) {
-      this.showAuthFeedback('Supabase cloud service is loading. Please retry in a moment.', 'error');
+      this.showOtpFeedback('Supabase cloud service is loading. Please retry in a moment.', 'error');
       return;
     }
 
-    const email = (this.authEmailInput?.value || '').trim();
-    const password = (this.authPassInput?.value || '').trim();
+    const email = this.pendingAuthEmail || (this.authEmailInput?.value || '').trim();
+    const code = (this.authOtpCodeInput?.value || '').trim();
 
-    if (!email || !password) {
+    if (!code || code.length !== 6) {
       sounds.playError();
-      this.showAuthFeedback('Please enter both email and password.', 'error');
+      this.showOtpFeedback('Please enter the complete 6-digit verification code.', 'error');
       return;
     }
 
     try {
-      this.showAuthFeedback('Signing into cloud account...', 'info');
+      this.showOtpFeedback('Verifying 6-digit code...', 'info');
       sounds.playClick();
 
-      const { data, error } = await supabaseClient.auth.signInWithPassword({
+      let result = await supabaseClient.auth.verifyOtp({
         email,
-        password
+        token: code,
+        type: 'email'
       });
 
-      if (error) {
+      if (result.error) {
+        const retry = await supabaseClient.auth.verifyOtp({
+          email,
+          token: code,
+          type: 'signup'
+        });
+        if (!retry.error) {
+          result = retry;
+        }
+      }
+
+      if (result.error) {
         sounds.playError();
-        this.showAuthFeedback(`Sign-in failed: ${error.message}`, 'error');
+        this.showOtpFeedback(`Verification failed: ${result.error.message}. Please check code and try again.`, 'error');
         return;
       }
 
+      const user = result.data?.user || (await supabaseClient.auth.getUser()).data?.user;
+
+      localStorage.setItem('solar_poker_user_session', JSON.stringify({ email: email, id: user?.id, isVerified: true }));
+      if (user?.id) localStorage.setItem('solar_poker_cloud_user_id', user.id);
+
       sounds.playWin();
-      this.showAuthFeedback(`Signed in successfully as ${email}!`, 'success');
-      await this.checkUserAuthStatus(true);
+      this.clearOtpFeedback();
+
+      if (this.authOtpStepView) this.authOtpStepView.classList.add('hidden');
+      this.renderAuthBoxState(email, true);
+      this.updateAuthPillUI(email, true);
+
+      await this.syncLeaderboardToCloud();
+      this.updateLeaderboardUI();
+
+      this.showInGameAlert({
+        title: 'EMAIL VERIFIED & ANCHORED',
+        message: `Your email (${email}) is officially verified! Your chips and save slots are safely anchored in the cloud, and you now have an active rank on the Global Leaderboard.`,
+        type: 'success'
+      });
+
+      if (this.authModal) {
+        setTimeout(() => {
+          this.authModal.classList.add('hidden');
+        }, 1200);
+      }
     } catch (err) {
       sounds.playError();
-      this.showAuthFeedback(`Sign-in error: ${err.message}`, 'error');
+      this.showOtpFeedback(`Verification error: ${err.message}`, 'error');
     }
   }
 
-  async handleResendVerification() {
+  async handleResendOtpCode() {
     if (!supabaseClient) return;
-
-    let email = (this.authEmailInput?.value || '').trim();
-    if (!email && this.authEmailDisplay) {
-      email = this.authEmailDisplay.textContent.trim();
-    }
-
-    if (!email || !email.includes('@')) {
-      this.showAuthFeedback('Could not detect email to resend verification. Please enter your email.', 'error');
+    const email = this.pendingAuthEmail || (this.authEmailInput?.value || '').trim();
+    if (!email) {
+      this.showOtpFeedback('Email address missing. Please click Change Email to enter your address.', 'error');
       return;
     }
 
     try {
-      this.showAuthFeedback(`Resending verification link to ${email}...`, 'info');
+      this.showOtpFeedback(`Resending 6-digit code to ${email}...`, 'info');
       sounds.playClick();
 
-      const { error } = await supabaseClient.auth.resend({
-        type: 'signup',
-        email
+      const { error } = await supabaseClient.auth.signInWithOtp({
+        email,
+        options: { shouldCreateUser: true }
       });
 
       if (error) {
         sounds.playError();
-        this.showAuthFeedback(`Resend failed: ${error.message}`, 'error');
+        this.showOtpFeedback(`Resend error: ${error.message}`, 'error');
         return;
       }
 
       sounds.playWin();
-      this.showAuthFeedback(`Verification link resent to ${email}! Please check your inbox.`, 'success');
+      this.showOtpFeedback(`A fresh 6-digit verification code has been emailed to ${email}!`, 'success');
     } catch (err) {
       sounds.playError();
-      this.showAuthFeedback(`Resend error: ${err.message}`, 'error');
+      this.showOtpFeedback(`Resend failed: ${err.message}`, 'error');
     }
   }
 
@@ -8492,6 +8662,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       localStorage.removeItem('solar_poker_cloud_user_id');
       this.renderAuthBoxState(null, false);
       this.updateAuthPillUI(null, false);
+      this.updateLeaderboardUI();
       this.showAuthFeedback('Account unlinked from this browser session.', 'info');
       sounds.playFold();
     } catch (err) {
@@ -8508,6 +8679,8 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
 
       const user = session.user;
       const isVerified = Boolean(user.email_confirmed_at || user.confirmed_at);
+      if (!isVerified) return;
+
       const heroName = (localStorage.getItem('royal_poker_username') || 'High Roller').trim();
 
       // Calculate total net worth across savings, minigame wallet, and all 4 save slots
@@ -8524,28 +8697,57 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       }
       const totalWealth = cumulativeSavings + miniGameWallet + slotsChips;
 
-      // Upsert record into Supabase leaderboard table
-      const { error } = await supabaseClient
-        .from('leaderboard')
-        .upsert({
+      // Update user metadata in Supabase
+      try {
+        await supabaseClient.auth.updateUser({
+          data: {
+            player_callsign: heroName,
+            wealth: totalWealth,
+            is_verified: true
+          }
+        });
+      } catch (uErr) {}
+
+      // Upsert record into Supabase leaderboard table if table exists
+      try {
+        await supabaseClient
+          .from('leaderboard')
+          .upsert({
+            user_id: user.id,
+            email: user.email,
+            player_name: heroName,
+            wealth: totalWealth,
+            is_verified: true,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id' });
+      } catch (lbErr) {}
+
+      // Also record in local verified cloud roster
+      try {
+        let roster = [];
+        const raw = localStorage.getItem('solar_poker_verified_cloud_roster');
+        if (raw) roster = JSON.parse(raw);
+        const existingIdx = roster.findIndex(p => p.email === user.email || p.user_id === user.id);
+        const heroRecord = {
           user_id: user.id,
           email: user.email,
-          player_name: heroName,
+          name: heroName,
           wealth: totalWealth,
-          is_verified: isVerified,
+          isVerified: true,
           updated_at: new Date().toISOString()
-        }, { onConflict: 'user_id' });
+        };
+        if (existingIdx !== -1) {
+          roster[existingIdx] = heroRecord;
+        } else {
+          roster.push(heroRecord);
+        }
+        localStorage.setItem('solar_poker_verified_cloud_roster', JSON.stringify(roster));
+      } catch (e) {}
 
-      if (error) {
-        console.warn('[Supabase] Leaderboard cloud sync notice:', error.message);
-      } else {
-        console.log('[Supabase] Leaderboard successfully synchronized to cloud for user:', user.email);
-      }
     } catch (err) {
       console.warn('[Supabase] syncLeaderboardToCloud notice:', err);
     }
   }
-
 
   // ==========================================================================
   // v1.13: FIRST-TIME OVERPOWERING UPDATE 1.13 ANNOUNCEMENT MODAL
