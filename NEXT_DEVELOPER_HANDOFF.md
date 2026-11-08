@@ -869,3 +869,45 @@ Update 1.13 delivers a comprehensive dashboard restructuring and local player id
 - `test_blackjack_engine.py`: 5/5 unit tests passed.
 - `simulate_performance_25_runs.py`: 25/25 benchmarks passed (0 regressions).
 - `simulate_10_runs.py`: 10/10 automated simulation runs passed.
+
+
+---
+
+## 37. Update 1.135: 30-Day Nickname Cooldown & Supabase Cloud Email Leaderboard
+
+### Architecture & System Enhancements
+1. **30-Day Nickname Change Policy & Cooldown Engine:**
+   - Relaxed the rigid permanent identity lock to allow players to update their callsign/nickname once every 30 days (`2,592,000,000 ms`).
+   - Added persistent timestamp tracking via `royal_poker_name_last_changed` in `localStorage`.
+   - **Dynamic Cooldown State:**
+     - When on cooldown, `#player-username-input` is read-only and styled with `.locked-input`.
+     - `#btn-save-username` transforms into a cooldown badge displaying exact remaining time (e.g. `29d 23h` or `18h 45m`) with yellow accent styling (`.cooldown-btn`).
+     - Clicking the input or button on cooldown presents an in-game modal alert explaining the integrity rule and exact remaining time.
+     - When the 30-day period elapses (or on fresh accounts), the input is editable and the button shows a green `Save` state (`.can-edit-btn`).
+     - On Factory Reset, `royal_poker_name_last_changed` is completely purged to restore pristine baseline status.
+
+2. **Official Supabase Client Integration:**
+   - Connected project to the user's Supabase instance:
+     - **Project URL:** `https://hoffkfeyrottyjwjighs.supabase.co`
+     - **Publishable Key:** `sb_publishable_1tDpwFvHrMKR_Bf_Llp61g_6CSQEb4G`
+   - Initialized `supabaseClient = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_PUBLISHABLE_KEY)`.
+
+3. **Email Verification & Cloud Authentication Modal (`#email-auth-modal`):**
+   - Added `#btn-open-auth-modal` next to the callsign input displaying real-time cloud account status (`Link Email` / `Verify Email` / `Verified Player`).
+   - Implemented `#email-auth-modal` modal dialog containing:
+     - Account registration (`handleEmailSignUp`) calling `supabase.auth.signUp(...)` with user email, password, and custom `player_callsign` metadata.
+     - Verification notice instructing players to click the confirmation link sent to their inbox.
+     - Login handler (`handleEmailSignIn`) calling `supabase.auth.signInWithPassword(...)`.
+     - Resend verification handler (`handleResendVerification`) calling `supabase.auth.resend({ type: 'signup', email })`.
+     - Verification status inspector (`checkUserAuthStatus(true)`) and account unlinking (`handleSignOut`).
+
+4. **Permanent Leaderboard Cloud Anchoring & Verified Badges:**
+   - Verified accounts automatically synchronize cumulative savings, mini-games wallet, and all 4 save slots to the Supabase `leaderboard` table via `syncLeaderboardToCloud()`.
+   - In-game registered leaderboard display marks verified accounts with official green verification badges (`.verified-cloud-badge`, `✔`), upgrading status to `Cloud Verified Hero` / `Verified Player`.
+
+### Verification Suite
+- `verify_syntax.py`: 100% Valid JavaScript AST, bracket balance, and tag hierarchy.
+- Emoji check: Strictly 0 high-unicode emojis in `index.html` and `style.css`.
+- `test_blackjack_engine.py`: 5/5 unit tests passed.
+- `simulate_performance_25_runs.py`: 25/25 performance benchmarks passed.
+- `simulate_10_runs.py`: 10/10 game simulation runs passed.

@@ -14,6 +14,8 @@
   <link rel="stylesheet" href="style.css">
   <!-- PeerJS for Real-Time P2P Online Multiplayer with Friends -->
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <!-- Official Supabase JS Client v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <!-- Atmospheric Luxury Casino Background & Overhead Spotlight -->
@@ -875,17 +877,22 @@
 
         <!-- TOP RIGHT HUB COLUMN: Profile Bar + Stipends + Update 1.2 Roadmap Progress Card -->
         <div class="top-right-hub-col">
-          <!-- Player Profile & Permanent Identity Bar -->
+          <!-- Player Profile & Identity Bar (Monthly Nickname Cooldown & Cloud Account) -->
           <div class="player-profile-bar">
             <div class="profile-input-wrap">
               <span class="profile-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="#fcd34d" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="#fcd34d" stroke-width="2"/></svg></span>
               <label for="player-username-input" class="profile-label">Callsign:</label>
-              <input type="text" id="player-username-input" class="username-input locked-input" placeholder="Permanent Callsign" maxlength="14" value="High Roller" readonly>
-              <button id="btn-save-username" class="btn-save-name locked-btn" title="Permanent Callsign &bull; Reset via Settings Factory Reset" type="button"><svg class="lock-svg" width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#fcd34d" stroke-width="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#fcd34d" stroke-width="2"/></svg><span>Locked</span></button>
+              <input type="text" id="player-username-input" class="username-input" placeholder="Enter Callsign" maxlength="14" value="High Roller">
+              <button id="btn-save-username" class="btn-save-name" title="Change nickname (Available once every 30 days)" type="button">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>Edit</span>
+              </button>
             </div>
-            <div class="permanent-id-badge" title="Identity is permanently bound to this device session. Factory reset in settings to change.">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#f59e0b" stroke-width="2"/><path d="M12 16v-4m0-4h.01" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/></svg>
-              <span>PERMANENT ID</span>
+            <div class="account-auth-badge-wrap">
+              <button id="btn-open-auth-modal" class="account-cloud-btn unverified" type="button" title="Link Email &amp; Verify for Cloud Leaderboard">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2"/><polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="2"/></svg>
+                <span id="account-cloud-status-text">Link Email for Leaderboard</span>
+              </button>
             </div>
           </div>
 
@@ -2885,6 +2892,81 @@
     <!-- ======================================================================
          6. COMPREHENSIVE POKER RULES & GUIDE MODAL
          ====================================================================== -->
+        <!-- ======================================================================
+         SUPABASE CLOUD ACCOUNT & EMAIL VERIFICATION MODAL
+         ====================================================================== -->
+    <div id="email-auth-modal" class="modal-overlay hidden" role="dialog" aria-labelledby="auth-modal-title" aria-modal="true">
+      <div class="modal-card email-auth-card">
+        <div class="modal-header">
+          <div class="email-auth-header-brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="#ffd700" stroke-width="2"/><polyline points="22,6 12,13 2,6" stroke="#ffd700" stroke-width="2"/></svg>
+            <h2 id="auth-modal-title">EMAIL VERIFICATION &bull; CLOUD LEADERBOARD</h2>
+          </div>
+          <button id="close-email-auth-btn" class="close-btn" type="button">&times;</button>
+        </div>
+
+        <div class="modal-body email-auth-body">
+          <p class="email-auth-lead">Link your email address to permanently anchor your casino bankroll, save slots, and climb the official <strong>Verified Global Leaderboard</strong>!</p>
+
+          <!-- Current Linked Account Status -->
+          <div id="email-auth-status-box" class="email-auth-status-box hidden">
+            <div class="eas-status-header">
+              <span class="eas-label">LINKED ACCOUNT:</span>
+              <span id="eas-badge" class="eas-badge unverified">VERIFICATION PENDING</span>
+            </div>
+            <div id="eas-email-display" class="eas-email-val">player@example.com</div>
+            <p id="eas-instructions" class="eas-instructions">We sent a verification email to your address. Click the link in that email to activate your account and unlock your Global Leaderboard rank!</p>
+            <div class="eas-actions">
+              <button id="btn-resend-verification" class="btn btn-secondary btn-sm" type="button">Resend Verification Email</button>
+              <button id="btn-check-verified-status" class="btn btn-primary gold-action-btn btn-sm" type="button">Check Verification Status</button>
+              <button id="btn-signout-email" class="btn btn-danger btn-sm" type="button">Unlink Account</button>
+            </div>
+          </div>
+
+          <!-- Registration & Login Form -->
+          <form id="email-auth-form" class="email-auth-form" onsubmit="return false;">
+            <div class="form-group">
+              <label for="auth-email-input">Player Email Address</label>
+              <div class="input-with-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="#94a3b8" stroke-width="2"/><polyline points="22,6 12,13 2,6" stroke="#94a3b8" stroke-width="2"/></svg>
+                <input type="email" id="auth-email-input" class="modal-text-input" placeholder="name@example.com" required autocomplete="email">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="auth-password-input">Account Password (min 6 characters)</label>
+              <div class="input-with-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#94a3b8" stroke-width="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#94a3b8" stroke-width="2"/></svg>
+                <input type="password" id="auth-password-input" class="modal-text-input" placeholder="Create or enter password" required minlength="6" autocomplete="current-password">
+              </div>
+            </div>
+
+            <div id="auth-feedback-msg" class="auth-feedback-msg hidden"></div>
+
+            <div class="auth-form-actions">
+              <button id="btn-auth-signup" class="btn btn-primary gold-action-btn" type="button">
+                <span>CREATE ACCOUNT &amp; SEND VERIFICATION</span>
+              </button>
+              <button id="btn-auth-signin" class="btn btn-secondary" type="button">
+                <span>SIGN IN WITH EXISTING EMAIL</span>
+              </button>
+            </div>
+          </form>
+
+          <div class="auth-perks-grid">
+            <div class="ap-item">
+              <div class="ap-icon gold">&diams;</div>
+              <div class="ap-text"><strong>Permanent Progress</strong><br>Bankroll &amp; save slots are protected against device wipes.</div>
+            </div>
+            <div class="ap-item">
+              <div class="ap-icon emerald">&spades;</div>
+              <div class="ap-text"><strong>Verified Leaderboard</strong><br>Only verified email accounts receive official Global Leaderboard ranks.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="rules-modal" class="modal-overlay hidden">
       <div class="modal-card rules-modal-card all-games-rules-card">
         <div class="modal-header">

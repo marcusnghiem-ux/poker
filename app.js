@@ -1,3 +1,19 @@
+// ==========================================================================
+// SUPABASE CLIENT INITIALIZATION (v1.135 - Email Verification & Cloud Leaderboard)
+// ==========================================================================
+const SUPABASE_PROJECT_URL = 'https://hoffkfeyrottyjwjighs.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_1tDpwFvHrMKR_Bf_Llp61g_6CSQEb4G';
+
+let supabaseClient = null;
+try {
+  if (typeof window !== 'undefined' && window.supabase && window.supabase.createClient) {
+    supabaseClient = window.supabase.createClient(SUPABASE_PROJECT_URL, SUPABASE_PUBLISHABLE_KEY);
+    console.log('[Supabase] Initialized cloud authentication and database client successfully.');
+  }
+} catch (sbErr) {
+  console.warn('[Supabase] Initialization warning:', sbErr);
+}
+
 /* ==========================================================================
    ROYAL TEXAS HOLD'EM - ADVANCED MODULAR CASINO ENGINE
    Architecture & Modules:
@@ -1936,6 +1952,7 @@ class PokerApp {
     try { this.initNewsTicker(); } catch (err) { console.error("initNewsTicker error:", err); }
     try { this.initLeaderboard(); } catch (err) { console.error("initLeaderboard error:", err); }
     try { this.initUpdateAnnouncementModal(); } catch (err) { console.error("initUpdateAnnouncementModal error:", err); }
+    try { this.initEmailAuth(); } catch (err) { console.error("initEmailAuth error:", err); }
     try { this.initSlotGameSelectModal(); } catch (err) { console.error("initSlotGameSelectModal error:", err); }
     try { this.initBlackjackBuyInModal(); } catch (err) { console.error("initBlackjackBuyInModal error:", err); }
     try { this.initBlackjack(); } catch (err) { console.error("initBlackjack error:", err); }
@@ -3030,7 +3047,10 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
         'royal_poker_name_locked',
         'royal_poker_volume',
         'solar_poker_leaderboard_data',
-        'solar_poker_registered_roster'
+        'solar_poker_registered_roster',
+        'royal_poker_name_last_changed',
+        'solar_poker_user_session',
+        'solar_poker_cloud_user_id'
       ];
       knownKeys.forEach(k => {
         try { localStorage.removeItem(k); } catch (e) {}
@@ -3129,11 +3149,19 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
         usernameInput.disabled = false;
         usernameInput.classList.remove('locked-input');
       }
-      const btnSaveUsername = document.getElementById('btn-save-username');
-      if (btnSaveUsername) {
-        btnSaveUsername.classList.remove('locked-btn');
-        btnSaveUsername.title = 'Save Permanent Callsign';
-        btnSaveUsername.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Save</span>';
+      if (typeof this.updateNicknameCooldownUI === 'function') {
+        this.updateNicknameCooldownUI();
+      } else {
+        const btnSaveUsername = document.getElementById('btn-save-username');
+        if (btnSaveUsername) {
+          btnSaveUsername.classList.remove('locked-btn', 'cooldown-btn');
+          btnSaveUsername.classList.add('can-edit-btn');
+          btnSaveUsername.title = 'Save your new nickname (Allowed once every 30 days)';
+          btnSaveUsername.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Save</span>';
+        }
+      }
+      if (typeof this.updateAuthPillUI === 'function') {
+        this.updateAuthPillUI(null, false);
       }
       const lbModal = document.getElementById('leaderboard-modal');
       if (lbModal) lbModal.classList.add('hidden');
@@ -3932,78 +3960,111 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
       this.startNewHand();
     });
 
-    // Custom Profile & Permanent Identity Callsign
+        // Custom Profile & 30-Day Callsign Change Cooldown
     this.usernameInput = document.getElementById('player-username-input');
     this.btnSaveUsername = document.getElementById('btn-save-username');
     if (this.usernameInput) {
       const savedName = localStorage.getItem('royal_poker_username') || 'High Roller';
       this.usernameInput.value = savedName;
-      this.players[0].name = savedName;
+      if (this.players && this.players[0]) {
+        this.players[0].name = savedName;
+      }
 
-      const isLocked = localStorage.getItem('royal_poker_name_locked') === 'true';
+      const COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000; // 30 days in ms (2,592,000,000 ms)
 
-      const updateLockUI = (locked) => {
+      this.updateNicknameCooldownUI = () => {
         if (!this.usernameInput) return;
-        if (locked) {
+        const lastChanged = parseInt(localStorage.getItem('royal_poker_name_last_changed') || '0', 10);
+        const now = Date.now();
+        const elapsed = now - lastChanged;
+
+        if (lastChanged > 0 && elapsed < COOLDOWN_MS) {
+          // In Cooldown period
+          const remainingMs = COOLDOWN_MS - elapsed;
+          const remDays = Math.floor(remainingMs / (24 * 60 * 60 * 1000));
+          const remHours = Math.floor((remainingMs % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+          const remMins = Math.floor((remainingMs % (60 * 60 * 1000)) / (60 * 1000));
+          const timeText = remDays > 0 ? `${remDays}d ${remHours}h` : (remHours > 0 ? `${remHours}h ${remMins}m` : `${remMins}m`);
+
           this.usernameInput.readOnly = true;
-          this.usernameInput.disabled = true;
           this.usernameInput.classList.add('locked-input');
           if (this.btnSaveUsername) {
-            this.btnSaveUsername.classList.add('locked-btn');
-            this.btnSaveUsername.title = 'Player identity is permanent and cannot be modified. Factory reset in settings to reset.';
-            this.btnSaveUsername.innerHTML = '<svg class="lock-svg" width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#fcd34d" stroke-width="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#fcd34d" stroke-width="2"/></svg><span>Locked</span>';
+            this.btnSaveUsername.classList.add('locked-btn', 'cooldown-btn');
+            this.btnSaveUsername.classList.remove('can-edit-btn');
+            this.btnSaveUsername.title = `Nickname on 30-day cooldown. Next change available in ${remDays} days, ${remHours} hours.`;
+            this.btnSaveUsername.innerHTML = `<svg class="lock-svg" width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#f59e0b" stroke-width="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#f59e0b" stroke-width="2"/></svg><span>${timeText}</span>`;
           }
         } else {
+          // Free to change nickname
           this.usernameInput.readOnly = false;
-          this.usernameInput.disabled = false;
           this.usernameInput.classList.remove('locked-input');
           if (this.btnSaveUsername) {
-            this.btnSaveUsername.classList.remove('locked-btn');
-            this.btnSaveUsername.title = 'Save Permanent Callsign';
+            this.btnSaveUsername.classList.remove('locked-btn', 'cooldown-btn');
+            this.btnSaveUsername.classList.add('can-edit-btn');
+            this.btnSaveUsername.title = 'Save your new nickname (Allowed once every 30 days)';
             this.btnSaveUsername.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Save</span>';
           }
         }
       };
 
-      updateLockUI(isLocked);
+      this.updateNicknameCooldownUI();
 
-      const handleNameAction = () => {
-        const currentlyLocked = localStorage.getItem('royal_poker_name_locked') === 'true';
-        if (currentlyLocked) {
+      const handleSaveName = () => {
+        const lastChanged = parseInt(localStorage.getItem('royal_poker_name_last_changed') || '0', 10);
+        const now = Date.now();
+        const elapsed = now - lastChanged;
+
+        if (lastChanged > 0 && elapsed < COOLDOWN_MS) {
+          const remainingMs = COOLDOWN_MS - elapsed;
+          const remDays = Math.floor(remainingMs / (24 * 60 * 60 * 1000));
+          const remHours = Math.floor((remainingMs % (24 * 60 * 60 * 1000)) / (60 * 1000));
           sounds.playError();
           this.showInGameAlert({
-            title: 'CALLSIGN PERMANENTLY LOCKED',
-            message: `Your callsign "${this.usernameInput.value}" is permanent. Only a complete Factory Reset in Settings can reset your identity and leaderboard standing.`
+            title: 'NICKNAME CHANGE ON COOLDOWN',
+            message: `Nicknames can only be changed once every 30 days to maintain integrity. Next change available in ${remDays} days, ${remHours} hours.`
           });
           return;
         }
 
         const val = (this.usernameInput.value || '').trim();
-        if (val && val.toLowerCase() !== 'you') {
-          localStorage.setItem('royal_poker_username', val);
-          localStorage.setItem('royal_poker_name_locked', 'true');
-          this.players[0].name = val;
-          const heroEl = document.getElementById('hero-name');
-          if (heroEl) heroEl.textContent = val;
-          updateLockUI(true);
-          this.renderMainMenuSlots();
-          sounds.playWin();
+        if (!val || val.toLowerCase() === 'you') {
+          sounds.playError();
           this.showInGameAlert({
-            title: 'IDENTITY PERMANENTLY BOUND',
-            message: `Player callsign "${val}" has been permanently registered. Your global leaderboard record will now track this callsign.`
+            title: 'INVALID CALLSIGN',
+            message: 'Please enter a valid callsign (1-14 characters).'
           });
+          return;
         }
+
+        localStorage.setItem('royal_poker_username', val);
+        localStorage.setItem('royal_poker_name_last_changed', now.toString());
+        if (this.players && this.players[0]) this.players[0].name = val;
+        const heroEl = document.getElementById('hero-name');
+        if (heroEl) heroEl.textContent = val;
+
+        this.updateNicknameCooldownUI();
+        this.renderMainMenuSlots();
+        this.updateLeaderboardUI();
+        if (typeof this.syncLeaderboardToCloud === 'function') {
+          this.syncLeaderboardToCloud();
+        }
+        sounds.playWin();
+        this.showInGameAlert({
+          title: 'CALLSIGN REGISTERED',
+          message: `Your callsign has been updated to "${val}"! Note: You may change it again in 30 days.`
+        });
       };
 
       if (this.btnSaveUsername) {
-        this.btnSaveUsername.addEventListener('click', handleNameAction);
+        this.btnSaveUsername.addEventListener('click', handleSaveName);
       }
       this.usernameInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') handleNameAction();
+        if (e.key === 'Enter') handleSaveName();
       });
       this.usernameInput.addEventListener('click', () => {
-        if (localStorage.getItem('royal_poker_name_locked') === 'true') {
-          handleNameAction();
+        const lastChanged = parseInt(localStorage.getItem('royal_poker_name_last_changed') || '0', 10);
+        if (lastChanged > 0 && (Date.now() - lastChanged) < COOLDOWN_MS) {
+          handleSaveName();
         }
       });
     }
@@ -7992,16 +8053,27 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     // Filter out Hero from savedProfiles so Hero isn't duplicated
     const otherRegistered = savedProfiles.filter(p => p.name.toLowerCase() !== heroName.toLowerCase());
 
+    // Check if hero has a verified email session
+    let heroVerified = false;
+    try {
+      const sess = localStorage.getItem('solar_poker_user_session');
+      if (sess) {
+        const parsed = JSON.parse(sess);
+        heroVerified = Boolean(parsed && parsed.isVerified);
+      }
+    } catch (e) {}
+
     // Combine Hero into in-game registered standings
     const standings = [
       ...IN_GAME_RIVALS,
       ...otherRegistered,
       {
         name: heroName,
-        role: "Registered Player",
-        status: "Active Hero",
+        role: heroVerified ? "Verified Player" : "Registered Player",
+        status: heroVerified ? "Cloud Verified Hero" : "Active Hero",
         wealth: heroTotalWealth,
-        isHero: true
+        isHero: true,
+        isVerified: heroVerified
       }
     ];
 
@@ -8056,6 +8128,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
             </td>
             <td class="player-cell">
               <strong>${player.name}</strong>
+              ${player.isVerified ? '<span class="verified-cloud-badge" title="Supabase Verified">&#10004;</span>' : ''}
               ${isHero ? '<span class="hero-tag-badge">YOU</span>' : ''}
             </td>
             <td class="region-cell">${player.role || 'Registered Player'}</td>
@@ -8082,6 +8155,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
             </td>
             <td class="mlb-td-name">
               <span class="mlb-name-text">${player.name}</span>
+              ${player.isVerified ? '<span class="verified-cloud-badge" title="Supabase Verified">&#10004;</span>' : ''}
               ${isHero ? '<span class="mlb-you-tag">YOU</span>' : ''}
             </td>
             <td class="mlb-td-origin">${player.role || 'Player'}</td>
@@ -8100,6 +8174,378 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       sounds.playToggleChime();
     }
   }
+
+  // ==========================================================================
+  // v1.135: EMAIL VERIFICATION & SUPABASE CLOUD LEADERBOARD INTEGRATION
+  // ==========================================================================
+  initEmailAuth() {
+    this.authModal = document.getElementById('email-auth-modal');
+    this.btnOpenAuthModal = document.getElementById('btn-open-auth-modal');
+    this.btnCloseAuthModal = document.getElementById('close-email-auth-btn');
+
+    this.authStatusBox = document.getElementById('email-auth-status-box');
+    this.authBadge = document.getElementById('eas-badge');
+    this.authEmailDisplay = document.getElementById('eas-email-display');
+    this.authInstructions = document.getElementById('eas-instructions');
+    this.btnResendVerification = document.getElementById('btn-resend-verification');
+    this.btnCheckStatus = document.getElementById('btn-check-verified-status');
+    this.btnSignOut = document.getElementById('btn-signout-email');
+
+    this.authForm = document.getElementById('email-auth-form');
+    this.authEmailInput = document.getElementById('auth-email-input');
+    this.authPassInput = document.getElementById('auth-password-input');
+    this.authFeedback = document.getElementById('auth-feedback-msg');
+    this.btnAuthSignUp = document.getElementById('btn-auth-signup');
+    this.btnAuthSignIn = document.getElementById('btn-auth-signin');
+
+    if (this.btnOpenAuthModal) {
+      this.btnOpenAuthModal.addEventListener('click', () => {
+        this.openEmailAuthModal();
+      });
+    }
+
+    if (this.btnCloseAuthModal) {
+      this.btnCloseAuthModal.addEventListener('click', () => {
+        if (this.authModal) this.authModal.classList.add('hidden');
+        sounds.playClick();
+      });
+    }
+
+    if (this.btnAuthSignUp) {
+      this.btnAuthSignUp.addEventListener('click', () => this.handleEmailSignUp());
+    }
+
+    if (this.btnAuthSignIn) {
+      this.btnAuthSignIn.addEventListener('click', () => this.handleEmailSignIn());
+    }
+
+    if (this.btnResendVerification) {
+      this.btnResendVerification.addEventListener('click', () => this.handleResendVerification());
+    }
+
+    if (this.btnCheckStatus) {
+      this.btnCheckStatus.addEventListener('click', () => this.checkUserAuthStatus(true));
+    }
+
+    if (this.btnSignOut) {
+      this.btnSignOut.addEventListener('click', () => this.handleSignOut());
+    }
+
+    // Check existing authentication session on launch
+    this.checkUserAuthStatus(false);
+  }
+
+  showAuthFeedback(msg, type = 'info') {
+    if (!this.authFeedback) return;
+    this.authFeedback.textContent = msg;
+    this.authFeedback.className = `auth-feedback-msg auth-${type}`;
+    this.authFeedback.classList.remove('hidden');
+  }
+
+  clearAuthFeedback() {
+    if (!this.authFeedback) return;
+    this.authFeedback.textContent = '';
+    this.authFeedback.classList.add('hidden');
+  }
+
+  openEmailAuthModal() {
+    this.clearAuthFeedback();
+    if (this.authModal) {
+      this.authModal.classList.remove('hidden');
+      sounds.playToggleChime();
+    }
+    this.checkUserAuthStatus(false);
+  }
+
+  async checkUserAuthStatus(isUserInitiated = false) {
+    if (!supabaseClient) {
+      this.updateAuthPillUI(null);
+      if (isUserInitiated) {
+        this.showAuthFeedback('Supabase cloud service connecting or offline. Please check connection.', 'error');
+      }
+      return;
+    }
+
+    try {
+      const { data: { session }, error } = await supabaseClient.auth.getSession();
+      if (error) {
+        console.warn('[Supabase] getSession notice:', error.message);
+      }
+
+      if (session && session.user) {
+        const user = session.user;
+        const isVerified = Boolean(user.email_confirmed_at || user.confirmed_at);
+        localStorage.setItem('solar_poker_user_session', JSON.stringify({ email: user.email, id: user.id, isVerified }));
+        localStorage.setItem('solar_poker_cloud_user_id', user.id);
+
+        this.renderAuthBoxState(user.email, isVerified);
+        this.updateAuthPillUI(user.email, isVerified);
+
+        if (isVerified) {
+          await this.syncLeaderboardToCloud();
+          if (isUserInitiated) {
+            sounds.playWin();
+            this.showAuthFeedback('Official email verified! Bankroll and save slots are securely cloud-anchored.', 'success');
+          }
+        } else if (isUserInitiated) {
+          sounds.playAlert();
+          this.showAuthFeedback('Verification email pending confirmation. Please click the link in your inbox.', 'warning');
+        }
+      } else {
+        localStorage.removeItem('solar_poker_user_session');
+        this.renderAuthBoxState(null, false);
+        this.updateAuthPillUI(null, false);
+        if (isUserInitiated) {
+          this.showAuthFeedback('No active cloud account linked. Sign up or sign in below.', 'info');
+        }
+      }
+    } catch (err) {
+      console.warn('[Supabase] checkUserAuthStatus error:', err);
+    }
+  }
+
+  renderAuthBoxState(email, isVerified) {
+    if (!this.authStatusBox || !this.authForm) return;
+
+    if (email) {
+      this.authStatusBox.classList.remove('hidden');
+      if (this.authEmailDisplay) this.authEmailDisplay.textContent = email;
+
+      if (this.authBadge) {
+        if (isVerified) {
+          this.authBadge.textContent = 'VERIFIED CLOUD MEMBER';
+          this.authBadge.className = 'eas-badge verified';
+        } else {
+          this.authBadge.textContent = 'VERIFICATION PENDING';
+          this.authBadge.className = 'eas-badge unverified';
+        }
+      }
+
+      if (this.authInstructions) {
+        if (isVerified) {
+          this.authInstructions.innerHTML = '<span style="color:#10b981;">&#10003; Your identity is verified.</span> Net worth and save slots automatically sync to the official Global Leaderboard.';
+        } else {
+          this.authInstructions.innerHTML = 'A verification confirmation link has been sent to your email. Click it to activate your permanent leaderboard rank and cloud safety.';
+        }
+      }
+
+      // Hide or minimize input form when already logged in
+      this.authForm.classList.add('hidden');
+    } else {
+      this.authStatusBox.classList.add('hidden');
+      this.authForm.classList.remove('hidden');
+    }
+  }
+
+  updateAuthPillUI(email, isVerified) {
+    if (!this.btnOpenAuthModal) return;
+
+    if (email && isVerified) {
+      this.btnOpenAuthModal.className = 'account-cloud-btn verified';
+      this.btnOpenAuthModal.title = `Cloud Verified: ${email}. Leaderboard status active.`;
+      this.btnOpenAuthModal.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="#10b981" stroke="#059669" stroke-width="1.5"/><path d="M9 12l2 2 4-4" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Verified Player</span>';
+    } else if (email && !isVerified) {
+      this.btnOpenAuthModal.className = 'account-cloud-btn pending';
+      this.btnOpenAuthModal.title = `Verification Pending for ${email}. Click to verify.`;
+      this.btnOpenAuthModal.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#f59e0b" stroke-width="2"/><polyline points="12,6 12,12 16,14" stroke="#f59e0b" stroke-width="2"/></svg><span>Verify Email</span>';
+    } else {
+      this.btnOpenAuthModal.className = 'account-cloud-btn unverified';
+      this.btnOpenAuthModal.title = 'Link Email to secure bankroll and join official Leaderboard';
+      this.btnOpenAuthModal.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2"/><polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="2"/></svg><span>Link Email</span>';
+    }
+  }
+
+  async handleEmailSignUp() {
+    if (!supabaseClient) {
+      this.showAuthFeedback('Supabase cloud service is loading. Please retry in a moment.', 'error');
+      return;
+    }
+
+    const email = (this.authEmailInput?.value || '').trim();
+    const password = (this.authPassInput?.value || '').trim();
+    const callsign = (localStorage.getItem('royal_poker_username') || 'High Roller').trim();
+
+    if (!email || !email.includes('@') || !email.includes('.')) {
+      sounds.playError();
+      this.showAuthFeedback('Please provide a valid email address.', 'error');
+      return;
+    }
+
+    if (!password || password.length < 6) {
+      sounds.playError();
+      this.showAuthFeedback('Password must be at least 6 characters long.', 'error');
+      return;
+    }
+
+    try {
+      this.showAuthFeedback('Sending verification email and creating account...', 'info');
+      sounds.playClick();
+
+      const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            player_callsign: callsign,
+            registered_at: new Date().toISOString()
+          }
+        }
+      });
+
+      if (error) {
+        sounds.playError();
+        this.showAuthFeedback(`Registration failed: ${error.message}`, 'error');
+        return;
+      }
+
+      sounds.playWin();
+      this.showAuthFeedback(`Verification email sent to ${email}! Please check your inbox or spam folder and click the link to verify.`, 'success');
+      this.checkUserAuthStatus(false);
+    } catch (err) {
+      sounds.playError();
+      this.showAuthFeedback(`An unexpected error occurred: ${err.message}`, 'error');
+    }
+  }
+
+  async handleEmailSignIn() {
+    if (!supabaseClient) {
+      this.showAuthFeedback('Supabase cloud service is loading. Please retry in a moment.', 'error');
+      return;
+    }
+
+    const email = (this.authEmailInput?.value || '').trim();
+    const password = (this.authPassInput?.value || '').trim();
+
+    if (!email || !password) {
+      sounds.playError();
+      this.showAuthFeedback('Please enter both email and password.', 'error');
+      return;
+    }
+
+    try {
+      this.showAuthFeedback('Signing into cloud account...', 'info');
+      sounds.playClick();
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        sounds.playError();
+        this.showAuthFeedback(`Sign-in failed: ${error.message}`, 'error');
+        return;
+      }
+
+      sounds.playWin();
+      this.showAuthFeedback(`Signed in successfully as ${email}!`, 'success');
+      await this.checkUserAuthStatus(true);
+    } catch (err) {
+      sounds.playError();
+      this.showAuthFeedback(`Sign-in error: ${err.message}`, 'error');
+    }
+  }
+
+  async handleResendVerification() {
+    if (!supabaseClient) return;
+
+    let email = (this.authEmailInput?.value || '').trim();
+    if (!email && this.authEmailDisplay) {
+      email = this.authEmailDisplay.textContent.trim();
+    }
+
+    if (!email || !email.includes('@')) {
+      this.showAuthFeedback('Could not detect email to resend verification. Please enter your email.', 'error');
+      return;
+    }
+
+    try {
+      this.showAuthFeedback(`Resending verification link to ${email}...`, 'info');
+      sounds.playClick();
+
+      const { error } = await supabaseClient.auth.resend({
+        type: 'signup',
+        email
+      });
+
+      if (error) {
+        sounds.playError();
+        this.showAuthFeedback(`Resend failed: ${error.message}`, 'error');
+        return;
+      }
+
+      sounds.playWin();
+      this.showAuthFeedback(`Verification link resent to ${email}! Please check your inbox.`, 'success');
+    } catch (err) {
+      sounds.playError();
+      this.showAuthFeedback(`Resend error: ${err.message}`, 'error');
+    }
+  }
+
+  async handleSignOut() {
+    if (!supabaseClient) return;
+
+    try {
+      sounds.playClick();
+      await supabaseClient.auth.signOut();
+      localStorage.removeItem('solar_poker_user_session');
+      localStorage.removeItem('solar_poker_cloud_user_id');
+      this.renderAuthBoxState(null, false);
+      this.updateAuthPillUI(null, false);
+      this.showAuthFeedback('Account unlinked from this browser session.', 'info');
+      sounds.playFold();
+    } catch (err) {
+      console.warn('Sign-out error:', err);
+    }
+  }
+
+  async syncLeaderboardToCloud() {
+    if (!supabaseClient) return;
+
+    try {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session || !session.user) return;
+
+      const user = session.user;
+      const isVerified = Boolean(user.email_confirmed_at || user.confirmed_at);
+      const heroName = (localStorage.getItem('royal_poker_username') || 'High Roller').trim();
+
+      // Calculate total net worth across savings, minigame wallet, and all 4 save slots
+      const cumulativeSavings = EconomyManager.getCumulativeSavings() || 0;
+      const walletObj = EconomyManager.getMiniGameWallet();
+      const miniGameWallet = (walletObj && typeof walletObj.balance === 'number') ? walletObj.balance : 0;
+      const saves = SaveManager.getSaves() || {};
+      let slotsChips = 0;
+      for (let i = 1; i <= 4; i++) {
+        const slot = saves[`slot_${i}`];
+        if (slot && typeof slot.chips === 'number') {
+          slotsChips += slot.chips;
+        }
+      }
+      const totalWealth = cumulativeSavings + miniGameWallet + slotsChips;
+
+      // Upsert record into Supabase leaderboard table
+      const { error } = await supabaseClient
+        .from('leaderboard')
+        .upsert({
+          user_id: user.id,
+          email: user.email,
+          player_name: heroName,
+          wealth: totalWealth,
+          is_verified: isVerified,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id' });
+
+      if (error) {
+        console.warn('[Supabase] Leaderboard cloud sync notice:', error.message);
+      } else {
+        console.log('[Supabase] Leaderboard successfully synchronized to cloud for user:', user.email);
+      }
+    } catch (err) {
+      console.warn('[Supabase] syncLeaderboardToCloud notice:', err);
+    }
+  }
+
 
   // ==========================================================================
   // v1.13: FIRST-TIME OVERPOWERING UPDATE 1.13 ANNOUNCEMENT MODAL
