@@ -580,9 +580,9 @@
           <span class="hamburger-bar"></span>
         </button>
         <!-- Top Left Update Log Trigger (v1.1) -->
-        <button id="btn-update-log-trigger" class="update-log-pill-btn" title="View Version 1.11 Release Notes" type="button">
+        <button id="btn-update-log-trigger" class="update-log-pill-btn" title="View Version 1.12 Release Notes" type="button">
           <span class="update-pill-dot"></span>
-          <span class="update-pill-text">Update 1.11</span>
+          <span class="update-pill-text">Update 1.12</span>
         </button>
         <div class="nav-brand-wrap">
           <svg class="nav-crown-svg" width="22" height="18" viewBox="0 0 72 54" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -639,6 +639,14 @@
           <span>Stats</span>
         </button>
 
+        <button id="btn-nav-leaderboard" class="nav-icon-btn" title="Global High-Roller Leaderboard [IN PROGRESS]">
+          <svg class="btn-svg-icon" width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path d="M6 9H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3m12 5h3a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-3M6 4h12v7a6 6 0 0 1-12 0V4z" fill="rgba(253,224,71,0.25)" stroke="#ffd700" stroke-width="1.8"/>
+            <path d="M12 17v4m-4 0h8" stroke="#ffd700" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <span>Ranks</span>
+        </button>
+
         <button id="btn-nav-settings" class="nav-icon-btn" title="Settings &amp; Module Controls">
           <svg class="btn-svg-icon" width="15" height="15" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="3" stroke="#38bdf8" stroke-width="2"/>
@@ -669,10 +677,10 @@
          ====================================================================== -->
     <section id="main-menu" class="main-menu-view">
       <div class="menu-hero">
-        <!-- Main Menu Update Banner v1.1 -->
-        <div class="menu-update-banner" id="menu-update-log-trigger" role="button" tabindex="0" title="Click to view v1.11 Release Notes">
-          <span class="update-badge-tag">BIG UPDATE 1.11</span>
-          <span class="update-badge-ver">1.11 &bull; Luxury Blackjack VIP Suite, Night Sky Fix, Slot Game Tags &amp; 3h Cycle</span>
+        <!-- Main Menu Update Banner v1.12 -->
+        <div class="menu-update-banner" id="menu-update-log-trigger" role="button" tabindex="0" title="Click to view v1.12 Release Notes">
+          <span class="update-badge-tag">BIG UPDATE 1.12</span>
+          <span class="update-badge-ver">1.12 &bull; 4 Background Themes, Cookie Clicker News Ticker, Global Leaderboard (WIP) &amp; Permanent ID</span>
           <span class="update-badge-arrow">&rarr;</span>
         </div>
         <h1 class="menu-title">SOLAR TEXAS HOLD'EM</h1>
@@ -688,6 +696,24 @@
           <span class="decor-suit">♣</span>
         </div>
       </div>
+
+      <!-- Cookie Clicker-Style Casino & Global News Ticker Bar -->
+      <div id="news-ticker-container" class="news-ticker-container" role="region" aria-label="Live Casino and Global News Wire" title="Click to cycle next headline">
+        <div class="news-ticker-badge">
+          <svg class="news-ticker-icon" width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1m2 13a2 2 0 0 1-2-2V7m2 13a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2m-4-3H9M7 8h6m-6 4h6m-6 4h4" stroke="#ffd700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="news-ticker-label">SOLAR DISPATCH</span>
+        </div>
+        <div class="news-ticker-marquee">
+          <div id="news-ticker-content" class="news-ticker-content">
+            <span id="news-ticker-tag" class="news-headline-tag poker">POKER WIRE</span>
+            <span id="news-ticker-text" class="news-headline-text">Welcome to Solar Texas Hold'em v1.12. Initializing satellite news feed...</span>
+          </div>
+        </div>
+        <div class="news-ticker-hint">
+          <span class="news-ticker-click-hint">CLICK TO SKIP &rarr;</span>
+        </div>
+      </div>
+
 
       <!-- DUAL WALLET DISPLAY (Main Menu Front Page) -->
       <div class="dual-wallet-display-hero">
@@ -731,70 +757,21 @@
         </div>
       </div>
 
-      <!-- Live Global Casino Stats Banner (Hand-Crafted Illustrated Icons) -->
-      <div class="global-stats-banner">
-        <div class="stat-pill">
-          <span class="stat-icon">
-            <svg class="stat-svg" width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="3" stroke="#fcd34d" stroke-width="1.8"/><circle cx="8" cy="12" r="1.5" fill="#fcd34d"/><circle cx="16" cy="12" r="1.5" fill="#fcd34d"/><path d="M12 9v6M9 12h6" stroke="#fcd34d" stroke-width="1.5"/></svg>
-          </span>
-          <span class="stat-label">Hands:</span>
-          <span class="stat-val" id="stat-total-hands">0</span>
-        </div>
-        <div class="stat-pill">
-          <span class="stat-icon">
-            <svg class="stat-svg" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 3h12v7a6 6 0 0 1-12 0V3z" fill="rgba(253,224,71,0.2)" stroke="#fcd34d" stroke-width="1.8"/><path d="M6 5H3a2 2 0 0 0-2 2v1a4 4 0 0 0 4 4h1M18 5h3a2 2 0 0 1 2 2v1a4 4 0 0 1-4 4h-1M12 16v4M8 20h8" stroke="#fcd34d" stroke-width="1.8" stroke-linecap="round"/></svg>
-          </span>
-          <span class="stat-label">Won:</span>
-          <span class="stat-val" id="stat-hands-won">0</span>
-        </div>
-        <div class="stat-pill">
-          <span class="stat-icon">
-            <svg class="stat-svg" width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#ef4444" stroke-width="1.8"/><circle cx="12" cy="12" r="5" stroke="#fcd34d" stroke-width="1.8"/><circle cx="12" cy="12" r="1.8" fill="#fcd34d"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="#ef4444" stroke-width="1.5"/></svg>
-          </span>
-          <span class="stat-label">Win Rate:</span>
-          <span class="stat-val" id="stat-win-rate">0%</span>
-        </div>
-        <div class="stat-pill">
-          <span class="stat-icon">
-            <svg class="stat-svg" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 4C9 4 8 7 8 7h8s-1-3-4-3z" stroke="#fcd34d" stroke-width="1.5"/><path d="M5 10c0-2 3-3 7-3s7 1 7 3c0 7-3 11-7 11s-7-4-7-11z" fill="rgba(253,224,71,0.15)" stroke="#fcd34d" stroke-width="1.8"/><path d="M12 11v6M10 13c1-1 3-1 4 0s-1 2-2 2-2 1-1 2c1 1 3 1 3 0" stroke="#fde047" stroke-width="1.5" stroke-linecap="round"/></svg>
-          </span>
-          <span class="stat-label">Biggest Pot:</span>
-          <span class="stat-val" id="stat-biggest-pot">$0</span>
-        </div>
-        <div class="stat-pill">
-          <span class="stat-icon">
-            <svg class="stat-svg" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2c0 4-5 6-5 11a7 7 0 0 0 14 0c0-4-3-8-4-9-1 3-3 4-5 2z" fill="rgba(239,68,68,0.25)" stroke="#f97316" stroke-width="1.8"/><path d="M12 11c0 2-2 3-2 5a3 3 0 0 0 6 0c0-2-1-3-2-4-1 1-1 1-2-1z" fill="#fde047"/></svg>
-          </span>
-          <span class="stat-label">Best Streak:</span>
-          <span class="stat-val" id="stat-best-streak">0</span>
-        </div>
-        <div class="stat-pill">
-          <span class="stat-icon">
-            <svg class="stat-svg" width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="10" height="15" rx="2" transform="rotate(-15 4 5)" fill="#0f172a" stroke="#fcd34d" stroke-width="1.5"/><rect x="10" y="4" width="10" height="15" rx="2" transform="rotate(10 10 4)" fill="#1e293b" stroke="#fcd34d" stroke-width="1.5"/><circle cx="15" cy="11" r="1.5" fill="#ef4444"/></svg>
-          </span>
-          <span class="stat-label">Best Hand:</span>
-          <span class="stat-val" id="stat-best-hand">High Card</span>
-        </div>
-        <div class="stat-pill online-pill">
-          <span class="stat-icon">
-            <svg class="stat-svg pulse-dot" width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#2ec4b6" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="#2ec4b6"/></svg>
-          </span>
-          <span class="stat-label">Exclusive Room:</span>
-          <span class="stat-val" id="stat-room-status">Joinable</span>
-        </div>
-      </div>
-
       <!-- MAIN DASHBOARD SPLIT GRID (Poker Campaign Left • Casino Action Portal Right) -->
       <div class="main-dashboard-grid">
         <!-- LEFT COLUMN: Texas Hold'em Solo Campaign Hub -->
         <div class="dashboard-left-col">
-          <!-- Player Profile & Custom Username Bar -->
+          <!-- Player Profile & Permanent Identity Bar -->
           <div class="player-profile-bar">
             <div class="profile-input-wrap">
               <span class="profile-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="#fcd34d" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="#fcd34d" stroke-width="2"/></svg></span>
-              <label for="player-username-input" class="profile-label">Player Name:</label>
-              <input type="text" id="player-username-input" class="username-input" placeholder="Enter Your Name" maxlength="14" value="High Roller">
-              <button id="btn-save-username" class="btn-save-name" title="Save Username"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <label for="player-username-input" class="profile-label">Callsign:</label>
+              <input type="text" id="player-username-input" class="username-input locked-input" placeholder="Permanent Callsign" maxlength="14" value="High Roller" readonly>
+              <button id="btn-save-username" class="btn-save-name locked-btn" title="Permanent Callsign &bull; Reset via Settings Factory Reset" type="button"><svg class="lock-svg" width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#fcd34d" stroke-width="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#fcd34d" stroke-width="2"/></svg><span>Locked</span></button>
+            </div>
+            <div class="permanent-id-badge" title="Identity is permanently bound to this device session. Factory reset in settings to change.">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#f59e0b" stroke-width="2"/><path d="M12 16v-4m0-4h.01" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/></svg>
+              <span>PERMANENT ID</span>
             </div>
           </div>
 
@@ -2278,58 +2255,58 @@
           <div class="update-header-brand">
             <span class="update-pulse-star">&#9733;</span>
             <div class="update-header-titles">
-              <span class="update-header-kicker">MAJOR RELEASE &bull; VERSION 1.11</span>
-              <h2>LUXURY BLACKJACK VIP SUITE &amp; NIGHT SKY UPDATE</h2>
+              <span class="update-header-kicker">MAJOR RELEASE &bull; VERSION 1.12</span>
+              <h2>4 BACKGROUND THEMES &bull; NEWS WIRE &bull; GLOBAL LEADERBOARD</h2>
             </div>
           </div>
           <button id="close-update-announcement-btn" class="close-btn" type="button">&times;</button>
         </div>
 
         <div class="modal-body update-announcement-body">
-          <p class="update-hero-lead">Welcome to <strong>Solar Poker v1.11</strong>! This release brings a complete VIP visual overhaul to the Solar Blackjack Arena, fixes the Settings Night Sky background switcher, displays active game titles on all save slots, and clarifies career allowances.</p>
+          <p class="update-hero-lead">Welcome to <strong>Solar Poker v1.12</strong>! This landmark release delivers 4 distinct visual background presets in Settings, a Cookie Clicker-style casino &amp; global news wire ticker, an experimental Global High-Roller Leaderboard (WIP), permanent player callsign locking, and a beautifully decluttered main hub.</p>
 
           <div class="update-feature-showcase-grid">
-            <!-- Feature 1: Luxury Blackjack VIP Suite -->
+            <!-- Feature 1: 4 Background Themes -->
             <div class="update-showcase-item">
               <div class="usi-icon gold">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="10" height="15" rx="2" transform="rotate(-10 3 4)" fill="#064e3b" stroke="#34d399" stroke-width="1.8"/><rect x="10" y="4" width="10" height="15" rx="2" transform="rotate(10 10 4)" fill="#0f172a" stroke="#ffd700" stroke-width="1.8"/><text x="13" y="15" font-family="'Cinzel',serif" font-size="7" font-weight="900" fill="#fde047">21</text></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#f59e0b" stroke-width="1.8"/><path d="M12 3a9 9 0 0 0 9 9 9 9 0 1 1-9-9z" fill="rgba(245,158,11,0.25)" stroke="#f59e0b" stroke-width="1.8"/></svg>
               </div>
               <div class="usi-text">
-                <h4>Luxury Blackjack VIP Arena &amp; Room Overhaul</h4>
-                <p>Authentic Monte Carlo high-roller atmosphere: padded double-stitched leather armrest rim, dealer chip rack with color-coded chip stacks, 4-deck acrylic shoe dispenser, acrylic discard box, and ambient spotlighting!</p>
+                <h4>4 Background Atmosphere Themes</h4>
+                <p>Choose between <strong>Solar Flare Ultra</strong> (Max FX), <strong>Solar Eclipse Balanced</strong> (medium detail), <strong>Night Sky Serenade</strong> (low detail), and <strong>Deep Cosmos Minimal</strong> (least graphics, pure starry void) with snapshot previews in Settings.</p>
               </div>
             </div>
 
-            <!-- Feature 2: Background Settings Fix -->
+            <!-- Feature 2: Cookie Clicker News Ticker -->
             <div class="update-showcase-item">
               <div class="usi-icon cyan">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#38bdf8" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="#38bdf8"/></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1m2 13a2 2 0 0 1-2-2V7m2 13a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2m-4-3H9M7 8h6m-6 4h6m-6 4h4" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </div>
               <div class="usi-text">
-                <h4>Settings Night Sky Theme Fix</h4>
-                <p>Fixed the background theme selector in Settings! Switching to Night Sky Serenade now immediately removes all heavy geometric bastions and spinning gears, revealing a pristine, calm twinkling starfield.</p>
+                <h4>Cookie Clicker News Wire Bar</h4>
+                <p>100+ non-repeating headlines covering Vietnam news (Hanoi Metro, Da Nang tech, VinFast, UNESCO sites), global breakthroughs, poker updates, and solar cosmic weather. Click to skip!</p>
               </div>
             </div>
 
-            <!-- Feature 3: Save Slot Game Identity -->
+            <!-- Feature 3: Global Leaderboard [IN PROGRESS] -->
             <div class="update-showcase-item">
               <div class="usi-icon emerald">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9" stroke="#34d399" stroke-width="2" fill="rgba(52,211,153,0.2)"/></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 9H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3m12 5h3a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-3M6 4h12v7a6 6 0 0 1-12 0V4z" fill="rgba(16,185,129,0.25)" stroke="#10b981" stroke-width="1.8"/><path d="M12 17v4m-4 0h8" stroke="#10b981" stroke-width="1.8" stroke-linecap="round"/></svg>
               </div>
               <div class="usi-text">
-                <h4>Save Slot Game Badges (Blackjack / Hold'em)</h4>
-                <p>Every save slot card now clearly displays the exact game you're playing with glowing badges (Solar Blackjack or Solar Texas Hold'em) and smooth continuation routing!</p>
+                <h4>Global High-Roller Leaderboard (WIP)</h4>
+                <p>Track your total career wealth dynamically ranked against poker legends like Phil Ivey, Daniel Negreanu, and Doyle Brunson. Resetting clears standing.</p>
               </div>
             </div>
 
-            <!-- Feature 4: 3-Hour Allowance Cycle Clarification -->
+            <!-- Feature 4: Permanent Identity & Decluttered Hub -->
             <div class="update-showcase-item">
               <div class="usi-icon red">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="3" stroke="#ef4444" stroke-width="2"/><circle cx="12" cy="12" r="3.5" stroke="#ffd700" stroke-width="1.8"/></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#c084fc" stroke-width="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#c084fc" stroke-width="2"/></svg>
               </div>
               <div class="usi-text">
-                <h4>3-Hour Allowance Cycle Clarification</h4>
-                <p>Corrected the $5,000 career allowance display to accurately show "$5,000 / 3 Hours" matching the accelerated 3-hour cooldown timer.</p>
+                <h4>Permanent Callsign &amp; Clean Hub</h4>
+                <p>Player identity is now permanently bound upon registration. Removed cluttered stats banner from main menu in favor of dedicated Stats modal.</p>
               </div>
             </div>
           </div>
@@ -2337,7 +2314,7 @@
 
         <div class="modal-footer update-announcement-footer">
           <button id="btn-start-playing-v11" class="btn btn-primary gold-action-btn btn-explore-update" type="button">
-            <span>START PLAYING UPDATE 1.11</span> <span class="play-arrow">▶</span>
+            <span>START PLAYING UPDATE 1.12</span> <span class="play-arrow">▶</span>
           </button>
         </div>
       </div>
@@ -2356,11 +2333,27 @@
           <button id="close-update-log-btn" class="close-btn" type="button">&times;</button>
         </div>
         <div class="modal-body update-log-body">
-          <!-- ==================== v1.11 CURRENT RELEASE ==================== -->
+          <!-- ==================== v1.12 CURRENT RELEASE ==================== -->
           <div class="update-log-section current-release-section">
             <div class="update-sec-badge-row">
-              <span class="update-log-ver-badge">v1.11 CURRENT</span>
+              <span class="update-log-ver-badge">v1.12 CURRENT</span>
               <span class="update-sec-date">Latest Big Release</span>
+            </div>
+            <h3 class="update-sec-title">v1.12: 4 Background Themes, Cookie Clicker News Ticker, Global Leaderboard (WIP) &amp; Permanent ID</h3>
+            <ul class="update-sec-list">
+              <li><strong>4 Distinct Background Themes:</strong> Full preset switcher in Settings with visual SVG snapshots: Solar Flare Ultra (Max FX), Solar Eclipse Balanced (medium detail with rotating cogs and soft glow), Night Sky Serenade (low detail deep navy cosmos), and Deep Cosmos Minimal (least graphics, pure starry void with 0 geometric clutter).</li>
+              <li><strong>Cookie Clicker-Style News Ticker:</strong> Integrated dynamic horizontal news wire displaying 100+ non-repeating rotating dispatches across Vietnam news, global science/space updates, high-stakes poker reports, and cosmic space weather. Click anywhere on the bar to instantly skip to the next headline!</li>
+              <li><strong>Global High-Roller Leaderboard [IN PROGRESS]:</strong> Real-time dynamic ranking comparing your cumulative net worth (Cumulative Savings Vault + chips across all save slots + mini-game wallet) with legends like Phil Ivey, Daniel Negreanu, Doyle Brunson, and Gerald the Solar King.</li>
+              <li><strong>Permanent Callsign Identity:</strong> Player handles are permanently bound once registered. Protected with visual lock badges; only a complete Factory Reset clears your identity and leaderboard standing.</li>
+              <li><strong>Decluttered Main Menu:</strong> Removed the redundant main menu stats banner; career statistics remain fully accessible with a single click via the top bar Stats button.</li>
+            </ul>
+          </div>
+
+          <!-- ==================== v1.11 PREVIOUS RELEASE ==================== -->
+          <div class="update-log-section">
+            <div class="update-sec-badge-row">
+              <span class="update-log-ver-badge">v1.11</span>
+              <span class="update-sec-date">Previous Release</span>
             </div>
             <h3 class="update-sec-title">v1.11: Luxury Blackjack VIP Suite, Night Sky Fix &amp; Save Slot Game Identity</h3>
             <ul class="update-sec-list">
@@ -3437,6 +3430,23 @@
         <div class="drawer-section">
           <div class="drawer-section-title">POKER &amp; CARD ARENAS</div>
           <div class="drawer-menu-list">
+                    <!-- Section: Global Standings & Circuit -->
+        <div class="drawer-section">
+          <div class="drawer-section-title">GLOBAL SERVICES &amp; STANDINGS</div>
+          <div class="drawer-menu-list">
+            <button class="drawer-item" id="drawer-item-leaderboard" data-dest="leaderboard">
+              <div class="d-item-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 9H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3m12 5h3a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-3M6 4h12v7a6 6 0 0 1-12 0V4z" fill="rgba(253,224,71,0.25)" stroke="#ffd700" stroke-width="1.8"/><path d="M12 17v4m-4 0h8" stroke="#ffd700" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </div>
+              <div class="d-item-info">
+                <div class="d-item-title">Global Leaderboard</div>
+                <div class="d-item-sub">High-roller wealth rankings &bull; Global circuit standings</div>
+              </div>
+              <span class="d-item-badge hot">WIP</span>
+            </button>
+          </div>
+        </div>
+
             <button class="drawer-item active" id="drawer-item-texas" data-dest="texas">
               <div class="d-item-icon">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2C9 7 4 10 4 14.5a6 6 0 0 0 10.5 3.8L12 22h4l-1.5-3.7A6 6 0 0 0 20 14.5C20 10 15 7 12 2z" fill="#ffd700"/></svg>
@@ -3637,16 +3647,19 @@
               </select>
             </div>
 
-            <!-- Background Theme Selection (with Snapshots) -->
+            <!-- 4 Distinct Background Themes Selection (Update 1.12) -->
             <div class="setting-theme-selection">
-              <span class="setting-theme-heading">Background Visual Theme</span>
-              <p class="setting-desc">Choose between vibrant dynamic solar geometry or serene, non-overpowering night sky.</p>
+              <div class="theme-heading-row">
+                <span class="setting-theme-heading">Background Visual Atmosphere (4 Themes)</span>
+                <span class="theme-count-badge">4 PRESETS</span>
+              </div>
+              <p class="setting-desc">Select your preferred background visual fidelity from full cosmic geometric intensity down to ultra-minimal void.</p>
               
-              <div class="bg-theme-cards-grid">
-                <!-- Option 1: Solar Flare Ultra (High Detail) -->
-                <div class="bg-theme-card active" id="bg-card-high" role="button" tabindex="0">
-                  <div class="bg-theme-snapshot high-snap">
-                    <svg width="100%" height="80" viewBox="0 0 200 100" fill="none">
+              <div class="bg-theme-cards-grid four-cards-grid">
+                <!-- Theme 1: Solar Flare Ultra (High Detail) -->
+                <div class="bg-theme-card active" id="bg-card-ultra" data-theme="ultra" role="button" tabindex="0">
+                  <div class="bg-theme-snapshot ultra-snap">
+                    <svg width="100%" height="75" viewBox="0 0 200 100" fill="none">
                       <rect width="200" height="100" fill="#140602"/>
                       <circle cx="100" cy="50" r="35" fill="url(#snapSolarGlow)"/>
                       <line x1="20" y1="10" x2="180" y2="90" stroke="#f59e0b" stroke-width="1.2" opacity="0.6"/>
@@ -3662,18 +3675,44 @@
                         </radialGradient>
                       </defs>
                     </svg>
-                    <span class="bg-snap-badge gold">SOLAR FLARE ULTRA</span>
+                    <span class="bg-snap-badge gold">MAX FX</span>
                   </div>
                   <div class="bg-theme-info">
-                    <div class="bg-theme-title">Solar Flare (High Detail)</div>
-                    <div class="bg-theme-sub">Dynamic rotating Bastion gears, plasma suns &amp; full geometric architecture.</div>
+                    <div class="bg-theme-title">Solar Flare Ultra</div>
+                    <div class="bg-theme-sub">Dynamic rotating Bastion gears, plasma flares &amp; full cosmic geometry.</div>
                   </div>
                 </div>
 
-                <!-- Option 2: Night Sky Serenade (Low Detail) -->
-                <div class="bg-theme-card" id="bg-card-low" role="button" tabindex="0">
-                  <div class="bg-theme-snapshot low-snap">
-                    <svg width="100%" height="80" viewBox="0 0 200 100" fill="none">
+                <!-- Theme 2: Solar Eclipse Balanced (Medium Detail) -->
+                <div class="bg-theme-card" id="bg-card-balanced" data-theme="balanced" role="button" tabindex="0">
+                  <div class="bg-theme-snapshot balanced-snap">
+                    <svg width="100%" height="75" viewBox="0 0 200 100" fill="none">
+                      <rect width="200" height="100" fill="#0c0714"/>
+                      <circle cx="100" cy="50" r="28" fill="url(#snapBalGlow)"/>
+                      <circle cx="100" cy="50" r="18" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4 2"/>
+                      <circle cx="40" cy="30" r="2" fill="#ffd700"/>
+                      <circle cx="160" cy="70" r="2" fill="#38bdf8"/>
+                      <line x1="30" y1="80" x2="170" y2="20" stroke="#f59e0b" stroke-width="0.8" opacity="0.35"/>
+                      <defs>
+                        <radialGradient id="snapBalGlow" cx="50%" cy="50%" r="50%">
+                          <stop offset="0%" stop-color="#fef08a"/>
+                          <stop offset="60%" stop-color="#7c2d12"/>
+                          <stop offset="100%" stop-color="rgba(12,7,20,0)"/>
+                        </radialGradient>
+                      </defs>
+                    </svg>
+                    <span class="bg-snap-badge amber">BALANCED</span>
+                  </div>
+                  <div class="bg-theme-info">
+                    <div class="bg-theme-title">Solar Eclipse (Balanced)</div>
+                    <div class="bg-theme-sub">Subtle core glow, gentle rotating cogs &amp; portal. Softened geometry.</div>
+                  </div>
+                </div>
+
+                <!-- Theme 3: Night Sky Serenade (Low Detail) -->
+                <div class="bg-theme-card" id="bg-card-night" data-theme="night" role="button" tabindex="0">
+                  <div class="bg-theme-snapshot night-snap">
+                    <svg width="100%" height="75" viewBox="0 0 200 100" fill="none">
                       <rect width="200" height="100" fill="#040714"/>
                       <circle cx="30" cy="25" r="2.5" fill="#ffffff"/>
                       <circle cx="70" cy="35" r="2" fill="#93c5fd"/>
@@ -3682,20 +3721,37 @@
                       <circle cx="175" cy="30" r="2.5" fill="#67e8f9"/>
                       <circle cx="90" cy="70" r="2" fill="#ffffff"/>
                       <circle cx="130" cy="80" r="2" fill="#93c5fd"/>
-                      <circle cx="45" cy="75" r="2" fill="#fef08a"/>
                       <line x1="30" y1="25" x2="70" y2="35" stroke="rgba(147,197,253,0.55)" stroke-width="1"/>
                       <line x1="70" y1="35" x2="110" y2="20" stroke="rgba(147,197,253,0.55)" stroke-width="1"/>
                       <line x1="110" y1="20" x2="140" y2="45" stroke="rgba(147,197,253,0.55)" stroke-width="1"/>
                       <line x1="140" y1="45" x2="175" y2="30" stroke="rgba(147,197,253,0.55)" stroke-width="1"/>
-                      <line x1="70" y1="35" x2="90" y2="70" stroke="rgba(147,197,253,0.35)" stroke-width="0.8" stroke-dasharray="2 2"/>
-                      <line x1="90" y1="70" x2="130" y2="80" stroke="rgba(147,197,253,0.35)" stroke-width="0.8"/>
-                      <line x1="45" y1="75" x2="90" y2="70" stroke="rgba(147,197,253,0.35)" stroke-width="0.8"/>
                     </svg>
-                    <span class="bg-snap-badge cyan">NIGHT SKY SERENADE</span>
+                    <span class="bg-snap-badge cyan">NIGHT SKY</span>
                   </div>
                   <div class="bg-theme-info">
-                    <div class="bg-theme-title">Night Sky (Low Detail)</div>
-                    <div class="bg-theme-sub">Deep calming night sky, gentle twinkling stars &amp; subtle constellations. Not overpowering.</div>
+                    <div class="bg-theme-title">Night Sky Serenade</div>
+                    <div class="bg-theme-sub">Deep calming night sky, gentle twinkling stars &amp; subtle constellations.</div>
+                  </div>
+                </div>
+
+                <!-- Theme 4: Deep Cosmos Minimal (Least Graphics) -->
+                <div class="bg-theme-card" id="bg-card-minimal" data-theme="minimal" role="button" tabindex="0">
+                  <div class="bg-theme-snapshot minimal-snap">
+                    <svg width="100%" height="75" viewBox="0 0 200 100" fill="none">
+                      <rect width="200" height="100" fill="#010206"/>
+                      <circle cx="25" cy="30" r="1.5" fill="#ffffff" opacity="0.8"/>
+                      <circle cx="65" cy="65" r="1.8" fill="#e2e8f0" opacity="0.9"/>
+                      <circle cx="115" cy="25" r="2.2" fill="#ffffff" opacity="0.95"/>
+                      <circle cx="155" cy="55" r="1.5" fill="#e2e8f0" opacity="0.75"/>
+                      <circle cx="180" cy="20" r="1.8" fill="#94a3b8" opacity="0.8"/>
+                      <line x1="25" y1="30" x2="65" y2="65" stroke="rgba(255,255,255,0.25)" stroke-width="0.8"/>
+                      <line x1="115" y1="25" x2="155" y2="55" stroke="rgba(255,255,255,0.25)" stroke-width="0.8"/>
+                    </svg>
+                    <span class="bg-snap-badge muted">MINIMAL</span>
+                  </div>
+                  <div class="bg-theme-info">
+                    <div class="bg-theme-title">Deep Cosmos Minimal</div>
+                    <div class="bg-theme-sub">Pitch-black starry void, twinkling stars &amp; pure minimal geometry. Zero clutter.</div>
                   </div>
                 </div>
               </div>

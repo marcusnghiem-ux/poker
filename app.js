@@ -1929,6 +1929,8 @@ class PokerApp {
     try { this.initCustomWagerModal(); } catch (err) { console.error("initCustomWagerModal error:", err); }
     try { this.initCraps(); } catch (err) { console.error("initCraps error:", err); }
     try { this.initBackgroundTheme(); } catch (err) { console.error("initBackgroundTheme error:", err); }
+    try { this.initNewsTicker(); } catch (err) { console.error("initNewsTicker error:", err); }
+    try { this.initLeaderboard(); } catch (err) { console.error("initLeaderboard error:", err); }
     try { this.initUpdateAnnouncementModal(); } catch (err) { console.error("initUpdateAnnouncementModal error:", err); }
     try { this.initSlotGameSelectModal(); } catch (err) { console.error("initSlotGameSelectModal error:", err); }
     try { this.initBlackjackBuyInModal(); } catch (err) { console.error("initBlackjackBuyInModal error:", err); }
@@ -2449,11 +2451,22 @@ class PokerApp {
     }
 
     localStorage.setItem('royal_poker_username', val);
+    localStorage.setItem('royal_poker_name_locked', 'true');
     this.players[0].name = val;
     const heroEl = document.getElementById('hero-name');
     if (heroEl) heroEl.textContent = val;
     const userInp = document.getElementById('player-username-input');
-    if (userInp) userInp.value = val;
+    if (userInp) {
+      userInp.value = val;
+      userInp.readOnly = true;
+      userInp.disabled = true;
+      userInp.classList.add('locked-input');
+    }
+    const saveBtn = document.getElementById('btn-save-username');
+    if (saveBtn) {
+      saveBtn.classList.add('locked-btn');
+      saveBtn.innerHTML = '<svg class="lock-svg" width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#fcd34d" stroke-width="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#fcd34d" stroke-width="2"/></svg><span>Locked</span>';
+    }
 
     this.renderMainMenuSlots();
     if (modal) modal.classList.add('hidden');
@@ -2969,7 +2982,9 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
         'royal_poker_quality',
         'royal_poker_sound_muted',
         'royal_poker_username',
-        'royal_poker_volume'
+        'royal_poker_name_locked',
+        'royal_poker_volume',
+        'solar_poker_leaderboard_data'
       ];
       knownKeys.forEach(k => {
         try { localStorage.removeItem(k); } catch (e) {}
@@ -3061,7 +3076,20 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
       this.updateDualWalletUI();
 
       const usernameInput = document.getElementById('player-username-input');
-      if (usernameInput) usernameInput.value = 'High Roller';
+      if (usernameInput) {
+        usernameInput.value = 'High Roller';
+        usernameInput.readOnly = false;
+        usernameInput.disabled = false;
+        usernameInput.classList.remove('locked-input');
+      }
+      const btnSaveUsername = document.getElementById('btn-save-username');
+      if (btnSaveUsername) {
+        btnSaveUsername.classList.remove('locked-btn');
+        btnSaveUsername.title = 'Save Permanent Callsign';
+        btnSaveUsername.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Save</span>';
+      }
+      const lbModal = document.getElementById('leaderboard-modal');
+      if (lbModal) lbModal.classList.add('hidden');
 
       // 6. Audio and announcement feedback
       sounds.playWin();
@@ -3534,11 +3562,20 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
       volSlider.value = Math.round(sounds.volume * 100);
       if (volVal) volVal.textContent = `${volSlider.value}%`;
     }
-    const currentTheme = localStorage.getItem('solar_poker_bg_theme') || 'high';
+    let currentTheme = localStorage.getItem('solar_poker_bg_theme') || 'ultra';
+    if (currentTheme === 'high') currentTheme = 'ultra';
+    if (currentTheme === 'low') currentTheme = 'night';
+
+    ['ultra', 'balanced', 'night', 'minimal'].forEach(t => {
+      const card = document.getElementById(`bg-card-${t}`);
+      if (card) {
+        card.classList.toggle('active', t === currentTheme);
+      }
+    });
     const bgCardHigh = document.getElementById('bg-card-high');
     const bgCardLow = document.getElementById('bg-card-low');
-    if (bgCardHigh) bgCardHigh.classList.toggle('active', currentTheme !== 'low');
-    if (bgCardLow) bgCardLow.classList.toggle('active', currentTheme === 'low');
+    if (bgCardHigh) bgCardHigh.classList.toggle('active', currentTheme === 'ultra');
+    if (bgCardLow) bgCardLow.classList.toggle('active', currentTheme === 'night');
 
     this.settingsModal.classList.remove('hidden');
   }
@@ -3848,29 +3885,80 @@ Claim your $5,000 (3-Hour) Poker Allowance or transfer Casino funds to start a r
       this.startNewHand();
     });
 
-    // Custom Profile & Username
+    // Custom Profile & Permanent Identity Callsign
     this.usernameInput = document.getElementById('player-username-input');
     this.btnSaveUsername = document.getElementById('btn-save-username');
     if (this.usernameInput) {
-      const savedName = localStorage.getItem('royal_poker_username') || 'You';
+      const savedName = localStorage.getItem('royal_poker_username') || 'High Roller';
       this.usernameInput.value = savedName;
       this.players[0].name = savedName;
-      const saveName = () => {
-        const val = (this.usernameInput.value || '').trim();
-        if (val) {
-          localStorage.setItem('royal_poker_username', val);
-          this.players[0].name = val;
-          const heroEl = document.getElementById('hero-name');
-          if (heroEl) heroEl.textContent = val;
-          this.renderMainMenuSlots();
+
+      const isLocked = localStorage.getItem('royal_poker_name_locked') === 'true';
+
+      const updateLockUI = (locked) => {
+        if (!this.usernameInput) return;
+        if (locked) {
+          this.usernameInput.readOnly = true;
+          this.usernameInput.disabled = true;
+          this.usernameInput.classList.add('locked-input');
           if (this.btnSaveUsername) {
-            this.btnSaveUsername.textContent = 'Saved';
-            setTimeout(() => { if (this.btnSaveUsername) this.btnSaveUsername.textContent = 'Save Name'; }, 1500);
+            this.btnSaveUsername.classList.add('locked-btn');
+            this.btnSaveUsername.title = 'Player identity is permanent and cannot be modified. Factory reset in settings to reset.';
+            this.btnSaveUsername.innerHTML = '<svg class="lock-svg" width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#fcd34d" stroke-width="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#fcd34d" stroke-width="2"/></svg><span>Locked</span>';
+          }
+        } else {
+          this.usernameInput.readOnly = false;
+          this.usernameInput.disabled = false;
+          this.usernameInput.classList.remove('locked-input');
+          if (this.btnSaveUsername) {
+            this.btnSaveUsername.classList.remove('locked-btn');
+            this.btnSaveUsername.title = 'Save Permanent Callsign';
+            this.btnSaveUsername.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Save</span>';
           }
         }
       };
-      if (this.btnSaveUsername) this.btnSaveUsername.addEventListener('click', saveName);
-      this.usernameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') saveName(); });
+
+      updateLockUI(isLocked);
+
+      const handleNameAction = () => {
+        const currentlyLocked = localStorage.getItem('royal_poker_name_locked') === 'true';
+        if (currentlyLocked) {
+          sounds.playError();
+          this.showInGameAlert({
+            title: 'CALLSIGN PERMANENTLY LOCKED',
+            message: `Your callsign "${this.usernameInput.value}" is permanent. Only a complete Factory Reset in Settings can reset your identity and leaderboard standing.`
+          });
+          return;
+        }
+
+        const val = (this.usernameInput.value || '').trim();
+        if (val && val.toLowerCase() !== 'you') {
+          localStorage.setItem('royal_poker_username', val);
+          localStorage.setItem('royal_poker_name_locked', 'true');
+          this.players[0].name = val;
+          const heroEl = document.getElementById('hero-name');
+          if (heroEl) heroEl.textContent = val;
+          updateLockUI(true);
+          this.renderMainMenuSlots();
+          sounds.playWin();
+          this.showInGameAlert({
+            title: 'IDENTITY PERMANENTLY BOUND',
+            message: `Player callsign "${val}" has been permanently registered. Your global leaderboard record will now track this callsign.`
+          });
+        }
+      };
+
+      if (this.btnSaveUsername) {
+        this.btnSaveUsername.addEventListener('click', handleNameAction);
+      }
+      this.usernameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handleNameAction();
+      });
+      this.usernameInput.addEventListener('click', () => {
+        if (localStorage.getItem('royal_poker_name_locked') === 'true') {
+          handleNameAction();
+        }
+      });
     }
 
     // Stage indicator & Hand History drawer
@@ -7489,68 +7577,430 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
   // v1.1: BACKGROUND THEME MODE CONTROLLER (SOLAR FLARE ULTRA & NIGHT SKY SERENADE)
   // ==========================================================================
   initBackgroundTheme() {
-    const bgCardHigh = document.getElementById('bg-card-high');
-    const bgCardLow = document.getElementById('bg-card-low');
-    const savedTheme = localStorage.getItem('solar_poker_bg_theme') || 'high';
+    let savedTheme = localStorage.getItem('solar_poker_bg_theme') || 'ultra';
+    if (savedTheme === 'high') savedTheme = 'ultra';
+    if (savedTheme === 'low') savedTheme = 'night';
+
+    const themes = ['ultra', 'balanced', 'night', 'minimal'];
 
     const applyTheme = (theme, notify = false) => {
-      if (theme === 'low') {
-        document.body.classList.add('low-detail-bg');
-        if (bgCardLow) bgCardLow.classList.add('active');
-        if (bgCardHigh) bgCardHigh.classList.remove('active');
-      } else {
-        document.body.classList.remove('low-detail-bg');
-        if (bgCardHigh) bgCardHigh.classList.add('active');
-        if (bgCardLow) bgCardLow.classList.remove('active');
+      let target = theme;
+      if (target === 'high') target = 'ultra';
+      if (target === 'low') target = 'night';
+      if (!themes.includes(target)) target = 'ultra';
+
+      // Remove all theme classes
+      document.body.classList.remove(
+        'bg-theme-ultra',
+        'bg-theme-balanced',
+        'bg-theme-night',
+        'bg-theme-minimal',
+        'low-detail-bg'
+      );
+
+      // Apply target classes
+      if (target === 'ultra') {
+        document.body.classList.add('bg-theme-ultra');
+      } else if (target === 'balanced') {
+        document.body.classList.add('bg-theme-balanced');
+      } else if (target === 'night') {
+        document.body.classList.add('bg-theme-night', 'low-detail-bg');
+      } else if (target === 'minimal') {
+        document.body.classList.add('bg-theme-minimal', 'low-detail-bg');
       }
-      localStorage.setItem('solar_poker_bg_theme', theme);
+
+      localStorage.setItem('solar_poker_bg_theme', target);
+
+      // Update UI cards
+      themes.forEach(t => {
+        const card = document.getElementById(`bg-card-${t}`);
+        if (card) {
+          card.classList.toggle('active', t === target);
+        }
+      });
+
+      // Backward compatibility for old card IDs if present
+      const oldHigh = document.getElementById('bg-card-high');
+      const oldLow = document.getElementById('bg-card-low');
+      if (oldHigh) oldHigh.classList.toggle('active', target === 'ultra');
+      if (oldLow) oldLow.classList.toggle('active', target === 'night');
 
       if (notify) {
+        const descriptions = {
+          ultra: 'Solar Flare Ultra activated. Full dynamic rotating Bastion gears, plasma flares & geometry restored.',
+          balanced: 'Solar Eclipse Balanced activated. Rotating cogs and gentle plasma retained with heavy borders softened.',
+          night: 'Night Sky Serenade activated. Deep serene navy atmosphere with calm twinkling stars and gentle constellations.',
+          minimal: 'Deep Cosmos Minimal activated. Pitch-black starry void with pure twinkling stars and zero geometric clutter.'
+        };
+        const titles = {
+          ultra: 'SOLAR FLARE ULTRA',
+          balanced: 'SOLAR ECLIPSE BALANCED',
+          night: 'NIGHT SKY SERENADE',
+          minimal: 'DEEP COSMOS MINIMAL'
+        };
+
         this.showInGameAlert({
-          title: theme === 'low' ? 'NIGHT SKY MODE' : 'SOLAR FLARE MODE',
-          message: theme === 'low' 
-            ? 'Switched to Night Sky Serenade. Heavy geometric structures softened for a calm, starry atmosphere.'
-            : 'Switched to Solar Flare Ultra. Dynamic cosmic geometry and plasma cores restored.'
+          title: titles[target] || 'THEME UPDATED',
+          message: descriptions[target] || 'Background atmosphere successfully updated.'
         });
       }
     };
 
     applyTheme(savedTheme, false);
 
-    if (bgCardHigh) {
-      bgCardHigh.addEventListener('click', () => {
-        applyTheme('high', true);
-        sounds.playToggleChime();
-      });
-    }
-    if (bgCardLow) {
-      bgCardLow.addEventListener('click', () => {
-        applyTheme('low', true);
-        sounds.playToggleChime();
-      });
-    }
+    // Bind click events on all 4 cards
+    themes.forEach(t => {
+      const card = document.getElementById(`bg-card-${t}`);
+      if (card) {
+        card.addEventListener('click', () => {
+          applyTheme(t, true);
+          sounds.playToggleChime();
+        });
+      }
+    });
+
+    // Also support legacy card IDs if clicked
+    const legacyHigh = document.getElementById('bg-card-high');
+    const legacyLow = document.getElementById('bg-card-low');
+    if (legacyHigh) legacyHigh.addEventListener('click', () => { applyTheme('ultra', true); sounds.playToggleChime(); });
+    if (legacyLow) legacyLow.addEventListener('click', () => { applyTheme('night', true); sounds.playToggleChime(); });
   }
 
   // ==========================================================================
-  // v1.1: FIRST-TIME OVERPOWERING UPDATE 1.1 ANNOUNCEMENT MODAL
+  // v1.12: COOKIE CLICKER-STYLE CASINO & GLOBAL NEWS WIRE TICKER (100+ HEADLINES)
+  // ==========================================================================
+  initNewsTicker() {
+    const container = document.getElementById('news-ticker-container');
+    const content = document.getElementById('news-ticker-content');
+    const tagEl = document.getElementById('news-ticker-tag');
+    const textEl = document.getElementById('news-ticker-text');
+    if (!container || !content || !tagEl || !textEl) return;
+
+    // Database of 105 distinct headlines (15% Poker, 70% Global & Vietnam, 15% Space Weather)
+    const HEADLINES = [
+      // --- POKER & CASINO WIRE (~15%) ---
+      { category: 'poker', tag: 'POKER WIRE', text: "High-stakes titan Phil Ivey spotted executing deep river check-raises in the Solar VIP lounge." },
+      { category: 'poker', tag: 'POKER WIRE', text: "Record-breaking $2,400,000 bad-beat jackpot triggered on Table 7 with Quad Aces cracked by a Royal Flush." },
+      { category: 'poker', tag: 'POKER WIRE', text: "Macau high-roller championship concludes as mystery player executes a legendary 5-bet air bluff on the river." },
+      { category: 'poker', tag: 'POKER WIRE', text: "World Poker Tour confirms Solar Flare Casino Hub as official host venue for the upcoming galactic tournament." },
+      { category: 'poker', tag: 'POKER WIRE', text: "Card counter politely advised to switch to European Roulette single-zero wheel after historic 14-shoe heater." },
+      { category: 'poker', tag: 'POKER WIRE', text: "Quantum solver algorithms debate optimal river shove frequencies with suited connectors on dry boards." },
+      { category: 'poker', tag: 'POKER WIRE', text: "Casino Transit Lounge reports record traffic as private high-roller multiplayer suites reach full capacity." },
+      { category: 'poker', tag: 'POKER WIRE', text: "Doyle Brunson's iconic 10-2 hand honored with custom 24-karat gold commemorative VIP chip." },
+      { category: 'poker', tag: 'POKER WIRE', text: "Daniel Negreanu inspects Solar Blackjack VIP table; certifies dealer stand on soft-17 as optimal player odds." },
+      { category: 'poker', tag: 'POKER WIRE', text: "Las Vegas casino directors tour Solar Flare Hub to study real-time P2P browser peer coordination." },
+      { category: 'poker', tag: 'POKER WIRE', text: "New career cashout record established: High roller banks $1,850,000 directly into Cumulative Savings Vault." },
+      { category: 'poker', tag: 'POKER WIRE', text: "European Roulette wheel clocks 11 consecutive black landings on Table 3 before spinning Red 7." },
+      { category: 'poker', tag: 'POKER WIRE', text: "Texas Hold'em stage 3 bot 'The Sultan' undergoes behavioral recalibration after aggressive triple-barrel bluffs." },
+      { category: 'poker', tag: 'POKER WIRE', text: "High-stakes private suite hosts marathon 48-hour cash game between international circuit champions." },
+      { category: 'poker', tag: 'POKER WIRE', text: "Casino lounge mixologist crafts signature cocktail 'The Pocket Aces' served with floating gold leaf." },
+      { category: 'poker', tag: 'POKER WIRE', text: "Craps table erupts into cheers as shooter rolls 18 consecutive passes before sevening out." },
+
+      // --- VIETNAM NEWS & BREAKTHROUGHS (~35%) ---
+      { category: 'vietnam', tag: 'VIETNAM', text: "Hanoi Metro Line 3 Nhon-Hanoi Station section welcomes over 100,000 enthusiastic passengers in opening week." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Da Nang High-Tech Park secures $1.5 billion foreign direct investment for advanced semiconductor packaging." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "UNESCO formally inscribes Ha Long Bay-Cat Ba Archipelago as Vietnam's newest inter-provincial World Natural Heritage site." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "VinFast expands smart electric vehicle deliveries across North American and European maritime corridors." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "North-South high-speed railway feasibility project receives resounding National Assembly endorsement." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Vietnam semiconductor workforce initiative aims to train 50,000 specialized chip engineers by 2030." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Ho Chi Minh City unveils futuristic Thu Thiem pedestrian bridge design inspired by glowing mangrove leaves." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Vietnam coffee exports shatter all historic records, surpassing $5.2 billion in annual international trade." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "National Innovation Center in Hoa Lac hosts ASEAN digital transformation and regional AI leadership summit." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Phu Quoc International Airport breaks ground on passenger terminal expansion to support eco-tourism travel." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Can Tho floating market preservation project launches interactive digital 3D waterway cultural map." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Hoi An Ancient Town transitions to 100% solar-powered nocturnal heritage lanterns along the Thu Bon River." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Long Thanh International Airport terminal roof superstructure reaches 80% completion ahead of schedule." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Sapa terraced rice valleys welcome record international photographers during golden harvest season." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Ba Na Hills Golden Bridge continues to receive global accolades among the world's most breathtaking architectural wonders." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Binh Thuan offshore wind project synchronizes first gigawatt of clean marine electricity to national grid." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Hue Imperial Citadel archaeological team uncovers pristine Nguyen Dynasty royal ceramic artifact collection." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Ha Giang Loop eco-transit corridor deploys solar-powered emergency communication beacons along mountain passes." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Cu Chi subterranean historical complex unveils photorealistic virtual reality historical journey." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Quy Nhon establishes international science discovery center and astronomical observatory on central coast." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Mekong Delta floating solar installations achieve 300-megawatt generation while preventing reservoir water loss." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Son Doong cave research expedition surveys subterranean river system extending 10 kilometers beneath limestone karst." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Vietnam circular textile manufacturers export apparel woven entirely from recycled coastal marine plastic." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Nha Trang Oceanography Institute releases 500 rehabilitated green sea turtles into protected marine sanctuaries." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Dalat high-tech strawberry farms deploy AI autonomous pollination drones in climate-controlled glasshouses." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Ban Gioc Waterfall cross-border tourism corridor welcomes international eco-hikers along emerald river trails." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Saigon River electric waterbus service doubles fleet to offer silent, emission-free urban commuting." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Cai Mep-Thi Vai deepwater port terminal welcomes 24,000-TEU mega container vessels connecting directly to America." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Bat Trang ceramic artisans blend ancient 700-year glazes with sustainable electric kilns." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Phong Nha-Ke Bang speleologists chart 5 new pristine caves adorned with glittering calcite crystals." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Vietnam national esports team claims international gold in premier competitive multiplayer arena." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Tam Coc-Bich Dong boatmen celebrate 100% solar recharge stations for river tour safety lighting." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Dong Van Karst Plateau Geopark introduces community eco-lodges celebrating traditional highland architecture." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Hai Van Pass scenic railway route voted among Southeast Asia's most spectacular coastal train journeys." },
+      { category: 'vietnam', tag: 'VIETNAM', text: "Saigon Central Post Office celebrates 135th anniversary with restored historic French neoclassical facade." },
+
+      // --- GLOBAL SCIENCE & WORLD BREAKTHROUGHS (~35%) ---
+      { category: 'global', tag: 'GLOBAL', text: "James Webb Space Telescope detects methane and water vapor signatures in atmosphere of temperate exoplanet." },
+      { category: 'global', tag: 'GLOBAL', text: "International Thermonuclear Experimental Reactor (ITER) sustains high-confinement magnetic plasma milestone." },
+      { category: 'global', tag: 'GLOBAL', text: "Renewable solar and wind generation collectively exceeds 30% of global electrical supply for the first time." },
+      { category: 'global', tag: 'GLOBAL', text: "NASA Artemis mission achieves successful translunar injection firing during deep space simulation." },
+      { category: 'global', tag: 'GLOBAL', text: "Mariana Trench deep-submersible expedition discovers bioluminescent benthic organisms at 8,200 meters depth." },
+      { category: 'global', tag: 'GLOBAL', text: "Fault-tolerant quantum processor demonstrates topological error correction across 1,200 logical qubits." },
+      { category: 'global', tag: 'GLOBAL', text: "Global reforestation satellite monitoring confirms 18 million hectares of indigenous forest recovery." },
+      { category: 'global', tag: 'GLOBAL', text: "European Southern Observatory produces razor-sharp polarized image of supermassive black hole magnetic fields." },
+      { category: 'global', tag: 'GLOBAL', text: "Solid-state lithium battery prototype demonstrates 1,100 km vehicle range with 8-minute ultrafast charge." },
+      { category: 'global', tag: 'GLOBAL', text: "United Nations High Seas Treaty officially enters into force protecting two-thirds of international waters." },
+      { category: 'global', tag: 'GLOBAL', text: "World Health Organization announces widespread eradication of wild polio virus across two additional continents." },
+      { category: 'global', tag: 'GLOBAL', text: "Exascale supercomputer models Earth's coupled climate-ocean circulation with millimetric precision." },
+      { category: 'global', tag: 'GLOBAL', text: "Astronomers locate wandering rogue exoplanet accompanied by two orbiting moons in interstellar void." },
+      { category: 'global', tag: 'GLOBAL', text: "Commercial aviation marks safest global operational year in history alongside green hydrogen flight tests." },
+      { category: 'global', tag: 'GLOBAL', text: "Next-generation stellarator fusion reactor sustains 60-million-degree electron core confinement." },
+      { category: 'global', tag: 'GLOBAL', text: "Low-Earth orbit mega-constellation brings gigabit laser-crosslinked internet to Antarctic researchers." },
+      { category: 'global', tag: 'GLOBAL', text: "Ambient direct-air carbon capture plant mineralizes 500,000 metric tons of atmospheric CO2 into basalt rock." },
+      { category: 'global', tag: 'GLOBAL', text: "Large Hadron Collider detects rare lepton-flavor universality violation providing hints of new physics." },
+      { category: 'global', tag: 'GLOBAL', text: "Graphene membrane desalinization plant slashes energy consumption for potable drinking water by 45%." },
+      { category: 'global', tag: 'GLOBAL', text: "Autonomous zero-emission electric container vessel completes maiden voyage across North Atlantic." },
+      { category: 'global', tag: 'GLOBAL', text: "Bio-engineered drought-tolerant wheat varietals demonstrate 35% higher yields under extreme heat waves." },
+      { category: 'global', tag: 'GLOBAL', text: "International Space Station astronauts harvest fresh cosmic dwarf tomatoes grown in aeroponic chambers." },
+      { category: 'global', tag: 'GLOBAL', text: "Marine biologists complete transplantation of 1 million heat-resilient coral micro-fragments across Pacific reefs." },
+      { category: 'global', tag: 'GLOBAL', text: "Voyager 1 spacecraft transmits coherent interstellar telemetry from 15.3 billion miles beyond Earth." },
+      { category: 'global', tag: 'GLOBAL', text: "Nobel Committee honors physicists for attosecond laser pulses enabling electron motion measurement." },
+      { category: 'global', tag: 'GLOBAL', text: "Global clean energy investments outpace fossil fuel exploration by greater than 2-to-1 margin." },
+      { category: 'global', tag: 'GLOBAL', text: "Super-deep geothermal test well reaches 9,800 meters into hot crystalline basement granite." },
+      { category: 'global', tag: 'GLOBAL', text: "High-speed maglev prototype sets world ground transportation speed record of 635 km/h in evacuated tube." },
+      { category: 'global', tag: 'GLOBAL', text: "Autonomous underwater gliders map 100,000 square kilometers of uncharted abyssal seafloor mountains." },
+      { category: 'global', tag: 'GLOBAL', text: "Space telescope captures direct optical reflection of proto-planetary debris belt orbiting nearby star." },
+      { category: 'global', tag: 'GLOBAL', text: "Neutrino observatory achieves sub-electronvolt sensitivity measuring cosmic neutrino mass hierarchy." },
+      { category: 'global', tag: 'GLOBAL', text: "Biomaterial engineers manufacture 100% biodegradable polymers synthesized entirely from kelp alginate." },
+      { category: 'global', tag: 'GLOBAL', text: "Space-based solar power satellite successfully beams microwave electricity to desert ground rectenna." },
+      { category: 'global', tag: 'GLOBAL', text: "Antarctic deep ice core drill retrieves 1.8-million-year-old ice containing pristine ancient atmospheric gas." },
+      { category: 'global', tag: 'GLOBAL', text: "Gravitational wave laser interferometers detect chirp of binary neutron star merger 400M light-years away." },
+
+      // --- COSMIC SPACE WEATHER & CASINO TEMPO (~15%) ---
+      { category: 'tempo', tag: 'SOLAR TEMPO', text: "Solar flare intensity elevated to Class X9.4: High-roller chip magnetism increased by 0.04%." },
+      { category: 'weather', tag: 'RESORT WEATHER', text: "Casino Transit Lounge micro-climate: Balmy 21.5°C with a 100% probability of escalating river bluffs." },
+      { category: 'tempo', tag: 'SOLAR TEMPO', text: "Solar corona stream velocity reaches 750 km/s; dealer recommends gripping pocket aces firmly." },
+      { category: 'weather', tag: 'RESORT WEATHER', text: "High-stakes VIP suite forecast: Heavy evening showers of $5,000 golden chips expected after midnight." },
+      { category: 'tempo', tag: 'SOLAR TEMPO', text: "Cosmic magnetic micro-fluctuation induces harmonic resonance in European Roulette wheel bearings." },
+      { category: 'weather', tag: 'RESORT WEATHER', text: "Planetary alignment creates optimal celestial fortune for disciplined check-raise strategies." },
+      { category: 'tempo', tag: 'SOLAR TEMPO', text: "Sunspot cluster AR3664 radiates auspicious cosmic photons directly onto Solo Campaign Save Slot 1." },
+      { category: 'weather', tag: 'RESORT WEATHER', text: "Deep space atmosphere: Clear cosmic skies across Orion arm with a gentle interstellar dust breeze." },
+      { category: 'tempo', tag: 'SOLAR TEMPO', text: "Gravitational micro-wave detected near Blackjack shoe; mathematical dealer bust odds remain constant." },
+      { category: 'weather', tag: 'RESORT WEATHER', text: "Casino Resort relative humidity: Ideal 45% for crisp, perfectly audible card-flicking acoustics." },
+      { category: 'tempo', tag: 'SOLAR TEMPO', text: "Geomagnetic KP-index reaches Level 8: Solar auroras illuminate casino glass viewing terraces." },
+      { category: 'weather', tag: 'RESORT WEATHER', text: "Lunar tidal perigee: Pocket Kings report 1.2% heightened aesthetic majesty under arena spotlights." },
+      { category: 'tempo', tag: 'SOLAR TEMPO', text: "Solar wind plasma stream generates gentle harmless static crackle on the Craps green felt." },
+      { category: 'weather', tag: 'RESORT WEATHER', text: "Transit hub weather: Cool evening breeze outdoors; warm golden high-roller hospitality indoors." },
+      { category: 'tempo', tag: 'SOLAR TEMPO', text: "Cosmic radiation deflection shield operating at 100%; cryptographic RNG seed entropy verified pristine." },
+      { category: 'weather', tag: 'RESORT WEATHER', text: "Solar observatory confirms serene cosmic dawn: All 4 background atmosphere presets synchronized." }
+    ];
+
+    // Fisher-Yates non-repeating shuffle queue
+    let shuffledIndices = [];
+    let currentIndex = 0;
+
+    const buildShuffledQueue = () => {
+      shuffledIndices = Array.from({ length: HEADLINES.length }, (_, i) => i);
+      for (let i = shuffledIndices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledIndices[i], shuffledIndices[j]] = [shuffledIndices[j], shuffledIndices[i]];
+      }
+      currentIndex = 0;
+    };
+
+    buildShuffledQueue();
+
+    const displayHeadline = (index, animated = true) => {
+      const item = HEADLINES[shuffledIndices[index]];
+      if (!item) return;
+
+      if (animated) {
+        content.classList.add('fading-out');
+        setTimeout(() => {
+          tagEl.className = `news-headline-tag ${item.category}`;
+          tagEl.textContent = item.tag;
+          textEl.textContent = item.text;
+          content.classList.remove('fading-out');
+          content.classList.add('fading-in');
+          setTimeout(() => content.classList.remove('fading-in'), 220);
+        }, 180);
+      } else {
+        tagEl.className = `news-headline-tag ${item.category}`;
+        tagEl.textContent = item.tag;
+        textEl.textContent = item.text;
+      }
+    };
+
+    let tickerInterval = null;
+
+    const advanceHeadline = (playAudio = false) => {
+      currentIndex++;
+      if (currentIndex >= shuffledIndices.length) {
+        buildShuffledQueue();
+      }
+      displayHeadline(currentIndex, true);
+      if (playAudio) {
+        sounds.playClick();
+      }
+    };
+
+    const resetTickerTimer = () => {
+      if (tickerInterval) clearInterval(tickerInterval);
+      tickerInterval = setInterval(() => advanceHeadline(false), 9000);
+    };
+
+    // Show initial headline immediately
+    displayHeadline(0, false);
+    resetTickerTimer();
+
+    // Click anywhere on ticker to cycle immediately (Cookie Clicker style)
+    container.addEventListener('click', () => {
+      advanceHeadline(true);
+      resetTickerTimer();
+    });
+  }
+
+  // ==========================================================================
+  // v1.12: GLOBAL HIGH-ROLLER LEADERBOARD [IN PROGRESS] CONTROLLER
+  // ==========================================================================
+  initLeaderboard() {
+    const btnNav = document.getElementById('btn-nav-leaderboard');
+    const drawerItem = document.getElementById('drawer-item-leaderboard');
+    const modal = document.getElementById('leaderboard-modal');
+    const closeBtn = document.getElementById('close-leaderboard-btn');
+    const closeFooterBtn = document.getElementById('btn-close-leaderboard');
+
+    const openModal = () => {
+      this.openLeaderboardModal();
+      if (this.transitDrawer) this.closeTransitDrawer();
+    };
+
+    const closeModal = () => {
+      if (modal) modal.classList.add('hidden');
+      sounds.playClick();
+    };
+
+    if (btnNav) btnNav.addEventListener('click', openModal);
+    if (drawerItem) drawerItem.addEventListener('click', openModal);
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (closeFooterBtn) closeFooterBtn.addEventListener('click', closeModal);
+  }
+
+  openLeaderboardModal() {
+    const modal = document.getElementById('leaderboard-modal');
+    if (!modal) return;
+
+    // Calculate Hero Net Worth: Cumulative Savings + Mini-game Wallet + All Save Slots
+    const cumulativeSavings = EconomyManager.getCumulativeSavings() || 0;
+    const miniGameWallet = EconomyManager.getMiniGameWallet() || 0;
+    const allSaves = SaveManager.getAllSaves() || {};
+    let slotsChips = 0;
+    for (let i = 1; i <= 3; i++) {
+      const slot = allSaves[i];
+      if (slot && typeof slot.chips === 'number') {
+        slotsChips += slot.chips;
+      }
+    }
+    const heroTotalWealth = cumulativeSavings + miniGameWallet + slotsChips;
+    const heroName = (localStorage.getItem('royal_poker_username') || 'Hero').trim();
+
+    // Circuit Legends Database
+    const LEGENDS = [
+      { name: "Phil Ivey", region: "Las Vegas, USA", title: "The Tiger Woods of Poker", wealth: 1250000 },
+      { name: "Daniel Negreanu", region: "Toronto, Canada", title: "Kid Poker / Hall of Fame", wealth: 980000 },
+      { name: "Doyle Brunson", region: "Longworth, Texas", title: "The Godfather of Poker", wealth: 850000 },
+      { name: "Gerald 'Solar King'", region: "Monte Carlo, Monaco", title: "Solar Sovereign Grandmaster", wealth: 620000 },
+      { name: "Vanessa Selbst", region: "New York, USA", title: "Triple WSOP Bracelet Titan", wealth: 450000 },
+      { name: "Justin Bonomo", region: "Denver, Colorado", title: "Super High-Roller Crusher", wealth: 380000 },
+      { name: "Erik Seidel", region: "New York, USA", title: "Old School High-Stakes Pro", wealth: 290000 },
+      { name: "Antonio Esfandiari", region: "Tehran, Iran", title: "The Magician / One Drop Champ", wealth: 210000 },
+      { name: "Tom Dwan", region: "Edison, New Jersey", title: "durrrr / High-Stakes Phenom", wealth: 150000 },
+      { name: "Phil Hellmuth", region: "Madison, Wisconsin", title: "The Poker Brat / 17 Bracelets", wealth: 95000 },
+      { name: "Fedor Holz", region: "Saarbrücken, Germany", title: "CrownUpGuy / High-Roller Icon", wealth: 75000 },
+      { name: "Dan Smith", region: "Manalapan, New Jersey", title: "Cowboy Dan / High Roller Pro", wealth: 50000 }
+    ];
+
+    // Combine Hero into the standings
+    const standings = [
+      ...LEGENDS,
+      {
+        name: heroName,
+        region: "Solar Transit Lounge",
+        title: "Solar High Roller Candidate",
+        wealth: heroTotalWealth,
+        isHero: true
+      }
+    ];
+
+    // Sort descending by total wealth
+    standings.sort((a, b) => b.wealth - a.wealth);
+
+    // Find Hero Rank
+    const heroRank = standings.findIndex(p => p.isHero) + 1;
+
+    // Update Hero Summary Card
+    const heroCallsignEl = document.getElementById('lb-hero-callsign');
+    const heroWealthEl = document.getElementById('lb-hero-wealth');
+    const heroRankEl = document.getElementById('lb-hero-rank');
+    const heroTierEl = document.getElementById('lb-hero-tier');
+
+    if (heroCallsignEl) heroCallsignEl.textContent = heroName;
+    if (heroWealthEl) heroWealthEl.textContent = `$${heroTotalWealth.toLocaleString()}`;
+    if (heroRankEl) heroRankEl.textContent = `#${heroRank} of ${standings.length}`;
+
+    let tierDesc = "High Roller Candidate";
+    if (heroTotalWealth >= 1000000) tierDesc = "Apex Sovereign Legend";
+    else if (heroTotalWealth >= 500000) tierDesc = "Solar Royalty VIP";
+    else if (heroTotalWealth >= 200000) tierDesc = "High-Roller Elite";
+    else if (heroTotalWealth >= 50000) tierDesc = "Circuit Contender";
+    else if (heroTotalWealth >= 10000) tierDesc = "Rising Table Specialist";
+
+    if (heroTierEl) heroTierEl.textContent = tierDesc;
+
+    // Render Table Rows
+    const tbody = document.getElementById('leaderboard-table-body');
+    if (tbody) {
+      tbody.innerHTML = standings.map((player, idx) => {
+        const rank = idx + 1;
+        const isHero = player.isHero;
+        const rankClass = rank === 1 ? 'rank-1' : (rank === 2 ? 'rank-2' : (rank === 3 ? 'rank-3' : ''));
+        const rowClass = isHero ? 'hero-leaderboard-row' : '';
+
+        return `
+          <tr class="${rowClass}">
+            <td class="rank-cell ${rankClass}">
+              ${rank === 1 ? '&#9733; #1' : `#${rank}`}
+            </td>
+            <td class="player-cell">
+              <strong>${player.name}</strong>
+              ${isHero ? '<span class="hero-tag-badge">YOU</span>' : ''}
+            </td>
+            <td class="region-cell">${player.region}</td>
+            <td class="title-cell">${player.title}</td>
+            <td class="td-wealth gold">$${player.wealth.toLocaleString()}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    modal.classList.remove('hidden');
+    sounds.playToggleChime();
+  }
+
+  // ==========================================================================
+  // v1.12: FIRST-TIME OVERPOWERING UPDATE 1.12 ANNOUNCEMENT MODAL
   // ==========================================================================
   initUpdateAnnouncementModal() {
     const modal = document.getElementById('update-announcement-modal');
     const closeBtn = document.getElementById('close-update-announcement-btn');
-    const startBtn = document.getElementById('btn-start-playing-v11');
+    const startBtn = document.getElementById('btn-start-playing-v11') || document.getElementById('btn-start-playing-v12');
     const seenVersion = localStorage.getItem('solar_poker_seen_version');
 
     const dismissModal = () => {
       if (modal) modal.classList.add('hidden');
-      localStorage.setItem('solar_poker_seen_version', '1.11');
+      localStorage.setItem('solar_poker_seen_version', '1.12');
       sounds.playClick();
     };
 
     if (closeBtn) closeBtn.addEventListener('click', dismissModal);
     if (startBtn) startBtn.addEventListener('click', dismissModal);
 
-    // Initial first-time presentation for v1.11
-    if (seenVersion !== '1.11' && modal) {
+    // Initial first-time presentation for v1.12
+    if (seenVersion !== '1.12' && modal) {
       setTimeout(() => {
         modal.classList.remove('hidden');
         sounds.playAlert();

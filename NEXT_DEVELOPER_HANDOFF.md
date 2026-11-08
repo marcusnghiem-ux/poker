@@ -702,3 +702,56 @@ Update 1.11 resolves player feedback following the v1.1 release by fixing the Se
 - `test_blackjack_engine.py`: 5/5 unit tests passed.
 - `simulate_performance_25_runs.py`: 25/25 benchmarks passed (0 regressions).
 - `simulate_10_full_games_to_2000.py`: 10/10 runs reached >= $2,000 target ($21,255 total cashout).
+
+
+## 34. Release v1.12: 4 Background Themes, Cookie Clicker News Ticker, Global High-Roller Leaderboard (WIP) & Permanent Identity
+
+### Executive Summary
+Update 1.12 delivers four major user requests: a 4-tier visual atmosphere selector in Settings (Ultra, Balanced, Night Sky, and Minimal), an animated Cookie Clicker-style news wire bar featuring 105+ non-repeating rotating headlines, an experimental Global High-Roller Leaderboard dynamically calculating Hero's standing among poker legends, permanent player callsign identity binding, and a beautifully decluttered main hub.
+
+### Key Architectural & Feature Deliverables
+1. **4 Distinct Background Atmosphere Themes (`bg-card-*`):**
+   - **Solar Flare Ultra (`body.bg-theme-ultra`)**: Max FX mode featuring all dynamic rotating Bastion gears, geometric suns, cosmic plasma, and animated sawtooth arches.
+   - **Solar Eclipse Balanced (`body.bg-theme-balanced`)**: Balanced medium-detail setting that preserves the core glow, celestial portal, and gentle rotating cogs while suppressing aggressive sawtooth borders, jagged bastions, and heavy chevrons for smooth 60fps performance and relaxed visual density.
+   - **Night Sky Serenade (`body.bg-theme-night` / `.low-detail-bg`)**: Low-detail deep navy night sky that hides all solar bastion architecture, leaving a calming starfield with gently glowing constellations (`.constellation-phoenix`, `.constellation-river`).
+   - **Deep Cosmos Minimal (`body.bg-theme-minimal`)**: Ultra-lightweight aesthetic featuring a pitch-black void (`#010206`) with pure twinkling stars and subtle faint constellation lines. Completely disables plasma, cosmic grid, and all SVG bastion geometries for zero clutter and maximum performance.
+   - **Settings Preset Grid (`.four-cards-grid`)**: 4 cards with handcrafted SVG snapshot previews and glowing badges (`MAX FX`, `BALANCED`, `NIGHT SKY`, `MINIMAL`). Automatically updates body classes, saves to `solar_poker_bg_theme`, plays synthesizer chimes, and triggers descriptive in-game confirmation alerts.
+
+2. **Cookie Clicker-Style Casino & Global News Ticker (`#news-ticker-container`):**
+   - Positioned prominently across the top of `#main-menu` with sleek casino dispatch styling and gold borders.
+   - Curated database of **105 distinct headlines** balanced across four categories:
+     - **~15% Poker & Casino Wire**: Tournament highlights, Phil Ivey river bluffs, $2.4M bad beat jackpots, solver debates, and VIP table news.
+     - **~35% Vietnam News & Milestones**: Hanoi Metro Line 3 opening, Da Nang semiconductor investments, UNESCO Ha Long Bay-Cat Ba archipelago, VinFast global EV logistics, North-South high-speed railway, Long Thanh terminal construction, Hoi An solar heritage illumination, Dalat AI agricultural drones, and Son Doong cave exploration.
+     - **~35% Global Science & World News**: James Webb exoplanet discoveries, ITER nuclear fusion milestones, UN High Seas Treaty, quantum computing error correction, global renewable milestones, solid-state battery breakthroughs, and Voyager 1 deep space communications.
+     - **~15% Space Weather & Casino Tempo**: Solar Class X9.4 flare telemetry, casino transit micro-climate reports, magnetic storm roulette wheel harmonics, and VIP golden chip rain forecasts.
+   - **Non-Repeating Shuffle Engine**: Implements a Fisher-Yates shuffle queue that guarantees no headline repeats until all 105 have been broadcast.
+   - **Interactive Skip**: Clicking anywhere on the news bar triggers instant slide-fade transition to the next headline and plays `sounds.playClick()`, replicating the beloved Cookie Clicker mechanic. Automatically cycles every 9 seconds.
+
+3. **Global High-Roller Leaderboard [IN PROGRESS] (`#leaderboard-modal`):**
+   - Labeled with prominent `[IN PROGRESS • v1.12]` badge and real-time satellite relay notice explaining that cross-client cloud persistence is in active development for v1.13.
+   - Dynamically calculates Hero's total career net worth: **Cumulative Savings Vault + Mini-Game Wallet + Chips across all 3 Solo Save Slots**.
+   - Compares Hero against an authentic roster of poker royalty: Phil Ivey ($1,250,000), Daniel Negreanu ($980,000), Doyle Brunson ($850,000), Gerald 'Solar King' ($620,000), Vanessa Selbst ($450,000), Justin Bonomo ($380,000), Erik Seidel ($290,000), Antonio Esfandiari ($210,000), Tom Dwan ($150,000), Phil Hellmuth ($95,000), Fedor Holz ($75,000), and Dan Smith ($50,000).
+   - Injects Hero into the sorted standings, computing Hero's exact rank (`#X of 13`), tier status (Apex Sovereign, Solar Royalty VIP, High-Roller Elite, Circuit Contender, or Candidate), and highlighting Hero's row with gold borders and a `YOU` tag.
+   - Accessible from the top navigation bar (`#btn-nav-leaderboard`) and the Transit Lounge drawer (`#drawer-item-leaderboard`).
+
+4. **Permanent Player Callsign Identity & Factory Reset Purge:**
+   - Callsigns entered during player registration or profile editing are permanently bound to `royal_poker_name_locked = 'true'`.
+   - Once registered, `#player-username-input` becomes read-only and disabled with a lock icon, while `#btn-save-username` transforms into a disabled `Locked` button. Clicking it triggers an in-game alert informing the player that callsigns are immutable.
+   - **Factory Reset Guarantee**: Performing a Complete Factory Reset in Settings explicitly wipes `royal_poker_name_locked`, `royal_poker_username`, and `solar_poker_leaderboard_data`, resetting the player profile to unlocked baseline and unranking Hero on the leaderboard.
+
+5. **Decluttered Main Hub:**
+   - Stripped the redundant `.global-stats-banner` from `#main-menu`, eliminating clutter and focusing the dashboard on the news wire, dual wallets, and solo campaign save slots.
+   - Career statistics remain 1-click accessible via the top-bar Stats button (`#btn-nav-stats`), which opens the dedicated `#stats-modal`.
+
+6. **Overpowering Update 1.12 Release Showcase:**
+   - Updated modal version gate to `solar_poker_seen_version !== '1.12'`.
+   - Top nav pill and hero banner updated to **Update 1.12**.
+   - `#update-log-modal` updated with the full v1.12 release log.
+
+### Verification Matrix
+- `verify_syntax.py`: 100% valid JavaScript AST, tags, and bracket nesting.
+- HTML tag validator: 0 syntax or closing tag errors.
+- Emoji compliance: Strictly 0 system emojis in HTML and CSS (100% pure SVG vector icons).
+- `test_blackjack_engine.py`: 5/5 unit tests passed.
+- `simulate_performance_25_runs.py`: 25/25 benchmarks passed (0 regressions).
+- `simulate_10_full_games_to_2000.py`: 10/10 runs reached >= $2,000 target ($21,733 total cashout).
