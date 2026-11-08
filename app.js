@@ -7197,23 +7197,31 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     const pickSymbol = () => {
       const rand = Math.random();
       if (this.slotVariant === 'classic') {
-        if (rand < 0.12) return '7️⃣';
-        if (rand < 0.30) return '🔔';
-        if (rand < 0.52) return '🍒';
-        if (rand < 0.76) return '♠️';
-        return '💎';
+        if (rand < 0.04) return '7️⃣';
+        if (rand < 0.11) return '🔔';
+        if (rand < 0.20) return '🍒';
+        if (rand < 0.33) return '♠️';
+        if (rand < 0.48) return '💎';
+        if (rand < 0.64) return '♥️';
+        if (rand < 0.82) return '♦️';
+        return '♣️';
       } else if (this.slotVariant === 'jackpot') {
-        if (rand < 0.05) return '7️⃣';
-        if (rand < 0.15) return '💎';
-        if (rand < 0.30) return '👑';
-        if (rand < 0.50) return '🔥';
-        if (rand < 0.70) return '⭐';
-        return '♠️';
+        if (rand < 0.02) return '7️⃣';
+        if (rand < 0.07) return '💎';
+        if (rand < 0.14) return '👑';
+        if (rand < 0.23) return '🔥';
+        if (rand < 0.35) return '⭐';
+        if (rand < 0.50) return '♠️';
+        if (rand < 0.65) return '♥️';
+        if (rand < 0.82) return '♦️';
+        return '♣️';
       } else {
         // Solar Multipliers
-        if (rand < 0.08) return '7️⃣';
-        if (rand < 0.22) return '🔥';
-        if (rand < 0.38) return '⭐';
+        if (rand < 0.03) return '7️⃣';
+        if (rand < 0.09) return '🔥';
+        if (rand < 0.18) return '⭐';
+        if (rand < 0.30) return '👑';
+        if (rand < 0.45) return '💎';
         const suits = ['♠️', '♥️', '♦️', '♣️'];
         return suits[Math.floor(Math.random() * suits.length)];
       }
@@ -7277,9 +7285,9 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       } else if (s1 === s2 || s2 === s3 || s1 === s3) {
         multiplier = 2;
         title = 'MATCHING PAIR! 2x WIN!';
-      } else if (reels.includes('7️⃣')) {
-        multiplier = 1;
-        title = 'LUCKY 7 PUSH! Wager Returned';
+      } else if (reels.filter(s => s === '7️⃣').length >= 2) {
+        multiplier = 2;
+        title = 'PAIR OF LUCKY 7s! 2x WIN!';
       } else {
         multiplier = 0;
         title = 'No Match. Spin again!';
@@ -7303,9 +7311,9 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       } else if (s1 === s2 || s2 === s3 || s1 === s3) {
         multiplier = 2;
         title = 'MATCHING PAIR! 2x WIN!';
-      } else if (reels.includes('7️⃣') || reels.includes('⭐')) {
-        multiplier = 1;
-        title = 'LUCKY PUSH! Wager Returned';
+      } else if (reels.filter(s => s === '⭐').length >= 2) {
+        multiplier = 2;
+        title = 'PAIR OF STARS! 2x WIN!';
       } else {
         multiplier = 0;
         title = 'No Match. Spin again!';
@@ -8287,6 +8295,7 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     this.authEmailInput = document.getElementById('auth-email-input');
     this.authFeedback = document.getElementById('auth-feedback-msg');
     this.btnAuthSendCode = document.getElementById('btn-auth-send-code');
+    this.btnSwitchToCode = document.getElementById('btn-switch-to-code');
 
     this.authOtpStepView = document.getElementById('auth-otp-step-view');
     this.authOtpTargetEmail = document.getElementById('auth-otp-target-email');
@@ -8321,6 +8330,15 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     if (this.authEmailInput) {
       this.authEmailInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') this.handleSendOtpCode();
+      });
+    }
+
+    if (this.btnSwitchToCode) {
+      this.btnSwitchToCode.addEventListener('click', () => {
+        const val = (this.authEmailInput?.value || '').trim().toLowerCase();
+        if (val) this.pendingAuthEmail = val;
+        this.switchToOtpCodeView(this.pendingAuthEmail || 'your email');
+        sounds.playClick();
       });
     }
 
@@ -8367,8 +8385,102 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       });
     }
 
+    // Global Access: Auto-verify on email link click (Zero Localhost Required)
+    this.initGlobalAuthLinkListener();
+
     // Check existing authentication session on launch
     this.checkUserAuthStatus(false);
+  }
+
+  switchToOtpCodeView(targetEmail) {
+    if (this.authEmailStepView) this.authEmailStepView.classList.add('hidden');
+    if (this.authOtpStepView) this.authOtpStepView.classList.remove('hidden');
+    if (this.authOtpTargetEmail) this.authOtpTargetEmail.textContent = targetEmail || 'your email';
+    if (this.authOtpCodeInput) {
+      this.authOtpCodeInput.value = '';
+      this.authOtpCodeInput.focus();
+    }
+  }
+
+  startAntiSpamCountdown(seconds = 60) {
+    if (this.antiSpamInterval) clearInterval(this.antiSpamInterval);
+    let remaining = seconds;
+    localStorage.setItem('solar_poker_last_otp_sent_time', (Date.now() - (60 - remaining) * 1000).toString());
+
+    const updateBtn = () => {
+      if (this.btnAuthSendCode) {
+        if (remaining > 0) {
+          this.btnAuthSendCode.disabled = true;
+          this.btnAuthSendCode.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2"/></svg><span>WAIT (${remaining}s) TO RESEND</span>`;
+        } else {
+          this.btnAuthSendCode.disabled = false;
+          this.btnAuthSendCode.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>EMAIL ME 6-DIGIT VERIFICATION CODE</span>`;
+          clearInterval(this.antiSpamInterval);
+          this.antiSpamInterval = null;
+        }
+      }
+    };
+
+    updateBtn();
+    this.antiSpamInterval = setInterval(() => {
+      remaining--;
+      if (remaining <= 0) {
+        updateBtn();
+      } else {
+        updateBtn();
+      }
+    }, 1000);
+  }
+
+  initGlobalAuthLinkListener() {
+    if (!supabaseClient) return;
+
+    // Listen to Supabase auth state change across all devices
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+      if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && session?.user) {
+        const user = session.user;
+        localStorage.setItem('solar_poker_user_session', JSON.stringify({
+          email: user.email,
+          id: user.id,
+          isVerified: true
+        }));
+        localStorage.setItem('solar_poker_cloud_user_id', user.id);
+        this.renderAuthBoxState(user.email, true);
+        this.updateAuthPillUI(user.email, true);
+        await this.syncLeaderboardToCloud();
+        this.updateLeaderboardUI();
+      }
+    });
+
+    // Check if URL contains email confirmation tokens from clicked email link
+    try {
+      const hash = window.location.hash || '';
+      if (hash && (hash.includes('access_token=') || hash.includes('type=signup') || hash.includes('type=magiclink'))) {
+        console.log('[Supabase] Email link clicked! Extracting authentication session...');
+        supabaseClient.auth.getSession().then(async ({ data: { session } }) => {
+          if (session && session.user) {
+            const user = session.user;
+            localStorage.setItem('solar_poker_user_session', JSON.stringify({
+              email: user.email,
+              id: user.id,
+              isVerified: true
+            }));
+            localStorage.setItem('solar_poker_cloud_user_id', user.id);
+            this.renderAuthBoxState(user.email, true);
+            this.updateAuthPillUI(user.email, true);
+            await this.syncLeaderboardToCloud();
+            this.updateLeaderboardUI();
+            sounds.playWin();
+            this.showInGameAlert({
+              title: 'ACCOUNT GLOBALLY VERIFIED',
+              message: `Your email (${user.email}) was verified via confirmation link! Your bankroll is safely anchored and your rank is active on the Global Leaderboard.`,
+              type: 'success'
+            });
+            window.history.replaceState(null, null, window.location.pathname + window.location.search);
+          }
+        });
+      }
+    } catch (e) {}
   }
 
   showAuthFeedback(msg, type = 'info') {
@@ -8404,6 +8516,14 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
       this.authModal.classList.remove('hidden');
       sounds.playToggleChime();
     }
+
+    // Check anti-spam remaining cooldown on open
+    const lastSent = parseInt(localStorage.getItem('solar_poker_last_otp_sent_time') || '0', 10);
+    const elapsed = Date.now() - lastSent;
+    if (lastSent > 0 && elapsed < 60000) {
+      this.startAntiSpamCountdown(Math.ceil((60000 - elapsed) / 1000));
+    }
+
     this.checkUserAuthStatus(false);
   }
 
@@ -8492,8 +8612,20 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
   }
 
   async handleSendOtpCode() {
+    if (this.isOtpSending) return; // Debounce in-flight requests
+
     if (!supabaseClient) {
       this.showAuthFeedback('Supabase cloud service is loading. Please check your internet connection.', 'error');
+      return;
+    }
+
+    // Check client-side anti-spam cooldown (60 seconds)
+    const now = Date.now();
+    const lastSent = parseInt(localStorage.getItem('solar_poker_last_otp_sent_time') || '0', 10);
+    if (now - lastSent < 60000) {
+      const waitSec = Math.ceil((60000 - (now - lastSent)) / 1000);
+      sounds.playError();
+      this.showAuthFeedback(`Anti-spam protection active. Please wait ${waitSec}s before sending another email.`, 'error');
       return;
     }
 
@@ -8507,15 +8639,17 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     }
 
     try {
-      this.showAuthFeedback('Sending 6-digit verification code to your email...', 'info');
+      this.isOtpSending = true;
+      this.showAuthFeedback('Contacting Supabase to send verification code...', 'info');
       sounds.playClick();
-
       this.pendingAuthEmail = email;
 
+      // Pass emailRedirectTo to guarantee production Vercel URL and prevent ANY localhost redirects
       const { data, error } = await supabaseClient.auth.signInWithOtp({
         email,
         options: {
           shouldCreateUser: true,
+          emailRedirectTo: 'https://solarflare-hub-iota.vercel.app/',
           data: {
             player_callsign: callsign,
             registered_at: new Date().toISOString()
@@ -8523,28 +8657,45 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
         }
       });
 
+      this.isOtpSending = false;
+
       if (error) {
         sounds.playError();
-        const msg = error.message && error.message.toLowerCase().includes('rate limit')
-          ? 'Email rate limit reached. Please wait 60 seconds before requesting another code.'
+        const isRateLimit = error.message && error.message.toLowerCase().includes('rate limit');
+        const msg = isRateLimit
+          ? 'Supabase free email limit reached (max 3/hour). If you already received a verification code or link, click below to enter your code!'
           : `Could not send code: ${error.message}`;
+
         this.showAuthFeedback(msg, 'error');
+
+        // Provide immediate button to switch to 6-digit code screen anyway
+        const fb = this.authFeedback;
+        if (fb) {
+          const btnWrap = document.createElement('div');
+          btnWrap.style.marginTop = '8px';
+          btnWrap.innerHTML = '<button id="btn-enter-code-fallback" class="btn btn-secondary btn-sm" type="button" style="width:100%">Already have a code? Enter 6-Digit Code &rarr;</button>';
+          fb.appendChild(btnWrap);
+          const fallbackBtn = document.getElementById('btn-enter-code-fallback');
+          if (fallbackBtn) {
+            fallbackBtn.onclick = () => {
+              this.switchToOtpCodeView(email);
+            };
+          }
+        }
         return;
       }
+
+      // Start 60-second anti-spam lock
+      this.startAntiSpamCountdown(60);
 
       sounds.playWin();
       this.clearAuthFeedback();
 
       // Switch to 6-digit OTP code entry view
-      if (this.authEmailStepView) this.authEmailStepView.classList.add('hidden');
-      if (this.authOtpStepView) this.authOtpStepView.classList.remove('hidden');
-      if (this.authOtpTargetEmail) this.authOtpTargetEmail.textContent = email;
-      if (this.authOtpCodeInput) {
-        this.authOtpCodeInput.value = '';
-        this.authOtpCodeInput.focus();
-      }
-      this.showOtpFeedback(`A 6-digit code was sent to ${email}! Check your inbox or spam folder.`, 'success');
+      this.switchToOtpCodeView(email);
+      this.showOtpFeedback(`A verification code was emailed to ${email}! Enter the 6 digits below.`, 'success');
     } catch (err) {
+      this.isOtpSending = false;
       sounds.playError();
       this.showAuthFeedback(`An unexpected error occurred: ${err.message}`, 'error');
     }
@@ -8557,11 +8708,12 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
     }
 
     const email = (this.pendingAuthEmail || this.authEmailInput?.value || '').trim().toLowerCase();
-    const code = (this.authOtpCodeInput?.value || '').replace(/\s+/g, '').trim();
+    const rawCode = (this.authOtpCodeInput?.value || '');
+    const code = rawCode.replace(/\s+/g, '').replace(/-/g, '').trim();
 
-    if (!code || code.length !== 6) {
+    if (!code || code.length !== 6 || !/^\d{6}$/.test(code)) {
       sounds.playError();
-      this.showOtpFeedback('Please enter the complete 6-digit verification code.', 'error');
+      this.showOtpFeedback('Please enter the exact 6-digit numeric verification code.', 'error');
       return;
     }
 
@@ -8626,6 +8778,17 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
 
   async handleResendOtpCode() {
     if (!supabaseClient) return;
+
+    // Check anti-spam cooldown
+    const now = Date.now();
+    const lastSent = parseInt(localStorage.getItem('solar_poker_last_otp_sent_time') || '0', 10);
+    if (now - lastSent < 60000) {
+      const waitSec = Math.ceil((60000 - (now - lastSent)) / 1000);
+      sounds.playError();
+      this.showOtpFeedback(`Anti-spam cooldown: Please wait ${waitSec}s before requesting a new code.`, 'error');
+      return;
+    }
+
     const email = (this.pendingAuthEmail || this.authEmailInput?.value || '').trim().toLowerCase();
     if (!email) {
       this.showOtpFeedback('Email address missing. Please click Change Email to enter your address.', 'error');
@@ -8638,15 +8801,22 @@ HIGH-ACTION PROPOSITIONS (Every Roll):
 
       const { error } = await supabaseClient.auth.signInWithOtp({
         email,
-        options: { shouldCreateUser: true }
+        options: {
+          shouldCreateUser: true,
+          emailRedirectTo: 'https://solarflare-hub-iota.vercel.app/'
+        }
       });
 
       if (error) {
         sounds.playError();
-        this.showOtpFeedback(`Resend error: ${error.message}`, 'error');
+        const msg = error.message && error.message.toLowerCase().includes('rate limit')
+          ? 'Supabase email rate limit reached (max 3/hour). Please wait before requesting another code.'
+          : `Resend error: ${error.message}`;
+        this.showOtpFeedback(msg, 'error');
         return;
       }
 
+      this.startAntiSpamCountdown(60);
       sounds.playWin();
       this.showOtpFeedback(`A fresh 6-digit verification code has been emailed to ${email}!`, 'success');
     } catch (err) {

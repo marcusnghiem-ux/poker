@@ -11103,3 +11103,23 @@ body.bg-theme-minimal .layer0-starfield-svg .c-star {
     flex: 1 1 100%;
   }
 }
+
+/* Update 1.55 Email Modal Navigation Button */
+.btn-switch-to-code {
+  width: 100%;
+  margin-top: 6px;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  color: #cbd5e1;
+  font-size: 0.78rem;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-switch-to-code:hover {
+  background: rgba(51, 65, 85, 0.9);
+  border-color: rgba(251, 191, 36, 0.4);
+  color: #ffd700;
+}
